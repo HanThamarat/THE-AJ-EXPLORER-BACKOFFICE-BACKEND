@@ -1,0 +1,21 @@
+FROM node:lts-slim
+ARG SECRET_JWT
+ENV SECRET_JWT=${SECRET_JWT}
+ARG API_DOC_URL
+ENV API_DOC_URL=${API_DOC_URL}
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+ARG LAZADA_APP_KEY
+ENV LAZADA_APP_KEY=${LAZADA_APP_KEY}
+ARG LAZADA_APP_SECRET
+ENV LAZADA_APP_SECRET=${LAZADA_APP_SECRET}
+RUN apt-get update -y
+RUN apt-get install -y openssl
+WORKDIR /app
+COPY package.json .
+RUN npm install --force
+COPY . .
+EXPOSE 3000
+RUN rm -rf node_modules/
+RUN npm update --force
+CMD ["npm", "run", "start:migrate:prod"]

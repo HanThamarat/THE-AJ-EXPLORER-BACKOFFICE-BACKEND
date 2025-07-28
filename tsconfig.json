@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",         // Enable ES Modules (ESM)
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",           // Set latest JavaScript target
+    "esModuleInterop": true,      // Allow interop with CommonJS modules
+    "resolveJsonModule": true,    // Allow importing JSON files
+    "strict": true,               // Enable strict mode
+    "outDir": "dist",             // Output folder
+    "rootDir": "src"             // Source folder
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
