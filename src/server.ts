@@ -1,13 +1,27 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { setResponse, setErrResponse } from './hooks/response';
+import morgan from 'morgan';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
 const port : any = process.env.PORT;
 
-app.use('/', (req: Request, res: Response) => {
+
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Authorization', 'Origin', 'X-Requested-With', 'X-API-KEY'],
+    credentials: true,
+};
+
+app.use(express.json());
+app.use(morgan('dev'));
+app.use(cors(corsOptions));
+
+app.get('/', (req: Request, res: Response) => {
     try {
         return setResponse({
             res: res,
