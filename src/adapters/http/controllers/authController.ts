@@ -18,7 +18,6 @@ export class AuthController {
           if (user) {
             const authToken = await Ecrypt.generateToken(user);
             const response: authEntity = {
-              authToken: authToken,
               userInfo: {
                 id: user?.id,
                 firstName: user?.firstName ? user?.firstName : "no data",
@@ -30,6 +29,7 @@ export class AuthController {
                 created_at: user?.created_at,
                 updated_at: user?.updated_at,
               },
+              authToken: authToken,
             };
             return setResponse({
               res: res,

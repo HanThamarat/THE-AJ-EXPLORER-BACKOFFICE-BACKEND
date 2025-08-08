@@ -20,6 +20,8 @@ model user {
   email       String?   @unique @db.VarChar(100)
   username    String?   @db.VarChar(100)
   password    String?   @db.VarChar(100)
+  picture     String?   @db.VarChar(255)
+  picturePath String?   @db.VarChar(155)
   roleId      Int
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
