@@ -55,7 +55,7 @@ passport.use(new JWTStrategy({
         secretOrKey: SecretJWT
     }, (jwtPayload: any, cb: any) => {
         try {
-            return cb(null, jwtPayload.user);
+            return cb(null, jwtPayload);
         } catch (err) {
             return cb(err);
         }
