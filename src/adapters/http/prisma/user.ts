@@ -1,6 +1,7 @@
-import { userEntity } from "../../../core/entity/user";
+import { userDTO, userEntity } from "../../../core/entity/user";
 import { UserRepositoryPort } from "../../../core/ports/userRepositiryPort";
 import { prisma } from "../../database/data-source";
+import { Ecrypt } from "../../helpers/encrypt";
 
 export class UserPrismaORM implements UserRepositoryPort {
     async create (user: userEntity, passwordHashed: string): Promise<userEntity> {
@@ -67,6 +68,89 @@ export class UserPrismaORM implements UserRepositoryPort {
             roleId: result.roleId,
             created_at: result.created_at,
             updated_at: result.updated_at
+        }
+
+        return user;
+    }
+
+    async update(id: string, userDto: userDTO): Promise<userEntity | null> {
+        const reCheckUser = await prisma.user.findFirst({
+            where: {
+                id: Number(id),
+            },
+        });
+
+        if (!reCheckUser) return null;
+
+        if (userDto?.password !== "" || userDto?.password !== null) {
+            if (userDto.currentPassword === null) return null; 
+            const compareOldPassword = await Ecrypt.passwordDecrypt(userDto?.currentPassword as string, reCheckUser.password as string); 
+            if (compareOldPassword === true) {
+                const hashNewPassword = await Ecrypt.passwordEncrypt(userDto.password as string);
+                await prisma.user.update({
+                    where: {
+                        id: Number(id)
+                    },
+                    data: {
+                        password: hashNewPassword
+                    }
+                });
+            }
+        }
+
+        const updateUser = await prisma.user.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                firstName: userDto?.firstName,
+                lastName: userDto?.lastName,
+                username: userDto?.username,
+                email: userDto?.email,
+                roleId: Number(userDto?.roleId),
+            }
+        });
+
+        const user: userEntity = {
+            id: updateUser?.id,
+            firstName: updateUser.firstName ? updateUser.firstName : 'no data',
+            lastName: updateUser.lastName ? updateUser.lastName : 'no data',
+            email: updateUser.email ? updateUser.email : 'no data',
+            username: updateUser.username ? updateUser.username : 'no data',
+            password: updateUser.password ? updateUser.password : 'no data',
+            roleId: updateUser.roleId,
+            created_at: updateUser.created_at,
+            updated_at: updateUser.updated_at
+        }
+
+        return user;
+    }
+
+    async delete(id: string): Promise<userEntity | null> {
+        const reCheckUser = await prisma.user.findFirst({
+            where: {
+                id: Number(id),
+            },
+        });
+
+        if (!reCheckUser) return null;
+
+        const deletedUser = await prisma.user.delete({
+            where: {
+                id: Number(id)
+            }
+        });
+
+        const user: userEntity = {
+            id: deletedUser?.id,
+            firstName: deletedUser.firstName ? deletedUser.firstName : 'no data',
+            lastName: deletedUser.lastName ? deletedUser.lastName : 'no data',
+            email: deletedUser.email ? deletedUser.email : 'no data',
+            username: deletedUser.username ? deletedUser.username : 'no data',
+            password: deletedUser.password ? deletedUser.password : 'no data',
+            roleId: deletedUser.roleId,
+            created_at: deletedUser.created_at,
+            updated_at: deletedUser.updated_at
         }
 
         return user;

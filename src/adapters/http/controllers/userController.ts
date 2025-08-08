@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../../../core/services/userService";
-import { userEntity } from "../../../core/entity/user";
+import { userEntity, userDTO } from "../../../core/entity/user";
 import { Ecrypt } from "../../helpers/encrypt";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 
@@ -80,4 +80,63 @@ export class UserController {
             });
         }
     } 
+
+    async updateUser(req: Request, res: Response) {
+        try {
+            const { firstName, lastName, email, username, password, roleId, currentPassword } = req.body;
+            const { id } = req.params;
+            
+            const userDraf : userDTO =  {
+                firstName: firstName,
+                lastName: lastName,
+                password: password,
+                email: email,
+                username: username,
+                roleId: roleId,
+                currentPassword: currentPassword,
+            };
+
+            const userResponse = await this.userService.update(id, userDraf);
+
+            if (userResponse === null) throw "user not found";
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Updating user data successfully.",
+                body: userResponse,
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Updating user data failed.",
+                error: error,
+            });
+        }
+    }
+
+    async deleteUser(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+
+            const userDelete = await this.userService.delete(id);
+
+            if (userDelete === null) throw "user not found";
+
+            return setResponse({
+                res: res,
+                message: "Deleting user successfully.",
+                statusCode: 200,
+                body: userDelete,
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Deleting user failed.",
+                error: error,
+            });
+        }
+    }
 }

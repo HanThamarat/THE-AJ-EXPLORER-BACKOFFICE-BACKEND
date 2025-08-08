@@ -1,5 +1,5 @@
 import { UserRepositoryPort } from "../ports/userRepositiryPort";
-import { userEntity } from "../entity/user";
+import { userEntity, userDTO } from "../entity/user";
 
 export class UserService {
     constructor(private readonly userRepository: UserRepositoryPort) {}
@@ -14,5 +14,13 @@ export class UserService {
 
     async findUserById(id: string): Promise<userEntity | null> {
         return this.userRepository.findByID(id);
+    }
+
+    async update(id: string, userDTO: userDTO): Promise<userEntity | null> {
+        return this.userRepository.update(id, userDTO);
+    }
+
+    async delete(id: string): Promise<userEntity | null> {
+        return this.userRepository.delete(id);
     }
 }
