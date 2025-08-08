@@ -103,4 +103,50 @@ router.get('/users', userController.findAllUser.bind(userController));
 */
 router.get('/user/:id', userController.findUserById.bind(userController));
 
+/**
+* @swagger
+* /api/usermanagement/user/{id}:
+*   put:
+*     tags: [User]
+*     summary: Update a user by ID
+*     description: Update user in the system.
+*     parameters:
+*       - in: path
+*         name: id
+*         required: true
+*         description: The ID of the updated user.
+*         schema:
+*           type: string
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/UserUpdate'
+*     responses:
+*       200:
+*         description: update user by user id successfully
+*/
+router.put('/user/:id', userController.updateUser.bind(userController));
+
+/**
+ * @swagger
+ * /api/usermanagement/user/{id}:
+ *   delete:
+ *     tags: [User]
+ *     summary: Delete a user by ID
+ *     description: Delete a user from the system based on their unique ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the user to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: deleting User by id successfully
+ */
+router.delete('/user/:id', userController.deleteUser.bind(userController));
+
 export default router;
