@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
+model administrator {
   id          Int       @id @default(autoincrement())
   firstName   String?   @db.VarChar(100)
   lastName    String?   @db.VarChar(100)
@@ -22,11 +22,12 @@ model user {
   password    String?   @db.VarChar(100)
   picture     String?   @db.VarChar(255)
   picturePath String?   @db.VarChar(155)
+  status      Boolean?  @default(true)
   roleId      Int
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
 
-  role        role      @relation("ToRole", fields: [roleId], references: [id])
+  role        role      @relation("ToRole", fields: [roleId], references: [id], onDelete: Cascade)
 }
 
 model role {
@@ -36,5 +37,168 @@ model role {
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
 
-  users             user[]    @relation("ToRole")
+  users             administrator[]    @relation("ToRole")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+}
+ 
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
+}
+ 
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([userId, credentialID])
+}
+
+model province {
+  id           Int         @id @default(autoincrement())
+  code         Int         @unique
+  nameTh       String
+  nameEn       String
+  districts    district[]
+
+  package      packages[]     @relation("ToPackageProvince")
+}
+
+model district {
+  id             Int          @id @default(autoincrement())
+  code           Int          @unique
+  nameTh         String
+  nameEn         String
+  province       province     @relation(fields: [provinceId], references: [id])
+  provinceId     Int
+  subdistricts   subdistrict[]
+
+  package        packages[]   @relation("ToPackageDistrict")
+}
+
+model subdistrict {
+  id             Int          @id @default(autoincrement())
+  code           Int          @unique
+  nameTh         String
+  nameEn         String
+  district       district     @relation(fields: [districtId], references: [id])
+  districtId     Int
+  postalCode     String
+
+  package       packages[]    @relation("ToPackageSubdistrict")
+}
+
+model packages {
+  id                Int           @id @default(autoincrement())
+  packageName       String?       @db.VarChar(100)
+  packageTypeId     Int           
+  description       String?       @db.VarChar(9000)
+  provinceId        Int?          
+  districtId        Int?
+  subDistrictId     Int?
+  lon               String?       @db.VarChar(100)
+  lat               String?       @db.VarChar(100)
+  packageImages     String?       @db.Text
+  status            Boolean?      @default(true)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  pacakgeType       pakageType    @relation("ToPacakgeType", fields: [packageTypeId], references: [id])
+  province          province?     @relation("ToPackageProvince", fields: [provinceId], references: [id])
+  district          district?     @relation("ToPackageDistrict", fields: [districtId], references: [id])
+  subdistrict       subdistrict?  @relation("ToPackageSubdistrict", fields: [subDistrictId], references: [id])
+
+  packageOption     packageOption[] @relation("ToPackage")
+}
+
+model packageOption {
+  id               Int            @id @default(autoincrement())
+  packageId        Int
+  pkgOptionId      Int
+  name             String?        @db.VarChar(100)
+  description      String?        @db.VarChar(6000)
+  adultPrice       Float?          
+  childPrice       Float?    
+  groupPrice       Float?      
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  package               packages           @relation("ToPackage", fields: [packageId], references: [id], onDelete: Cascade)
+  packageOptionType     pakageOptionType   @relation("ToPackageOptionType", fields: [pkgOptionId], references: [id], onDelete: Cascade)
+}
+
+model pakageType {
+  id               Int            @id @default(autoincrement())
+  name             String?        @db.VarChar(100)
+  status           Boolean?       @default(true)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  package          packages[]     @relation("ToPacakgeType")
+}
+
+model pakageOptionType {
+  id               Int            @id @default(autoincrement())
+  name             String?        @db.VarChar(100)
+  status           Boolean?       @default(true)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  packageOption   packageOption[] @relation("ToPackageOptionType")
 }

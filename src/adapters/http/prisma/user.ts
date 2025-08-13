@@ -5,7 +5,7 @@ import { Ecrypt } from "../../helpers/encrypt";
 
 export class UserPrismaORM implements UserRepositoryPort {
     async create (user: userEntity, passwordHashed: string): Promise<userEntity> {
-        const result = await prisma.user.create({
+        const result = await prisma.administrator.create({
             data: {
                 firstName: user.firstName,
                 lastName: user.lastName,
@@ -32,7 +32,7 @@ export class UserPrismaORM implements UserRepositoryPort {
     }
 
     async findAll(): Promise<userEntity[]> {
-        const result = await prisma.user.findMany({});
+        const result = await prisma.administrator.findMany({});
 
         const mapData: userEntity[] = result.map((data) => ({
             id: data.id,
@@ -50,7 +50,7 @@ export class UserPrismaORM implements UserRepositoryPort {
     }
 
     async findByID(id: string): Promise<userEntity | null> {
-        const result = await prisma.user.findFirst({
+        const result = await prisma.administrator.findFirst({
             where: {
                 id: Number(id)
             }
@@ -74,7 +74,7 @@ export class UserPrismaORM implements UserRepositoryPort {
     }
 
     async update(id: string, userDto: userDTO): Promise<userEntity | null> {
-        const reCheckUser = await prisma.user.findFirst({
+        const reCheckUser = await prisma.administrator.findFirst({
             where: {
                 id: Number(id),
             },
@@ -87,7 +87,7 @@ export class UserPrismaORM implements UserRepositoryPort {
             const compareOldPassword = await Ecrypt.passwordDecrypt(userDto?.currentPassword as string, reCheckUser.password as string); 
             if (compareOldPassword === true) {
                 const hashNewPassword = await Ecrypt.passwordEncrypt(userDto.password as string);
-                await prisma.user.update({
+                await prisma.administrator.update({
                     where: {
                         id: Number(id)
                     },
@@ -98,7 +98,7 @@ export class UserPrismaORM implements UserRepositoryPort {
             }
         }
 
-        const updateUser = await prisma.user.update({
+        const updateUser = await prisma.administrator.update({
             where: {
                 id: Number(id)
             },
@@ -127,7 +127,7 @@ export class UserPrismaORM implements UserRepositoryPort {
     }
 
     async delete(id: string): Promise<userEntity | null> {
-        const reCheckUser = await prisma.user.findFirst({
+        const reCheckUser = await prisma.administrator.findFirst({
             where: {
                 id: Number(id),
             },
@@ -135,7 +135,7 @@ export class UserPrismaORM implements UserRepositoryPort {
 
         if (!reCheckUser) return null;
 
-        const deletedUser = await prisma.user.delete({
+        const deletedUser = await prisma.administrator.delete({
             where: {
                 id: Number(id)
             }

@@ -9,7 +9,7 @@ export default async function UserInitial() {
 
         const passportHashing = await Ecrypt.passwordEncrypt('123456');
          
-        const result = await prisma.user.create({
+        const result = await prisma.administrator.create({
             data: {
                 firstName: 'Administrator',
                 lastName: 'AJ',
