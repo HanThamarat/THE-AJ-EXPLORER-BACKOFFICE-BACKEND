@@ -10,8 +10,9 @@ import  './adapters/http/middleware/passport';
 import { rateLimit } from 'express-rate-limit';
 
 // import routes  here
-import authRoutes from './adapters/http/routes/auth.routes';
-import userRoutes from './adapters/http/routes/user.routes';
+import authRoutes       from './adapters/http/routes/auth.routes';
+import userRoutes       from './adapters/http/routes/user.routes';
+import packageRoutes    from './adapters/http/routes/package.routes';
 
 
 dotenv.config();
@@ -41,11 +42,12 @@ app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);
 
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 app.use('/docs', sawgerserver, swaggerui);
 app.use('/api/auth', authRoutes);
 app.use('/api/usermanagement', passport.authenticate('jwt', { session: false }), userRoutes);
+app.use('/api/packagemanagement', passport.authenticate('jwt', { session: false }), packageRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
