@@ -2,6 +2,7 @@ import { PackageService } from "../../../core/services/packageService";
 import { Request, Response } from "express";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import { packageDTO, packageOptionDTO } from "../../../core/entity/package";
+import { Ecrypt } from "../../helpers/encrypt";
 
 export class PackageController {
     constructor(private packageService: PackageService) {}
@@ -18,7 +19,9 @@ export class PackageController {
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)
             }));
-
+            const userInfo = await Ecrypt.JWTDecrypt(req);
+            const userId = userInfo?.id;
+            
             const packageData: packageDTO = {
                 packageName: packageName,
                 packageTypeId: Number(packageTypeId),
@@ -30,7 +33,9 @@ export class PackageController {
                 lat: lat,
                 status: status,
                 packageImage: packageImage,
-                packageOption: packageOptionArr
+                packageOption: packageOptionArr,
+                created_by: userId,
+                updated_by: userId
             };
 
             const newPackage = await this.packageService.createPackage(packageData);
@@ -106,6 +111,8 @@ export class PackageController {
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)
             }));
+            const userInfo = await Ecrypt.JWTDecrypt(req);
+            const userId = userInfo?.id;
 
             const packageData: packageDTO = {
                 packageName: packageName,
@@ -118,7 +125,8 @@ export class PackageController {
                 lat: lat,
                 status: status,
                 packageImage: packageImage,
-                packageOption: packageOptionArr
+                packageOption: packageOptionArr,
+                updated_by: userId
             };
 
             const updatePackage = await this.packageService.updatePackage(id, packageData);
