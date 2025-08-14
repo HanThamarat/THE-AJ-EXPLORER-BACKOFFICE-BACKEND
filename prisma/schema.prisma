@@ -158,8 +158,9 @@ model packages {
   status            Boolean?      @default(true)
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
+  deleted_at        DateTime?
 
-  pacakgeType       pakageType    @relation("ToPacakgeType", fields: [packageTypeId], references: [id])
+  pacakgeType       packageType   @relation("ToPacakgeType", fields: [packageTypeId], references: [id])
   province          province?     @relation("ToPackageProvince", fields: [provinceId], references: [id])
   district          district?     @relation("ToPackageDistrict", fields: [districtId], references: [id])
   subdistrict       subdistrict?  @relation("ToPackageSubdistrict", fields: [subDistrictId], references: [id])
@@ -180,10 +181,10 @@ model packageOption {
   updated_at       DateTime       @updatedAt
 
   package               packages           @relation("ToPackage", fields: [packageId], references: [id], onDelete: Cascade)
-  packageOptionType     pakageOptionType   @relation("ToPackageOptionType", fields: [pkgOptionId], references: [id], onDelete: Cascade)
+  packageOptionType     packageOptionType   @relation("ToPackageOptionType", fields: [pkgOptionId], references: [id], onDelete: Cascade)
 }
 
-model pakageType {
+model packageType {
   id               Int            @id @default(autoincrement())
   name             String?        @db.VarChar(100)
   status           Boolean?       @default(true)
@@ -193,7 +194,7 @@ model pakageType {
   package          packages[]     @relation("ToPacakgeType")
 }
 
-model pakageOptionType {
+model packageOptionType {
   id               Int            @id @default(autoincrement())
   name             String?        @db.VarChar(100)
   status           Boolean?       @default(true)
