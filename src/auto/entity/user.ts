@@ -3,7 +3,7 @@ import { Ecrypt } from "../../adapters/helpers/encrypt";
 
 export default async function UserInitial() {
     try {
-        const recheckUser = await prisma.user.count({});
+        const recheckUser = await prisma.administrator.count({});
 
         if (recheckUser !== 0) return console.log('🚀User Initialize successfully');
 

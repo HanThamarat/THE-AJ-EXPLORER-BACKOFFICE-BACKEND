@@ -17,6 +17,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 lon: packageDto.lon,
                 packageImages: packageDto.packageImage,
                 status: packageDto.status,
+                created_by: Number(packageDto.created_by),
+                updated_by: Number(packageDto.updated_by)
             }
         });
 
@@ -88,6 +90,18 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         childPrice: true,
                         groupPrice: true,
                     }
+                },
+                createBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                updateBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
                 }
             }
         });
@@ -116,6 +130,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
             updated_at: result?.updated_at ? result.updated_at : 'no data',
+            created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
+            updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
 
         return resultFormat;
@@ -177,6 +193,18 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         childPrice: true,
                         groupPrice: true,
                     }
+                },
+                createBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                updateBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
                 }
             }
         });
@@ -205,6 +233,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
             updated_at: result?.updated_at ? result.updated_at : 'no data',
+            created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
+            updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         }))
 
         return resultFormat;
@@ -272,6 +302,18 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         childPrice: true,
                         groupPrice: true,
                     }
+                },
+                createBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                updateBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
                 }
             }
         });
@@ -300,6 +342,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
             updated_at: result?.updated_at ? result.updated_at : 'no data',
+            created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
+            updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
 
         return resultFormat;
@@ -330,6 +374,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 lon: packageDto.lon,
                 packageImages: packageDto.packageImage,
                 status: packageDto.status,
+                updated_by: Number(packageDto.updated_by)
             }
         });
 
@@ -407,6 +452,18 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         childPrice: true,
                         groupPrice: true,
                     }
+                },
+                createBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                updateBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
                 }
             }
         });
@@ -435,6 +492,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
             updated_at: result?.updated_at ? result.updated_at : 'no data',
+            created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
+            updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
 
         return resultFormat;
@@ -513,6 +572,18 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         childPrice: true,
                         groupPrice: true,
                     }
+                },
+                createBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                updateBy: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    }
                 }
             }
         });
@@ -541,6 +612,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
             updated_at: result?.updated_at ? result.updated_at : 'no data',
+            created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
+            updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
 
         return resultFormat;

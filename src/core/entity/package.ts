@@ -11,6 +11,8 @@ export interface packageDTO {
     status:             boolean;
     packageImage:       string;
     packageOption:      packageOptionDTO[];
+    created_by?:         number;
+    updated_by?:         number;
 }
 
 export interface packageOptionDTO {
@@ -37,6 +39,8 @@ export interface packageEntity {
     packageImage:       string;
     packageOption:      packageOptionEntity[] | null;
     status:             boolean | string;
+    created_by:         string;
+    updated_by:         string;
     created_at:         Date | string;
     updated_at:         Date | string;
 }

@@ -28,6 +28,11 @@ model administrator {
   updated_at  DateTime  @updatedAt
 
   role        role      @relation("ToRole", fields: [roleId], references: [id], onDelete: Cascade)
+
+  blogInsert      blog[]      @relation("BlogUserInsert")
+  blogUpdate      blog[]      @relation("BlogUserUpdate")
+  packageInsert   packages[]  @relation("packageInsert")
+  packageupdate   packages[]  @relation("packageUpdate")
 }
 
 model role {
@@ -156,10 +161,14 @@ model packages {
   lat               String?       @db.VarChar(100)
   packageImages     String?       @db.Text
   status            Boolean?      @default(true)
+  created_by        Int
+  updated_by        Int
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
   deleted_at        DateTime?
 
+  createBy          administrator @relation("packageInsert", fields: [created_by], references: [id], onDelete: Cascade)
+  updateBy          administrator @relation("packageUpdate", fields: [updated_by], references: [id], onDelete: Cascade)
   pacakgeType       packageType   @relation("ToPacakgeType", fields: [packageTypeId], references: [id])
   province          province?     @relation("ToPackageProvince", fields: [provinceId], references: [id])
   district          district?     @relation("ToPackageDistrict", fields: [districtId], references: [id])
@@ -202,4 +211,19 @@ model packageOptionType {
   updated_at       DateTime       @updatedAt
 
   packageOption   packageOption[] @relation("ToPackageOptionType")
+}
+
+model blog {
+  id               Int            @id @default(autoincrement())
+  title            String         @db.VarChar(100)
+  descrition       String?        @db.Text
+  status           Boolean?       @default(true)
+  created_by       Int
+  updated_by       Int
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  deleted_at       DateTime?
+
+  insertBy         administrator  @relation("BlogUserInsert", fields: [created_by], references: [id], onDelete: Cascade)
+  updateBy         administrator  @relation("BlogUserUpdate", fields: [updated_by], references: [id], onDelete: Cascade)
 }
