@@ -8,6 +8,7 @@ import AutoinitializeData from './auto/initialize';
 import passport from 'passport';
 import  './adapters/http/middleware/passport';
 import { rateLimit } from 'express-rate-limit';
+import bodyParser from 'body-parser';
 
 // import routes  here
 import authRoutes       from './adapters/http/routes/auth.routes';
@@ -36,8 +37,8 @@ const limiter = rateLimit({
 	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
 })
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: 200 * 1024 * 1024 })); // 200 MB
+app.use(bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true }));
 app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);

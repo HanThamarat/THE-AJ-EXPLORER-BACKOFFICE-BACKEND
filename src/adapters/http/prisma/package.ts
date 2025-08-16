@@ -1,6 +1,11 @@
-import { packageDTO, packageEntity, packageOptionEntity } from "../../../core/entity/package";
+import { packageDTO, packageEntity, packageImageSave } from "../../../core/entity/package";
 import { PackageRepositoryPort } from "../../../core/ports/packageRepositoryPort";
 import { prisma } from "../../database/data-source";
+import { AxiosInstance } from "../../../hooks/axiosInstance";
+import { Request } from "express";
+import { FILE_SCHEMA } from "../../../const/schema/file";
+import { CacheHelper } from "../../helpers/redisCache";
+import { PACKAGE_SCHEMA } from "../../../const/schema/package";
 
 export class PackagePrismaORM implements PackageRepositoryPort {
     
@@ -106,6 +111,13 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             }
         });
 
+        let parseImageArr: packageImageSave[] = []; 
+        if (result?.packageImages) {
+            parseImageArr = JSON.parse(result.packageImages);                    
+        }
+
+        await CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGES_DATA_KEY);
+
         const resultFormat: packageEntity = {
             id: result?.id ? result.id : 0,
             packageName: result?.packageName ? result.packageName : 'no data',
@@ -116,7 +128,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
             lon: result?.lon ? result.lon : 'no data',
             lat: result?.lat ? result.lat : 'no dara',
-            packageImage: result?.packageImages ? result.packageImages : 'no data',
+            packageImage: parseImageArr,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
                 packageId: data.packageId,
@@ -138,6 +150,14 @@ export class PackagePrismaORM implements PackageRepositoryPort {
     }
 
     async findPackage(): Promise<packageEntity[]> {
+        
+        const packagesCache = await CacheHelper.getCache(PACKAGE_SCHEMA.PACKAGES_DATA_KEY);
+
+        if (packagesCache !== null) {
+            const prasePkgCache = JSON.parse(packagesCache);
+            return prasePkgCache as packageEntity[];
+        }        
+
         const data = await prisma.packages.findMany({
             orderBy: {
                 id: 'desc'
@@ -209,38 +229,55 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             }
         });
 
-        const resultFormat: packageEntity[] = data.map((result) => ({
-            id: result?.id ? result.id : 0,
-            packageName: result?.packageName ? result.packageName : 'no data',
-            packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
-            description: result?.description ? result.description : 'no data',
-            province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
-            district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
-            subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
-            lon: result?.lon ? result.lon : 'no data',
-            lat: result?.lat ? result.lat : 'no dara',
-            packageImage: result?.packageImages ? result.packageImages : 'no data',
-            packageOption: result?.packageOption ? result.packageOption.map((data) => ({
-                id: data.id,
-                packageId: data.packageId,
-                pkgOptionType: data.packageOptionType?.name ?? "",
-                name: data.name ?? "",
-                description: data.description ?? "",
-                adultPrice: Number(data.adultPrice ?? 0),
-                childPrice: Number(data.childPrice ?? 0),
-                groupPrice: Number(data.groupPrice ?? 0),
-            })) : null,
-            status: result?.status ? result.status : 'no data',
-            created_at: result?.created_at ? result.created_at : 'no data',
-            updated_at: result?.updated_at ? result.updated_at : 'no data',
-            created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
-            updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
-        }))
+        const resultFormat: packageEntity[] = data.map((result) => {
+            let parseImageArr: packageImageSave[] = []; 
+            if (result?.packageImages) {
+                parseImageArr = JSON.parse(result.packageImages);                    
+            }
+            return {
+                id: result?.id ? result.id : 0,
+                packageName: result?.packageName ? result.packageName : 'no data',
+                packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
+                description: result?.description ? result.description : 'no data',
+                province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
+                district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
+                subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
+                lon: result?.lon ? result.lon : 'no data',
+                lat: result?.lat ? result.lat : 'no dara',
+                packageImage: parseImageArr,
+                packageOption: result?.packageOption ? result.packageOption.map((data) => ({
+                    id: data.id,
+                    packageId: data.packageId,
+                    pkgOptionType: data.packageOptionType?.name ?? "",
+                    name: data.name ?? "",
+                    description: data.description ?? "",
+                    adultPrice: Number(data.adultPrice ?? 0),
+                    childPrice: Number(data.childPrice ?? 0),
+                    groupPrice: Number(data.groupPrice ?? 0),
+                })) : null,
+                status: result?.status ? result.status : 'no data',
+                created_at: result?.created_at ? result.created_at : 'no data',
+                updated_at: result?.updated_at ? result.updated_at : 'no data',
+                created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
+                updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
+            }
+        });
+
+        const converResult = JSON.stringify(resultFormat);        
+        await CacheHelper.setCache(PACKAGE_SCHEMA.PACKAGES_DATA_KEY, converResult);
 
         return resultFormat;
     }
 
-    async findPackageById(id: string): Promise<packageEntity> {
+    async findPackageById(id: string, req: Request): Promise<packageEntity> {
+        const packageIdCache = await CacheHelper.getCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
+
+        if (packageIdCache !== null) {
+            const parsePackage = JSON.parse(packageIdCache);
+            return parsePackage as packageEntity;
+        }
+
+        const axios = await AxiosInstance(req);
         const recheckPackage = await prisma.packages.count({
             where: {
                 id: Number(id),
@@ -318,6 +355,32 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             }
         });
 
+        // recheck null data and convert string to arr.
+        let parseImageArr: packageImageSave[] = []; 
+        if (result?.packageImages) {
+            parseImageArr = JSON.parse(result.packageImages);                    
+        }
+
+        // take a parseImageArr for push to new arr for prepare to use in api.
+        let imgArr: Array<string> = [];
+        for (const Image of parseImageArr) {
+            imgArr.push(Image.file_name);
+        }
+
+        const imageBase64 = await axios?.post('/findfiles', {
+            file_name: imgArr,
+            file_path: FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH
+        });
+
+        // merge origin image arr and push base64 to arr
+        const mergedImage: packageImageSave[] = parseImageArr.map(original => {
+            const match = imageBase64?.data?.body?.find((imgs: any) => imgs.file_name === original.file_name);
+
+            return match
+                ? { ...original, file_base64: match.file_base64 }
+                : original;
+        }); 
+
         const resultFormat: packageEntity = {
             id: result?.id ? result.id : 0,
             packageName: result?.packageName ? result.packageName : 'no data',
@@ -328,7 +391,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
             lon: result?.lon ? result.lon : 'no data',
             lat: result?.lat ? result.lat : 'no dara',
-            packageImage: result?.packageImages ? result.packageImages : 'no data',
+            packageImage: mergedImage,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
                 packageId: data.packageId,
@@ -345,6 +408,9 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
             updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
+
+        const convertResult = JSON.stringify(resultFormat);
+        await CacheHelper.setCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id, convertResult);
 
         return resultFormat;
     }
@@ -468,6 +534,11 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             }
         });
 
+        let parseImageArr: packageImageSave[] = []; 
+        if (result?.packageImages) {
+            parseImageArr = JSON.parse(result.packageImages);                    
+        }
+
         const resultFormat: packageEntity = {
             id: result?.id ? result.id : 0,
             packageName: result?.packageName ? result.packageName : 'no data',
@@ -478,7 +549,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
             lon: result?.lon ? result.lon : 'no data',
             lat: result?.lat ? result.lat : 'no dara',
-            packageImage: result?.packageImages ? result.packageImages : 'no data',
+            packageImage: parseImageArr,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
                 packageId: data.packageId,
@@ -587,6 +658,11 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 }
             }
         });
+        
+        let parseImageArr: packageImageSave[] = []; 
+        if (result?.packageImages) {
+            parseImageArr = JSON.parse(result.packageImages);                    
+        }
 
         const resultFormat: packageEntity = {
             id: result?.id ? result.id : 0,
@@ -598,7 +674,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
             lon: result?.lon ? result.lon : 'no data',
             lat: result?.lat ? result.lat : 'no dara',
-            packageImage: result?.packageImages ? result.packageImages : 'no data',
+            packageImage: parseImageArr,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
                 packageId: data.packageId,

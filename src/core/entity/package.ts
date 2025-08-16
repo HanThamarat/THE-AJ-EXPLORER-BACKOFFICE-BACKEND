@@ -11,8 +11,8 @@ export interface packageDTO {
     status:             boolean;
     packageImage:       string;
     packageOption:      packageOptionDTO[];
-    created_by?:         number;
-    updated_by?:         number;
+    created_by?:        number;
+    updated_by?:        number;
 }
 
 export interface packageOptionDTO {
@@ -25,6 +25,19 @@ export interface packageOptionDTO {
     groupPrice?:        number;
 }
 
+export interface packageImageDTO {
+    base64:             string;
+    fileName:           string;
+    mainFile:          boolean;               
+}
+
+export interface packageImageSave {
+    file_name:          string;
+    file_original_name: string;
+    file_path:          string;
+    mainFile:           boolean;
+    base64?:            string | null;
+}
 
 export interface packageEntity {
     id:                 number;
@@ -36,7 +49,7 @@ export interface packageEntity {
     subDistrict:        string;
     lon:                string;
     lat:                string;
-    packageImage:       string;
+    packageImage:       packageImageSave[] | [];
     packageOption:      packageOptionEntity[] | null;
     status:             boolean | string;
     created_by:         string;
