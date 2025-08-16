@@ -1,5 +1,6 @@
 import { PackageRepositoryPort } from "../ports/packageRepositoryPort";
 import { packageDTO, packageEntity } from "../entity/package";
+import { Request } from "express";
 
 export class PackageService {
     constructor(private readonly packageRepository: PackageRepositoryPort) {}
@@ -12,8 +13,8 @@ export class PackageService {
         return this.packageRepository.findPackage();
     }
 
-    async findPackageById(id: string): Promise<packageEntity> {
-        return this.packageRepository.findPackageById(id);
+    async findPackageById(id: string, req: Request): Promise<packageEntity> {
+        return this.packageRepository.findPackageById(id, req);
     }
 
     async updatePackage(id: string, packageDto: packageDTO): Promise<packageEntity> {

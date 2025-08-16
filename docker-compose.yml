@@ -20,6 +20,37 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    
+  redisServer:
+    restart: always
+    platform: linux/x86_64
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - .docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - .docker/redis/data:/data
+    networks:
+      - server
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s 
+      timeout: 5s  
+      retries: 5    
+      start_period: 5s 
+
+  redis_insight:
+    platform: linux/x86_64
+    image: redislabs/redisinsight:1.14.0
+    restart: always
+    ports:
+      - 8001:8001
+    volumes:
+      - .docker/redisinsight:/db
+    networks:
+      - server
+    depends_on:
+      - redisServer
 
   server:
     restart: always
@@ -49,6 +80,8 @@ services:
       - server
     depends_on:
       postgreSql:
+        condition: service_healthy
+      redisServer:
         condition: service_healthy
 
 networks:

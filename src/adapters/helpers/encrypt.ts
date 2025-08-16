@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import { Request } from 'express';
 import { authUserEntity } from '../../core/entity/auth';

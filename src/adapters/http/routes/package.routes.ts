@@ -50,6 +50,23 @@ const packageController = new PackageController(packageService);
  *       required:
  *         - pkgOptionTypeId
  *         - name
+ * 
+ *     PackageImageDTO:
+ *       type: object
+ *       properties:
+ *         base64:
+ *           type: string
+ *           example: base64
+ *         fileName:
+ *           type: string
+ *           example: fileName
+ *         mainFile:
+ *           type: boolean
+ *           example: true
+ *       required:
+ *         - base64
+ *         - fileName
+ *         - mainFile
  *
  *     CreatePackageDTO:
  *       type: object
@@ -82,9 +99,9 @@ const packageController = new PackageController(packageService);
  *           type: boolean
  *           example: true
  *         packageImage:
- *           type: string
- *           format: uri
- *           example: "https://example.com/images/package.jpg"
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/PackageImageDTO'
  *         packageOption:
  *           type: array
  *           items:
