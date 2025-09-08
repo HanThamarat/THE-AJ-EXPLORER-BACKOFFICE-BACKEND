@@ -16,6 +16,10 @@ export class UserService {
         return this.userRepository.findByID(id);
     }
 
+    async findByJWT(id: string): Promise<userEntity  | null> {
+        return this.userRepository.findByJWT(id);
+    }
+
     async update(id: string, userDTO: userDTO): Promise<userEntity | null> {
         return this.userRepository.update(id, userDTO);
     }

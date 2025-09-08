@@ -81,6 +81,29 @@ export class UserController {
         }
     } 
 
+    async findUserByJWT(req: Request, res: Response) {
+        try {
+            const userInfo = await Ecrypt.JWTDecrypt(req);
+            const userId = userInfo?.id === null ? 0 : userInfo?.id;
+
+            const response = await this.userService.findByJWT(`${userId}`);
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Finding current user successfully.",
+                body: response
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Finding current user failed",
+                error: error,
+            });
+        }
+    }
+
     async updateUser(req: Request, res: Response) {
         try {
             const { firstName, lastName, email, username, password, roleId, currentPassword } = req.body;
