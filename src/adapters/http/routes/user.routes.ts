@@ -105,6 +105,18 @@ router.get('/user/:id', userController.findUserById.bind(userController));
 
 /**
 * @swagger
+* /api/usermanagement/currentuser:
+*   get:
+*     tags: [User]
+*     summary: Get user info by user jwt
+*     responses:
+*       200:
+*         description: Fetch a list of user info usinng jwt from the system.
+*/
+router.get('/currentuser', userController.findUserByJWT.bind(userController));
+
+/**
+* @swagger
 * /api/usermanagement/user/{id}:
 *   put:
 *     tags: [User]

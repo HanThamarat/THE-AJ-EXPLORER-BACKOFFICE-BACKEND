@@ -24,7 +24,6 @@ export class AuthController {
                 lastName: user?.lastName ? user?.lastName : "no data",
                 email: user?.email ? user?.email : "no data",
                 username: user?.username ? user?.username : "no data",
-                password: user?.password ? user?.password : "no data",
                 roleId: user?.roleId,
                 created_at: user?.created_at,
                 updated_at: user?.updated_at,

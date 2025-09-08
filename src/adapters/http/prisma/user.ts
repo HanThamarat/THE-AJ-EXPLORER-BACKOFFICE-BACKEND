@@ -34,7 +34,7 @@ export class UserPrismaORM implements UserRepositoryPort {
     async findAll(): Promise<userEntity[]> {
         const result = await prisma.administrator.findMany({});
 
-        const mapData: userEntity[] = result.map((data) => ({
+        const mapData: userEntity[] = result.map((data: any) => ({
             id: data.id,
             firstName: data.firstName ? data.firstName : 'no data',
             lastName: data.lastName ? data.lastName : 'no data',
@@ -53,6 +53,9 @@ export class UserPrismaORM implements UserRepositoryPort {
         const result = await prisma.administrator.findFirst({
             where: {
                 id: Number(id)
+            },
+            include: {
+                role: true
             }
         });
         
@@ -66,6 +69,39 @@ export class UserPrismaORM implements UserRepositoryPort {
             username: result.username ? result.username : 'no data',
             password: result.password ? result.password : 'no data',
             roleId: result.roleId,
+            role: {
+                id: result.role.id,
+                name: result.role.name,
+            },
+            created_at: result.created_at,
+            updated_at: result.updated_at
+        }
+
+        return user;
+    }
+
+    async findByJWT(id: string): Promise<userEntity | null> {
+        const result = await prisma.administrator.findFirst({
+            where: {
+                id: Number(id)
+            },
+            include: {
+                role: true
+            }
+        });
+        
+        if (!result) return null;
+
+        const user: userEntity = {
+            id: result?.id,
+            firstName: result.firstName ? result.firstName : 'no data',
+            lastName: result.lastName ? result.lastName : 'no data',
+            email: result.email ? result.email : 'no data',
+            username: result.username ? result.username : 'no data',
+            role: {
+                id: result.role.id,
+                name: result.role.name,
+            },
             created_at: result.created_at,
             updated_at: result.updated_at
         }

@@ -11,7 +11,7 @@ export interface authUserEntity {
     lastName: string;
     email: string;
     username: string;
-    password: string;
+    password?: string;
     picture: string | null;
     picturePath: string | null;
     status: boolean;
