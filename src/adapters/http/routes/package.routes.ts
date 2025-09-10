@@ -120,7 +120,7 @@ const packageController = new PackageController(packageService);
 
 /**
 * @swagger
-* /api/packagemanagement/package:
+* /api/v1/packagemanagement/package:
 *   post:
 *     tags: [Package]
 *     summary: Create a new package
@@ -139,7 +139,7 @@ router.post('/package', packageController.createPackage.bind(packageController))
 
 /**
 * @swagger
-* /api/packagemanagement/package:
+* /api/v1/packagemanagement/package:
 *   get:
 *     tags: [Package]
 *     summary: Get all package
@@ -151,7 +151,7 @@ router.get('/package', packageController.findPackages.bind(packageController));
 
 /**
 * @swagger
-* /api/packagemanagement/package/{id}:
+* /api/v1/packagemanagement/package/{id}:
 *   get:
 *     tags: [Package]
 *     summary: Get package info by package id
@@ -171,7 +171,7 @@ router.get('/package/:id', packageController.findPackageByid.bind(packageControl
 
 /**
 * @swagger
-* /api/packagemanagement/package/{id}:
+* /api/v1/packagemanagement/package/{id}:
 *   put:
 *     tags: [Package]
 *     summary: Update a package by ID
@@ -197,7 +197,7 @@ router.put('/package/:id', packageController.updatePackage.bind(packageControlle
 
 /**
  * @swagger
- * /api/packagemanagement/package/{id}:
+ * /api/v1/packagemanagement/package/{id}:
  *   delete:
  *     tags: [Package]
  *     summary: Delete a package by ID

@@ -54,7 +54,7 @@ const userController = new UserController(userService);
 
 /**
 * @swagger
-* /api/usermanagement/create_user:
+* /api/v1/usermanagement/create_user:
 *   post:
 *     tags: [User]
 *     summary: Create a new user
@@ -73,7 +73,7 @@ router.post('/create_user', userController.createUser.bind(userController));
 
 /**
 * @swagger
-* /api/usermanagement/users:
+* /api/v1/usermanagement/users:
 *   get:
 *     tags: [User]
 *     summary: Get all users
@@ -85,7 +85,7 @@ router.get('/users', userController.findAllUser.bind(userController));
 
 /**
 * @swagger
-* /api/usermanagement/user/{id}:
+* /api/v1/usermanagement/user/{id}:
 *   get:
 *     tags: [User]
 *     summary: Get user info by user id
@@ -105,7 +105,7 @@ router.get('/user/:id', userController.findUserById.bind(userController));
 
 /**
 * @swagger
-* /api/usermanagement/currentuser:
+* /api/v1/usermanagement/currentuser:
 *   get:
 *     tags: [User]
 *     summary: Get user info by user jwt
@@ -117,7 +117,7 @@ router.get('/currentuser', userController.findUserByJWT.bind(userController));
 
 /**
 * @swagger
-* /api/usermanagement/user/{id}:
+* /api/v1/usermanagement/user/{id}:
 *   put:
 *     tags: [User]
 *     summary: Update a user by ID
@@ -143,7 +143,7 @@ router.put('/user/:id', userController.updateUser.bind(userController));
 
 /**
  * @swagger
- * /api/usermanagement/user/{id}:
+ * /api/v1/usermanagement/user/{id}:
  *   delete:
  *     tags: [User]
  *     summary: Delete a user by ID

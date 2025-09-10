@@ -14,6 +14,7 @@ import bodyParser from 'body-parser';
 import authRoutes       from './adapters/http/routes/auth.routes';
 import userRoutes       from './adapters/http/routes/user.routes';
 import packageRoutes    from './adapters/http/routes/package.routes';
+import promoRoutes      from './adapters/http/routes/promo.routes';
 
 
 dotenv.config();
@@ -46,9 +47,10 @@ app.use(limiter);
 app.set("trust proxy", 1);
 
 app.use('/docs', sawgerserver, swaggerui);
-app.use('/api/auth', authRoutes);
-app.use('/api/usermanagement', passport.authenticate('jwt', { session: false }), userRoutes);
-app.use('/api/packagemanagement', passport.authenticate('jwt', { session: false }), packageRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/usermanagement', passport.authenticate('jwt', { session: false }), userRoutes);
+app.use('/api/v1/packagemanagement', passport.authenticate('jwt', { session: false }), packageRoutes);
+app.use('/api/v1/packagepromotion', passport.authenticate('jwt', { session: false }), promoRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
