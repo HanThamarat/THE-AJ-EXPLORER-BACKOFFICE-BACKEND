@@ -29,10 +29,12 @@ model administrator {
 
   role        role      @relation("ToRole", fields: [roleId], references: [id], onDelete: Cascade)
 
-  blogInsert      blog[]      @relation("BlogUserInsert")
-  blogUpdate      blog[]      @relation("BlogUserUpdate")
-  packageInsert   packages[]  @relation("packageInsert")
-  packageupdate   packages[]  @relation("packageUpdate")
+  blogInsert      blog[]           @relation("BlogUserInsert")
+  blogUpdate      blog[]          @relation("BlogUserUpdate")
+  packageInsert   packages[]      @relation("packageInsert")
+  packageupdate   packages[]      @relation("packageUpdate")
+  PromoUserCreate packagePromo[]  @relation("PromoUserCreate")
+  PromoUserUpdate packagePromo[]  @relation("PromoUserUpdate")
 }
 
 model role {
@@ -174,7 +176,8 @@ model packages {
   district          district?     @relation("ToPackageDistrict", fields: [districtId], references: [id])
   subdistrict       subdistrict?  @relation("ToPackageSubdistrict", fields: [subDistrictId], references: [id])
 
-  packageOption     packageOption[] @relation("ToPackage")
+  packagePromoLink  promoLink[]      @relation("packagePromoLink")
+  packageOption     packageOption[]  @relation("ToPackage")
 }
 
 model packageOption {
@@ -189,7 +192,7 @@ model packageOption {
   created_at       DateTime       @default(now())
   updated_at       DateTime       @updatedAt
 
-  package               packages           @relation("ToPackage", fields: [packageId], references: [id], onDelete: Cascade)
+  package               packages            @relation("ToPackage", fields: [packageId], references: [id], onDelete: Cascade)
   packageOptionType     packageOptionType   @relation("ToPackageOptionType", fields: [pkgOptionId], references: [id], onDelete: Cascade)
 }
 
@@ -211,6 +214,36 @@ model packageOptionType {
   updated_at       DateTime       @updatedAt
 
   packageOption   packageOption[] @relation("ToPackageOptionType")
+}
+
+model packagePromo {
+  id               Int              @id @default(autoincrement())
+  promoName        String           @db.VarChar(100)
+  startDate        DateTime       
+  endDate          DateTime
+  status           Boolean?         @default(true)
+  created_at       DateTime         @default(now())
+  created_by       Int        
+  updated_at       DateTime         @updatedAt
+  updated_by       Int?
+  deleted_at       DateTime?
+
+  userCreate       administrator    @relation("PromoUserCreate", fields: [created_by], references: [id])
+  userUpdate       administrator?   @relation("PromoUserUpdate", fields: [updated_by], references: [id])
+
+  promoLink        promoLink[]      @relation("packagePromo")
+}
+
+model promoLink {
+  id                Int              @id @default(autoincrement())
+  percentage        Float            
+  packageLink       Int
+  promoId           Int
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+  
+  packagePromoLink  packages         @relation("packagePromoLink", fields: [packageLink], references: [id])
+  packagePromo      packagePromo     @relation("packagePromo", fields: [promoId], references: [id])
 }
 
 model blog {

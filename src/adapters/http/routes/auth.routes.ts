@@ -38,7 +38,7 @@ const authController = new AuthController(authService);
 
 /**
 * @swagger
-* /api/auth/signin:
+* /api/v1/auth/signin:
 *   post:
 *     tags: [Authentication]
 *     summary: authenticate line
