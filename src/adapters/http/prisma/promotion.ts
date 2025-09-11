@@ -35,6 +35,12 @@ export class PromoPrismaORM implements PromoRepositoryPort {
 
     async findAll(): Promise<Promotion[]> {
         const result = await prisma.packagePromo.findMany({
+            orderBy: {
+                updated_at: 'desc'
+            },
+            where: {
+                deleted_at: null
+            },
             select: {
                 id: true,
                 promoName: true,
@@ -94,6 +100,7 @@ export class PromoPrismaORM implements PromoRepositoryPort {
     async findById(id: string): Promise<Promotion> {
         const recheckPromotion = await prisma.packagePromo.count({
             where: {
+                deleted_at: null,
                 id: Number(id)
             }
         });
@@ -108,6 +115,7 @@ export class PromoPrismaORM implements PromoRepositoryPort {
     async update(id: string, promoDto: PromotionDTO): Promise<Promotion> {
         const recheckPromotion = await prisma.packagePromo.findFirst({
             where: {
+                deleted_at: null,
                 id: Number(id)
             }
         });
@@ -204,6 +212,7 @@ export class PromoPrismaORM implements PromoRepositoryPort {
     async delete(id: string): Promise<Promotion> {
         const recheckPromotion = await prisma.packagePromo.count({
             where: {
+                deleted_at: null,
                 id: Number(id)
             }
         });
