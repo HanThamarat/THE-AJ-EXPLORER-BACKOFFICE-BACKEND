@@ -152,22 +152,27 @@ model subdistrict {
 }
 
 model packages {
-  id                Int           @id @default(autoincrement())
-  packageName       String?       @db.VarChar(100)
-  packageTypeId     Int           
-  description       String?       @db.VarChar(9000)
-  provinceId        Int?          
-  districtId        Int?
-  subDistrictId     Int?
-  lon               String?       @db.VarChar(100)
-  lat               String?       @db.VarChar(100)
-  packageImages     String?       @db.Text
-  status            Boolean?      @default(true)
-  created_by        Int
-  updated_by        Int
-  created_at        DateTime      @default(now())
-  updated_at        DateTime      @updatedAt
-  deleted_at        DateTime?
+  id                            Int           @id @default(autoincrement())
+  packageName                   String?       @db.VarChar(100)
+  packageTypeId                 Int           
+  description                   String?       @db.VarChar(9000)
+  additional_description        String?       @db.VarChar(9000)
+  provinceId                    Int?          
+  districtId                    Int?
+  subDistrictId                 Int?
+  depart_point_lon              String?       @db.VarChar(100)
+  depart_point_lat              String?       @db.VarChar(100)
+  end_point_lon                 String?       @db.VarChar(100)
+  end_point_lat                 String?       @db.VarChar(100)
+  benefit_include               String?       @db.Text
+  benefit_not_include           String?       @db.Text
+  packageImages                 String?       @db.Text
+  status                        Boolean?      @default(true)
+  created_by                    Int
+  updated_by                    Int
+  created_at                    DateTime      @default(now())
+  updated_at                    DateTime      @updatedAt
+  deleted_at                    DateTime?
 
   createBy          administrator @relation("packageInsert", fields: [created_by], references: [id], onDelete: Cascade)
   updateBy          administrator @relation("packageUpdate", fields: [updated_by], references: [id], onDelete: Cascade)
@@ -176,8 +181,22 @@ model packages {
   district          district?     @relation("ToPackageDistrict", fields: [districtId], references: [id])
   subdistrict       subdistrict?  @relation("ToPackageSubdistrict", fields: [subDistrictId], references: [id])
 
-  packagePromoLink  promoLink[]      @relation("packagePromoLink")
-  packageOption     packageOption[]  @relation("ToPackage")
+  packagePromoLink  promoLink[]         @relation("packagePromoLink")
+  packageOption     packageOption[]     @relation("ToPackage")
+  packageAttraction packageAttraction[] @relation("packageAttraction")
+}
+
+model packageAttraction {
+  id                Int           @id @default(autoincrement())
+  packageId         Int
+  attractionName    String        @db.VarChar(100)
+  attractionTime    DateTime      
+  description       String?       @db.VarChar(1000)
+  status            Boolean       @default(true)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  package           packages      @relation("packageAttraction", fields: [packageId], references: [id])
 }
 
 model packageOption {

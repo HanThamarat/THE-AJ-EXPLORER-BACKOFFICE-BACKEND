@@ -1,4 +1,4 @@
-import { packageDTO, packageEntity, packageImageSave } from "../../../core/entity/package";
+import { packageDTO, packageEntity, packageImageSave, packageInclude, packageNotInclude } from "../../../core/entity/package";
 import { PackageRepositoryPort } from "../../../core/ports/packageRepositoryPort";
 import { prisma } from "../../database/data-source";
 import { AxiosInstance } from "../../../hooks/axiosInstance";
@@ -18,8 +18,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 provinceId: packageDto.provinceId,
                 districtId: packageDto.districtId,
                 subDistrictId: packageDto.subDistrictId,
-                lat: packageDto.lat,
-                lon: packageDto.lon,
+                depart_point_lat: packageDto.depart_point_lat,
+                depart_point_lon: packageDto.depart_point_lon,
+                end_point_lat: packageDto.end_point_lat,
+                end_point_lon: packageDto.end_point_lon,
+                benefit_include: packageDto.benefit_include,
+                benefit_not_include: packageDto.benefit_not_include,
                 packageImages: packageDto.packageImage,
                 status: packageDto.status,
                 created_by: Number(packageDto.created_by),
@@ -43,6 +47,18 @@ export class PackagePrismaORM implements PackageRepositoryPort {
 
         if (!createPkgOption) throw new Error("Creating a package option something wrong.");
 
+        const createPkgAttraction = await prisma.packageAttraction.createMany({
+            data: packageDto.packageAttraction.map((data) => ({
+                packageId: createpackage.id,
+                attractionName: data.attractionName,
+                attractionTime: data.attractionTime,
+                description: data?.description,
+                status: data.status
+            }))
+        });
+
+        if (!createPkgAttraction) throw new Error("Creating a pkg attraction something wrong.");
+
         const result = await prisma.packages.findFirst({
             where: {
                 id: createpackage.id
@@ -51,12 +67,24 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
-                lon: true,
-                lat: true,
+                depart_point_lat: true,
+                depart_point_lon: true,
+                end_point_lat: true,
+                end_point_lon: true,
+                benefit_include: true,
+                benefit_not_include: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
                 packageImages: true,
+                packageAttraction: {
+                    select: {
+                        attractionName: true,
+                        attractionTime: true,
+                        description: true,
+                        status: true
+                    }
+                },
                 pacakgeType: {
                     select: {
                         name: true
@@ -112,8 +140,16 @@ export class PackagePrismaORM implements PackageRepositoryPort {
         });
 
         let parseImageArr: packageImageSave[] = []; 
+        let parseBenefitInclude: packageInclude[] = [];
+        let parseBenefitNotInclude: packageNotInclude[] = [];
         if (result?.packageImages) {
             parseImageArr = JSON.parse(result.packageImages);                    
+        }
+        if (result?.benefit_include) {
+            parseBenefitInclude = JSON.parse(result.benefit_include);
+        }
+        if (result?.benefit_not_include) {
+            parseBenefitNotInclude = JSON.parse(result.benefit_not_include);
         }
 
         await CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGES_DATA_KEY);
@@ -126,8 +162,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
-            lon: result?.lon ? result.lon : 'no data',
-            lat: result?.lat ? result.lat : 'no dara',
+            depart_point_lat: result?.depart_point_lat ? result.depart_point_lat : 'no data',
+            depart_point_lon: result?.depart_point_lon ? result.depart_point_lon : 'no dara',
+            end_point_lat: result?.end_point_lat ? result.end_point_lat : 'no data',
+            end_point_lon: result?.end_point_lon ? result.end_point_lon : 'no dara',
+            benefit_include: parseBenefitInclude,
+            benefit_not_include: parseBenefitNotInclude,
             packageImage: parseImageArr,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
@@ -138,6 +178,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+            })) : null,
+            pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
+                attractionName: data.attractionName,
+                attractionTime: data.attractionTime,
+                description: data?.description ? data.description : "nO data",
+                status: data.status
             })) : null,
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
@@ -169,12 +215,24 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
-                lon: true,
-                lat: true,
+                depart_point_lat: true,
+                depart_point_lon: true,
+                end_point_lat: true,
+                end_point_lon: true,
+                benefit_include: true,
+                benefit_not_include: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
                 packageImages: true,
+                packageAttraction: {
+                    select: {
+                        attractionName: true,
+                        attractionTime: true,
+                        description: true,
+                        status: true
+                    }
+                },
                 pacakgeType: {
                     select: {
                         name: true
@@ -231,8 +289,16 @@ export class PackagePrismaORM implements PackageRepositoryPort {
 
         const resultFormat: packageEntity[] = data.map((result) => {
             let parseImageArr: packageImageSave[] = []; 
+            let parseBenefitInclude: packageInclude[] = [];
+            let parseBenefitNotInclude: packageNotInclude[] = [];
             if (result?.packageImages) {
                 parseImageArr = JSON.parse(result.packageImages);                    
+            }
+            if (result?.benefit_include) {
+                parseBenefitInclude = JSON.parse(result.benefit_include);
+            }
+            if (result?.benefit_not_include) {
+                parseBenefitNotInclude = JSON.parse(result.benefit_not_include);
             }
             return {
                 id: result?.id ? result.id : 0,
@@ -242,8 +308,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
                 district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
                 subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
-                lon: result?.lon ? result.lon : 'no data',
-                lat: result?.lat ? result.lat : 'no dara',
+                depart_point_lat: result?.depart_point_lat ? result.depart_point_lat : 'no data',
+                depart_point_lon: result?.depart_point_lon ? result.depart_point_lon : 'no dara',
+                end_point_lat: result?.end_point_lat ? result.end_point_lat : 'no data',
+                end_point_lon: result?.end_point_lon ? result.end_point_lon : 'no dara',
+                benefit_include: parseBenefitInclude,
+                benefit_not_include: parseBenefitNotInclude,
                 packageImage: parseImageArr,
                 packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                     id: data.id,
@@ -254,6 +324,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                     adultPrice: Number(data.adultPrice ?? 0),
                     childPrice: Number(data.childPrice ?? 0),
                     groupPrice: Number(data.groupPrice ?? 0),
+                })) : null,
+                pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
+                    attractionName: data.attractionName,
+                    attractionTime: data.attractionTime,
+                    description: data?.description ? data.description : "nO data",
+                    status: data.status
                 })) : null,
                 status: result?.status ? result.status : 'no data',
                 created_at: result?.created_at ? result.created_at : 'no data',
@@ -295,12 +371,24 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
-                lon: true,
-                lat: true,
+                depart_point_lat: true,
+                depart_point_lon: true,
+                end_point_lat: true,
+                end_point_lon: true,
+                benefit_include: true,
+                benefit_not_include: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
                 packageImages: true,
+                packageAttraction: {
+                    select: {
+                        attractionName: true,
+                        attractionTime: true,
+                        description: true,
+                        status: true
+                    }
+                },
                 pacakgeType: {
                     select: {
                         name: true
@@ -357,8 +445,16 @@ export class PackagePrismaORM implements PackageRepositoryPort {
 
         // recheck null data and convert string to arr.
         let parseImageArr: packageImageSave[] = []; 
+        let parseBenefitInclude: packageInclude[] = [];
+        let parseBenefitNotInclude: packageNotInclude[] = [];
         if (result?.packageImages) {
             parseImageArr = JSON.parse(result.packageImages);                    
+        }
+        if (result?.benefit_include) {
+            parseBenefitInclude = JSON.parse(result.benefit_include);
+        }
+        if (result?.benefit_not_include) {
+            parseBenefitNotInclude = JSON.parse(result.benefit_not_include);
         }
 
         // take a parseImageArr for push to new arr for prepare to use in api.
@@ -389,8 +485,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
-            lon: result?.lon ? result.lon : 'no data',
-            lat: result?.lat ? result.lat : 'no dara',
+            depart_point_lat: result?.depart_point_lat ? result.depart_point_lat : 'no data',
+            depart_point_lon: result?.depart_point_lon ? result.depart_point_lon : 'no dara',
+            end_point_lat: result?.end_point_lat ? result.end_point_lat : 'no data',
+            end_point_lon: result?.end_point_lon ? result.end_point_lon : 'no dara',
+            benefit_include: parseBenefitInclude,
+            benefit_not_include: parseBenefitNotInclude,
             packageImage: mergedImage,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
@@ -401,6 +501,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+            })) : null,
+            pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
+                attractionName: data.attractionName,
+                attractionTime: data.attractionTime,
+                description: data?.description ? data.description : "nO data",
+                status: data.status
             })) : null,
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
@@ -436,8 +542,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 provinceId: packageDto.provinceId,
                 districtId: packageDto.districtId,
                 subDistrictId: packageDto.subDistrictId,
-                lat: packageDto.lat,
-                lon: packageDto.lon,
+                depart_point_lat: packageDto.depart_point_lat,
+                depart_point_lon: packageDto.depart_point_lon,
+                end_point_lat: packageDto.end_point_lat,
+                end_point_lon: packageDto.end_point_lon,
+                benefit_include: packageDto.benefit_include,
+                benefit_not_include: packageDto.benefit_not_include,
                 packageImages: packageDto.packageImage,
                 status: packageDto.status,
                 updated_by: Number(packageDto.updated_by)
@@ -466,6 +576,25 @@ export class PackagePrismaORM implements PackageRepositoryPort {
 
         if (!createPkgOption) throw new Error("Updating a package option something wrong.");
 
+        await prisma.packageAttraction.deleteMany({
+            where: {
+                packageId: Number(id)
+            },
+        });
+
+        const createPkgAttraction = await prisma.packageAttraction.createMany({
+            data: packageDto.packageAttraction.map((data) => ({
+                packageId: createpackage.id,
+                attractionName: data.attractionName,
+                attractionTime: data.attractionTime,
+                description: data?.description,
+                status: data.status
+            }))
+        });
+
+        if (!createPkgAttraction) throw new Error("Updating a pkg attraction something wrong.");
+
+
         const result = await prisma.packages.findFirst({
             where: {
                 id: createpackage.id
@@ -474,12 +603,24 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
-                lon: true,
-                lat: true,
+                depart_point_lat: true,
+                depart_point_lon: true,
+                end_point_lat: true,
+                end_point_lon: true,
+                benefit_include: true,
+                benefit_not_include: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
                 packageImages: true,
+                packageAttraction: {
+                    select: {
+                        attractionName: true,
+                        attractionTime: true,
+                        description: true,
+                        status: true
+                    }
+                },
                 pacakgeType: {
                     select: {
                         name: true
@@ -535,8 +676,16 @@ export class PackagePrismaORM implements PackageRepositoryPort {
         });
 
         let parseImageArr: packageImageSave[] = []; 
+        let parseBenefitInclude: packageInclude[] = [];
+        let parseBenefitNotInclude: packageNotInclude[] = [];
         if (result?.packageImages) {
             parseImageArr = JSON.parse(result.packageImages);                    
+        }
+        if (result?.benefit_include) {
+            parseBenefitInclude = JSON.parse(result.benefit_include);
+        }
+        if (result?.benefit_not_include) {
+            parseBenefitNotInclude = JSON.parse(result.benefit_not_include);
         }
 
         const resultFormat: packageEntity = {
@@ -547,8 +696,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
-            lon: result?.lon ? result.lon : 'no data',
-            lat: result?.lat ? result.lat : 'no dara',
+            depart_point_lat: result?.depart_point_lat ? result.depart_point_lat : 'no data',
+            depart_point_lon: result?.depart_point_lon ? result.depart_point_lon : 'no dara',
+            end_point_lat: result?.end_point_lat ? result.end_point_lat : 'no data',
+            end_point_lon: result?.end_point_lon ? result.end_point_lon : 'no dara',
+            benefit_include: parseBenefitInclude,
+            benefit_not_include: parseBenefitNotInclude,
             packageImage: parseImageArr,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
@@ -559,6 +712,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+            })) : null,
+            pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
+                attractionName: data.attractionName,
+                attractionTime: data.attractionTime,
+                description: data?.description ? data.description : "nO data",
+                status: data.status
             })) : null,
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',
@@ -599,12 +758,24 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
-                lon: true,
-                lat: true,
+                depart_point_lat: true,
+                depart_point_lon: true,
+                end_point_lat: true,
+                end_point_lon: true,
+                benefit_include: true,
+                benefit_not_include: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
                 packageImages: true,
+                packageAttraction: {
+                    select: {
+                        attractionName: true,
+                        attractionTime: true,
+                        description: true,
+                        status: true
+                    }
+                },
                 pacakgeType: {
                     select: {
                         name: true
@@ -660,8 +831,16 @@ export class PackagePrismaORM implements PackageRepositoryPort {
         });
         
         let parseImageArr: packageImageSave[] = []; 
+        let parseBenefitInclude: packageInclude[] = [];
+        let parseBenefitNotInclude: packageNotInclude[] = [];
         if (result?.packageImages) {
             parseImageArr = JSON.parse(result.packageImages);                    
+        }
+        if (result?.benefit_include) {
+            parseBenefitInclude = JSON.parse(result.benefit_include);
+        }
+        if (result?.benefit_not_include) {
+            parseBenefitNotInclude = JSON.parse(result.benefit_not_include);
         }
 
         const resultFormat: packageEntity = {
@@ -672,8 +851,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
-            lon: result?.lon ? result.lon : 'no data',
-            lat: result?.lat ? result.lat : 'no dara',
+            depart_point_lat: result?.depart_point_lat ? result.depart_point_lat : 'no data',
+            depart_point_lon: result?.depart_point_lon ? result.depart_point_lon : 'no dara',
+            end_point_lat: result?.end_point_lat ? result.end_point_lat : 'no data',
+            end_point_lon: result?.end_point_lon ? result.end_point_lon : 'no dara',
+            benefit_include: parseBenefitInclude,
+            benefit_not_include: parseBenefitNotInclude,
             packageImage: parseImageArr,
             packageOption: result?.packageOption ? result.packageOption.map((data) => ({
                 id: data.id,
@@ -684,6 +867,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+            })) : null,
+            pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
+                attractionName: data.attractionName,
+                attractionTime: data.attractionTime,
+                description: data?.description ? data.description : "nO data",
+                status: data.status
             })) : null,
             status: result?.status ? result.status : 'no data',
             created_at: result?.created_at ? result.created_at : 'no data',

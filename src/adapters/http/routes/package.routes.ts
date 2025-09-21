@@ -67,6 +67,40 @@ const packageController = new PackageController(packageService);
  *         - base64
  *         - fileName
  *         - mainFile
+ * 
+ *     PackageAttractionDTO:
+ *       type: object
+ *       properties:
+ *         attractionName:
+ *           type: string
+ *           example: fileName
+ *         attractionTime:
+ *           type: string
+ *           example: "2023-08-15 05:36:56"
+ *         description:
+ *           type: string
+ *           example: description
+ *         status:
+ *           type: boolean
+ *           example: true
+ *       required:
+ *         - attractionName
+ *         - attractionTime
+ *         - status
+ * 
+ *     benefit_includeDTO:
+ *       type: object
+ *       properties:
+ *         detail:
+ *           type: string
+ *           example: Transfers from/to your Hotel Ao Nang / Railay
+ * 
+ *     benefit_notincludeDTO:
+ *       type: object
+ *       properties:
+ *         detail:
+ *           type: string
+ *           example: Transfers Krabi Town, Khlong Muang, Tub Keek extra 1.000 THB
  *
  *     CreatePackageDTO:
  *       type: object
@@ -89,10 +123,16 @@ const packageController = new PackageController(packageService);
  *         subDistrictId:
  *           type: integer
  *           example: 1
- *         lon:
+ *         depart_point_lat:
  *           type: string
  *           example: "98.3923"
- *         lat:
+ *         depart_point_lon:
+ *           type: string
+ *           example: "7.8804"
+ *         end_point_lat:
+ *           type: string
+ *           example: "98.3923"
+ *         end_point_lon:
  *           type: string
  *           example: "7.8804"
  *         status:
@@ -102,20 +142,38 @@ const packageController = new PackageController(packageService);
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/PackageImageDTO'
+ *         benefit_include:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/benefit_includeDTO'
+ *         benefit_not_include:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/benefit_notincludeDTO'
  *         packageOption:
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/PackageOptionDTO'
+ *         attraction:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/PackageAttractionDTO'
  *       required:
  *         - packageName
  *         - packageTypeId
  *         - provinceId
  *         - districtId
  *         - subDistrictId
- *         - lon
- *         - lat
+ *         - depart_point_lat
+ *         - depart_point_lon
+ *         - end_point_lat
+ *         - end_point_lon
  *         - status
  *         - packageOption
+ *         - attraction
+ *         - benefit_include
+ *         - benefit_not_include
+ *         - packageImage
  */
 
 /**
