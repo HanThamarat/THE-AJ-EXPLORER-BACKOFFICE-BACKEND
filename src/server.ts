@@ -9,19 +9,31 @@ import passport from 'passport';
 import  './adapters/http/middleware/passport';
 import { rateLimit } from 'express-rate-limit';
 import bodyParser from 'body-parser';
+import http from 'http';
+import { setupSocket } from './conf/socket';
 
 // import routes  here
 import authRoutes       from './adapters/http/routes/auth.routes';
 import userRoutes       from './adapters/http/routes/user.routes';
 import packageRoutes    from './adapters/http/routes/package.routes';
 import promoRoutes      from './adapters/http/routes/promo.routes';
+import { Server } from 'socket.io';
 
 
 dotenv.config();
 
 const app = express();
 const port : any = process.env.PORT;
+const server = http.createServer(app);
 
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+    },
+});
+
+setupSocket(io);
 
 const corsOptions = {
     origin: '*',
@@ -70,7 +82,7 @@ app.get('/', (req: Request, res: Response) => {
     }
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
     try {
         AutoinitializeData();
         console.log('Server is runing on port :', port);

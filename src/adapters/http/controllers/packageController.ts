@@ -1,7 +1,7 @@
 import { PackageService } from "../../../core/services/packageService";
 import { Request, Response } from "express";
 import { setResponse, setErrResponse } from "../../../hooks/response";
-import { packageDTO, packageImageDTO, packageImageSave, packageOptionDTO } from "../../../core/entity/package";
+import { packageAttractionDTO, packageDTO, packageImageDTO, packageImageSave, packageInclude, packageNotInclude, packageOptionDTO } from "../../../core/entity/package";
 import { Ecrypt } from "../../helpers/encrypt";
 import { Convertion } from "../../helpers/convertion";
 import { AxiosInstanceMultipart } from "../../../hooks/axiosInstance";
@@ -16,7 +16,7 @@ export class PackageController {
             let fileBufferArr: any[] = [];
             let imageInBucket: packageImageSave[] = [];
             const axios = await AxiosInstanceMultipart(req);
-            const { packageName, packageTypeId, description, provinceId, districtId, subDistrictId, lon, lat, status, packageImage, packageOption } = req.body;
+            const { packageName, packageTypeId, description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
                 packageId: Number(data.packageId),
                 pkgOptionTypeId: Number(data.pkgOptionTypeId),
@@ -26,11 +26,23 @@ export class PackageController {
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)
             }));
-
             const packageImageArr: packageImageDTO[] = packageImage.map((data: packageImageDTO) => ({
                 base64: data.base64,
                 fileName: data.fileName,
                 mainFile: data.mainFile
+            }));
+            const attractionArr: packageAttractionDTO[] = attraction.map((data: packageAttractionDTO) => ({
+                packageId: Number(data?.packageId),
+                attractionName: data.attractionName,
+                attractionTime: new Date(data.attractionTime),
+                description: data.description,
+                status: data.status
+            }));
+            const pakcageBenefitIncludeArr: packageInclude[] = benefit_include.map((data: packageInclude) => ({
+                detail: data.detail
+            }));
+            const pakcageBenefitNotIncludeArr: packageNotInclude[] = benefit_not_include.map((data: packageNotInclude) => ({
+                detail: data.detail
             }));
 
             const userInfo = await Ecrypt.JWTDecrypt(req);
@@ -66,6 +78,8 @@ export class PackageController {
 
             
             const packageImg = JSON.stringify(imageInBucket);
+            const packageBenefitInclude = JSON.stringify(pakcageBenefitIncludeArr);
+            const packageBenefitNotInclude = JSON.stringify(pakcageBenefitNotIncludeArr);
             const packageData: packageDTO = {
                 packageName: packageName,
                 packageTypeId: Number(packageTypeId),
@@ -73,11 +87,16 @@ export class PackageController {
                 provinceId: Number(provinceId),
                 districtId: Number(districtId),
                 subDistrictId: Number(subDistrictId),
-                lon: lon,
-                lat: lat,
+                depart_point_lat: depart_point_lat,
+                depart_point_lon: depart_point_lon,
+                end_point_lat: end_point_lat,
+                end_point_lon: end_point_lon,
+                benefit_include: packageBenefitInclude,
+                benefit_not_include: packageBenefitNotInclude,
                 status: status,
                 packageImage: packageImg,
                 packageOption: packageOptionArr,
+                packageAttraction: attractionArr,
                 created_by: userId,
                 updated_by: userId
             };
@@ -145,7 +164,7 @@ export class PackageController {
     async updatePackage(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const { packageName, packageTypeId, description, provinceId, districtId, subDistrictId, lon, lat, status, packageImage, packageOption } = req.body;
+            const { packageName, packageTypeId, description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
                 packageId: Number(data.packageId),
                 pkgOptionTypeId: Number(data.pkgOptionTypeId),
@@ -155,9 +174,24 @@ export class PackageController {
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)
             }));
+            const attractionArr: packageAttractionDTO[] = attraction.map((data: packageAttractionDTO) => ({
+                packageId: Number(data.packageId),
+                attractionName: data.attractionName,
+                attractionTime: new Date(data.attractionTime),
+                description: data.description,
+                status: data.status
+            }));
+            const pakcageBenefitIncludeArr: packageInclude[] = benefit_include.map((data: packageInclude) => ({
+                detail: data.detail
+            }));
+            const pakcageBenefitNotIncludeArr: packageNotInclude[] = benefit_not_include.map((data: packageNotInclude) => ({
+                detail: data.detail
+            }));
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = userInfo?.id;
 
+            const packageBenefitInclude = JSON.stringify(pakcageBenefitIncludeArr);
+            const packageBenefitNotInclude = JSON.stringify(pakcageBenefitNotIncludeArr);
             const packageData: packageDTO = {
                 packageName: packageName,
                 packageTypeId: Number(packageTypeId),
@@ -165,11 +199,16 @@ export class PackageController {
                 provinceId: Number(provinceId),
                 districtId: Number(districtId),
                 subDistrictId: Number(subDistrictId),
-                lon: lon,
-                lat: lat,
+                depart_point_lat: depart_point_lat,
+                depart_point_lon: depart_point_lon,
+                end_point_lat: end_point_lat,
+                end_point_lon: end_point_lon,
+                benefit_include: packageBenefitInclude,
+                benefit_not_include: packageBenefitNotInclude,
                 status: status,
                 packageImage: packageImage,
                 packageOption: packageOptionArr,
+                packageAttraction: attractionArr,
                 updated_by: userId
             };
 

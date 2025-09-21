@@ -6,13 +6,26 @@ export interface packageDTO {
     provinceId:         number;
     districtId:         number;
     subDistrictId:      number;
-    lon:                string;
-    lat:                string;
+    depart_point_lon:   string;
+    depart_point_lat:   string;
+    end_point_lon:      string;
+    end_point_lat:      string;
+    benefit_include:    string;
+    benefit_not_include:string;
     status:             boolean;
     packageImage:       string;
     packageOption:      packageOptionDTO[];
+    packageAttraction:  packageAttractionDTO[];
     created_by?:        number;
     updated_by?:        number;
+}
+
+export interface packageAttractionDTO {
+    packageId?:          number;
+    attractionName:     string;
+    attractionTime:     Date;
+    description?:       string;
+    status:             boolean;
 }
 
 export interface packageOptionDTO {
@@ -31,6 +44,14 @@ export interface packageImageDTO {
     mainFile:          boolean;               
 }
 
+export interface packageNotInclude {
+    detail:      string;
+}
+
+export interface packageInclude {
+    detail:      string;
+}
+
 export interface packageImageSave {
     file_name:          string;
     file_original_name: string;
@@ -47,15 +68,27 @@ export interface packageEntity {
     province:           string;
     district:           string;
     subDistrict:        string;
-    lon:                string;
-    lat:                string;
     packageImage:       packageImageSave[] | [];
+    depart_point_lon:   string;
+    depart_point_lat:   string;
+    end_point_lon:      string;
+    end_point_lat:      string;
+    benefit_include:    packageInclude[] | null;
+    benefit_not_include:packageNotInclude[] | null;
     packageOption:      packageOptionEntity[] | null;
+    pakcageAttraction : packageAttractionEntity[] | null; 
     status:             boolean | string;
     created_by:         string;
     updated_by:         string;
     created_at:         Date | string;
     updated_at:         Date | string;
+}
+
+export interface packageAttractionEntity {
+    attractionName:     string;
+    attractionTime:     Date;
+    description?:       string;
+    status:             boolean;
 }
 
 export interface packageOptionEntity {
