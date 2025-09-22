@@ -114,6 +114,9 @@ const packageController = new PackageController(packageService);
  *         description:
  *           type: string
  *           example: "A 3-day adventure in Phuket"
+ *         additional_description:
+ *           type: string
+ *           example: "A 3-day adventure in Phuket"
  *         provinceId:
  *           type: integer
  *           example: 1
