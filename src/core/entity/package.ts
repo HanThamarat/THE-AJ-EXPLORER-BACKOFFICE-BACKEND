@@ -21,7 +21,7 @@ export interface packageDTO {
 }
 
 export interface packageAttractionDTO {
-    packageId?:          number;
+    packageId?:         number;
     attractionName:     string;
     attractionTime:     Date;
     description?:       string;

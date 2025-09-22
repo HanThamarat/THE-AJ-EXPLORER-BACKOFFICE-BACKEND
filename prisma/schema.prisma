@@ -35,6 +35,8 @@ model administrator {
   packageupdate   packages[]      @relation("packageUpdate")
   PromoUserCreate packagePromo[]  @relation("PromoUserCreate")
   PromoUserUpdate packagePromo[]  @relation("PromoUserUpdate")
+  pkgTypeCreated  packageType[]   @relation("createdPackageTypeBy")
+  pkgTypeUpdated  packageType[]   @relation("updatedPackageTypeBy")
 }
 
 model role {
@@ -220,9 +222,15 @@ model packageType {
   name             String?        @db.VarChar(100)
   status           Boolean?       @default(true)
   created_at       DateTime       @default(now())
+  created_by       Int
   updated_at       DateTime       @updatedAt
+  updated_by       Int
+  deleted_at       DateTime?
 
   package          packages[]     @relation("ToPacakgeType")
+
+  createdBy         administrator  @relation("createdPackageTypeBy", fields: [created_by], references: [id])
+  updatedBy         administrator  @relation("updatedPackageTypeBy", fields: [updated_by], references: [id])
 }
 
 model packageOptionType {
