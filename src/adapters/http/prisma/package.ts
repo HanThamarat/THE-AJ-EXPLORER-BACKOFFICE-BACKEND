@@ -15,6 +15,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 packageName: packageDto.packageName,
                 packageTypeId: packageDto.packageTypeId,
                 description: packageDto.description,
+                additional_description: packageDto.additional_description,
                 provinceId: packageDto.provinceId,
                 districtId: packageDto.districtId,
                 subDistrictId: packageDto.subDistrictId,
@@ -73,6 +74,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 end_point_lon: true,
                 benefit_include: true,
                 benefit_not_include: true,
+                additional_description: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
@@ -159,6 +161,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             packageName: result?.packageName ? result.packageName : 'no data',
             packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
             description: result?.description ? result.description : 'no data',
+            additional_description: result?.additional_description ? result.additional_description : 'no data',
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
@@ -209,12 +212,13 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: 'desc'
             },
             where: {
-                deleted_at: null
+               deleted_at: null 
             },
             select: {
                 id: true,
                 packageName: true,
                 description: true,
+                additional_description: true,
                 depart_point_lat: true,
                 depart_point_lon: true,
                 end_point_lat: true,
@@ -305,6 +309,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 packageName: result?.packageName ? result.packageName : 'no data',
                 packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
                 description: result?.description ? result.description : 'no data',
+                additional_description: result?.additional_description ? result.additional_description : 'no data',
                 province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
                 district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
                 subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
@@ -371,6 +376,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
+                additional_description: true,
                 depart_point_lat: true,
                 depart_point_lon: true,
                 end_point_lat: true,
@@ -482,6 +488,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             packageName: result?.packageName ? result.packageName : 'no data',
             packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
             description: result?.description ? result.description : 'no data',
+            additional_description: result?.additional_description ? result.additional_description : 'no data',
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
@@ -539,6 +546,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 packageName: packageDto.packageName,
                 packageTypeId: packageDto.packageTypeId,
                 description: packageDto.description,
+                additional_description: packageDto.additional_description,
                 provinceId: packageDto.provinceId,
                 districtId: packageDto.districtId,
                 subDistrictId: packageDto.subDistrictId,
@@ -594,7 +602,6 @@ export class PackagePrismaORM implements PackageRepositoryPort {
 
         if (!createPkgAttraction) throw new Error("Updating a pkg attraction something wrong.");
 
-
         const result = await prisma.packages.findFirst({
             where: {
                 id: createpackage.id
@@ -603,6 +610,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
+                additional_description: true,
                 depart_point_lat: true,
                 depart_point_lon: true,
                 end_point_lat: true,
@@ -693,6 +701,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             packageName: result?.packageName ? result.packageName : 'no data',
             packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
             description: result?.description ? result.description : 'no data',
+            additional_description: result?.additional_description ? result.additional_description : 'no data',
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
@@ -726,6 +735,15 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
 
+        const packageIdCache = await CacheHelper.getCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
+
+        if (packageIdCache !== null) {
+            CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
+        } else {
+             const convertResult = JSON.stringify(resultFormat);
+            CacheHelper.setCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id, convertResult);
+        }
+
         return resultFormat;
     }
 
@@ -750,6 +768,8 @@ export class PackagePrismaORM implements PackageRepositoryPort {
 
         if (!deletePackageCash) throw new Error("Deleting a package something wrong.");
 
+
+
         const result = await prisma.packages.findFirst({
             where: {
                 id: Number(id),
@@ -764,6 +784,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 end_point_lon: true,
                 benefit_include: true,
                 benefit_not_include: true,
+                additional_description: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
@@ -848,6 +869,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             packageName: result?.packageName ? result.packageName : 'no data',
             packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
             description: result?.description ? result.description : 'no data',
+            additional_description: result?.additional_description ? result.additional_description : 'no data',
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
@@ -880,6 +902,13 @@ export class PackagePrismaORM implements PackageRepositoryPort {
             created_by: result?.createBy ? `${result.createBy.firstName} ${result.createBy.lastName}` : 'no data',
             updated_by: result?.updateBy ? `${result.updateBy.firstName} ${result.updateBy.lastName}` : 'no data'
         };
+
+        const packageIdCache = await CacheHelper.getCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
+
+        if (packageIdCache !== null) {
+            CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
+        }
+        CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGES_DATA_KEY);
 
         return resultFormat;
     }
