@@ -11,6 +11,7 @@ import { rateLimit } from 'express-rate-limit';
 import bodyParser from 'body-parser';
 import http from 'http';
 import { setupSocket } from './conf/socket';
+import helmet from 'helmet';
 
 // import routes  here
 import authRoutes       from './adapters/http/routes/auth.routes';
@@ -18,6 +19,7 @@ import userRoutes       from './adapters/http/routes/user.routes';
 import packageRoutes    from './adapters/http/routes/package.routes';
 import promoRoutes      from './adapters/http/routes/promo.routes';
 import pkgTypeRoutes    from './adapters/http/routes/pkgType.routes';
+import geolocatRoutes   from './adapters/http/routes/geolocat.routes';
 import { Server } from 'socket.io';
 
 
@@ -56,6 +58,7 @@ app.use(bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true }));
 app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);
+app.use(helmet());
 
 app.set("trust proxy", 1);
 
@@ -65,6 +68,7 @@ app.use('/api/v1/usermanagement', passport.authenticate('jwt', { session: false 
 app.use('/api/v1/packagemanagement', passport.authenticate('jwt', { session: false }), packageRoutes);
 app.use('/api/v1/packagepromotion', passport.authenticate('jwt', { session: false }), promoRoutes);
 app.use('/api/v1/pkgtypemanagement', passport.authenticate('jwt', { session: false }), pkgTypeRoutes);
+app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }), geolocatRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
