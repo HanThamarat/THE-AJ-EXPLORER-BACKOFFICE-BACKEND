@@ -26,7 +26,7 @@ import { Server } from 'socket.io';
 dotenv.config();
 
 const app = express();
-const port : any = process.env.PORT;
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const server = http.createServer(app);
 
 const io = new Server(server, {
