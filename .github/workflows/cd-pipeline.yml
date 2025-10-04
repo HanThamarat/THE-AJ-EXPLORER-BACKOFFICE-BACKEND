@@ -31,8 +31,8 @@ jobs:
     - name: Pull Docker image
       run: sudo docker pull $IMAGE_NAME_THE_AJ_API
 
-    - name: Create Docker network
-      run: sudo docker network create aj-network
+    - name: Create Docker network (safe)
+      run: sudo docker network create aj-network || echo "Network already exists ✅"
 
     - name: Run Docker Backend Container
       env:
