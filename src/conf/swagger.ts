@@ -33,7 +33,7 @@ const swaggerOptions = {
             },
         ],
       },
-      apis: ['./src/adapters/http/routes/*.ts'],
+      apis: [process.env.API_ROUTES_PATH as string],
 };
 
 const swaggerDocs = swaggerDocument(swaggerOptions);
