@@ -1,0 +1,53 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - name: Set IMAGE_NAME variables
+      run: |
+        echo "IMAGE_NAME_THE_AJ_API=hanthamarats/the-aj-explorer-api:latest" >> $GITHUB_ENV
+
+    - name: Debug IMAGE_NAME variables
+      run: |
+        echo "IMAGE_NAME_THE_AJ_API is $IMAGE_NAME_THE_AJ_API"
+        echo "IMAGE_NAME_PCL_CMS is $IMAGE_NAME_PCL_CMS"
+
+    - name: Delete Old the-aj-explorer-api docker container
+      run: sudo docker rm -f the-aj-explorer-api || true
+
+    - name: Delete Old docker image
+      run: sudo docker images | grep hanthamarats/the-aj-explorer-api | awk '{print $3}' | xargs sudo docker rmi || true
+
+    - name: Pull Docker image
+      run: sudo docker pull $IMAGE_NAME_THE_AJ_API
+
+    - name: Run Docker Backend Container
+      env:
+        SERVER_PORT: ${{secrets.SERVER_PORT}}
+        PORT: ${{secrets.PORT}}
+        JWT_SECRET: ${{secrets.JWT_SECRET}}
+        API_DOC_URL: ${{secrets.API_DOC_URL}}
+        DATABASE_URL: ${{secrets.DATABASE_URL}}
+        DIRECT_URL: ${{secrets.DIRECT_URL}}
+        AUTH_SECRET: ${{secrets.AUTH_SECRET}}
+        AUTH_GOOGLE_ID: ${{secrets.AUTH_GOOGLE_ID}}
+        AUTH_GOOGLE_SECRET: ${{secrets.AUTH_GOOGLE_SECRET}}
+        MAILER_EMAIL: ${{secrets.MAILER_EMAIL}}
+        MAILER_PASSWORD: ${{secrets.MAILER_PASSWORD}}
+        MAILER_PORT: ${{secrets.MAILER_PORT}}
+        BUCKET_BASE_URL: ${{secrets.BUCKET_BASE_URL}}
+        REDIS_HOST: ${{secrets.REDIS_HOST}}
+        REDIS_PORT: ${{secrets.REDIS_PORT}}
+        OMISE_PUBLIC_KEY: ${{secrets.OMISE_PUBLIC_KEY}}
+        OMISE_SECRET_KEY: ${{secrets.OMISE_SECRET_KEY}}
+      run: sudo docker run -p $SERVER_PORT:$SERVER_PORT -e PORT=$SECPORTRET_JWT -e JWT_SECRET=$JWT_SECRET -e API_DOC_URL=$API_DOC_URL -e DATABASE_URL=$DATABASE_URL -e DIRECT_URL=$DIRECT_URL -e AUTH_SECRET=$AUTH_SECRET -e AUTH_GOOGLE_ID=$AUTH_GOOGLE_ID -e AUTH_GOOGLE_SECRET=$AUTH_GOOGLE_SECRET -e MAILER_EMAIL=$MAILER_EMAIL -e MAILER_PASSWORD=$MAILER_PASSWORD -e MAILER_PORT=$MAILER_PORT -e BUCKET_BASE_URL=$BUCKET_BASE_URL -e REDIS_HOST=$REDIS_HOST -e REDIS_PORT=$REDIS_PORT -e OMISE_PUBLIC_KEY=$OMISE_PUBLIC_KEY -e OMISE_SECRET_KEY=$OMISE_SECRET_KEY -d --name the-aj-explorer-api $IMAGE_NAME_THE_AJ_API
