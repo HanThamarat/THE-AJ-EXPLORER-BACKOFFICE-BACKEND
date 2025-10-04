@@ -1,0 +1,34 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Login to DockerHub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+    - name: Set IMAGE_NAME variables
+      run: |
+        echo "IMAGE_NAME_THE_AJ_API=hanthamarats/the-aj-explorer-api:latest" >> $GITHUB_ENV
+
+    - name: Debug IMAGE_NAME variables
+      run: |
+        echo "IMAGE_NAME_THE_AJ_API is $IMAGE_NAME_THE_AJ_API"
+
+    - name: Build and push Backend API Docker Image
+      working-directory: backend
+      run: |
+        ls -l Dockerfile.prod  # Ensure correct Dockerfile
+        docker build  -t $IMAGE_NAME_THE_AJ_API -f Dockerfile.prod .
+        docker push $IMAGE_NAME_THE_AJ_API

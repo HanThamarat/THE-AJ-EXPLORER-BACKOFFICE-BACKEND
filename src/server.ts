@@ -57,7 +57,7 @@ app.use(bodyParser.json({ limit: 200 * 1024 * 1024 })); // 200 MB
 app.use(bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true }));
 app.use(morgan('dev'));
 app.use(cors(corsOptions));
-app.use(limiter);
+// app.use(limiter);
 app.use(helmet());
 
 app.set("trust proxy", 1);
