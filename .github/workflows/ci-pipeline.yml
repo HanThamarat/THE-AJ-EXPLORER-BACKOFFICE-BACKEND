@@ -27,7 +27,6 @@ jobs:
         echo "IMAGE_NAME_THE_AJ_API is $IMAGE_NAME_THE_AJ_API"
 
     - name: Build and push Backend API Docker Image
-      working-directory: backend
       run: |
         ls -l Dockerfile.prod  # Ensure correct Dockerfile
         docker build  -t $IMAGE_NAME_THE_AJ_API -f Dockerfile.prod .
