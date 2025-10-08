@@ -28,11 +28,11 @@ const authController = new AuthController(authService);
 *       properties:
 *         username:
 *           type: string
-*           example: administrator
+*           example: username
 *           description: Here, you can take a your username.
 *         password:
 *           type: string
-*           example: 123456
+*           example: password
 *           description: The passsword of username.
 */
 
