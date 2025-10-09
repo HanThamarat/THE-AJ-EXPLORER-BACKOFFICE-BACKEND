@@ -18,6 +18,24 @@ const financialController = new FinancialController(financialService);
  */
 
 /**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreatePaymentPromptpay:
+ *       type: object
+ *       properties:
+ *         bookingId:
+ *           type: string
+ *           example: "BK-1414141414141"
+ *         amount:
+ *           type: integer
+ *           example: 10000
+ *       required:
+ *         - bookingId
+ *         - amount
+ */
+
+/**
 * @swagger
 * /api/v1/financial/balance:
 *   get:
@@ -28,5 +46,44 @@ const financialController = new FinancialController(financialService);
 *         description: Get the financial.
 */
 router.get("/balance", financialController.balance.bind(financialController));
+
+/**
+* @swagger
+* /api/v1/financial/pay/promptpay:
+*   post:
+*     tags: [Financial]
+*     summary: Create a new charges for generate qr code promptpay.
+*     description: Create a new charges for generate qr code promptpay.
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CreatePaymentPromptpay'
+*     responses:
+*       201:
+*         description: Create a new charges for generate qr code promptpay successfully.
+*/
+router.post("/pay/promptpay", financialController.generateQr.bind(financialController));
+
+/**
+* @swagger
+* /api/v1/financial/charges/{id}:
+*   get:
+*     tags: [Financial]
+*     summary: Get charges info by charge id
+*     parameters:
+*       - in: path
+*         name: id
+*         required: true
+*         description: Get charges info by charge id
+*         schema:
+*           type: string
+*     requestBody:
+*     responses:
+*       200:
+*         description: Get charges info by charge id successfully.
+*/
+router.get("/charges/:id", financialController.findChargesById.bind(financialController));
 
 export default router;
