@@ -1,12 +1,24 @@
 import { chargeDTO, omiseChargeEntity, omiseFinancialEntity } from "../../../core/entity/financial";
 import { FinancialRepositoryPort } from "../../../core/ports/financialRopositoryPort";
 import omise from "../../database/omise";
+import { CurrencyConvert } from "../../helpers/currencyConvertion";
 
 export class FinancialORM implements FinancialRepositoryPort {
     async balance(): Promise<omiseFinancialEntity> {
         const balance = await omise.balance.retrieve();
 
-        return balance as omiseFinancialEntity;
+        const balanceFormatter: omiseFinancialEntity = {
+            object: balance.object,
+            location: balance.location,
+            livemode: balance.livemode,
+            currency: balance.currency,
+            total: CurrencyConvert.formatAsThb(balance.total),
+            transferable: CurrencyConvert.formatAsThb(balance.transferable),
+            reserve: balance.reserve,
+            created_at: balance.created_at
+        };
+
+        return balanceFormatter as omiseFinancialEntity;
     }
 
     async generateQr(chargeDTO: chargeDTO): Promise<omiseChargeEntity> {
