@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { FinancialService } from "../../../core/services/financialService";
 import { setErrResponse, setResponse } from "../../../hooks/response";
-import { chargeDTO } from "../../../core/entity/financial";
+import { chargeDTO, RefundDTO } from "../../../core/entity/financial";
 
 export class FinancialController {
     constructor(private financialService: FinancialService) {}
@@ -70,6 +70,34 @@ export class FinancialController {
                 res: res,
                 message: "Finding charge by charge id failed.",
                 error: err instanceof Error ? err.message : 'Finding charge by charge id failed.',
+                statusCode: 500
+            });
+        }
+    }
+
+    async createRefund(req: Request, res: Response) {
+        try {
+            const { chargesId, amount, booking_id } = req.body;
+
+            const RefundDTOFormetter: RefundDTO = {
+                chargesId: chargesId,
+                amount: Number(amount),
+                booking_id: booking_id
+            };
+
+            const response = await this.financialService.createRefund(RefundDTOFormetter);
+
+            return setResponse({
+                res: res,
+                message: `Creating a new refund for this charges id successfully: ${chargesId}`,
+                statusCode: 200,
+                body: response
+            });
+        } catch (err) {
+            return setErrResponse({
+                res: res,
+                message: `Creating a new refund for this charges id failed.`,
+                error: err instanceof Error ? err.message : `Creating a new refund for this charges id failed.`,
                 statusCode: 500
             });
         }

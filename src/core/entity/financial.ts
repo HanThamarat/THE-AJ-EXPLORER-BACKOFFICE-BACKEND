@@ -203,3 +203,28 @@ export interface ProviderReferences {
   reference_number_2: any
   buyer_name: any
 }
+
+export interface OmiseRefundEntiry {
+    object:             string;
+    id:                 string;
+    location:           string;
+    livemode:           boolean;
+    voided:             boolean;
+    currency:           string;
+    amount:             number;
+    metadata:           any;
+    charge:             string;
+    terminal?:          null;
+    transaction:        string;
+    status?:            string;
+    funding_amount?:    number;
+    funding_currency?:  string;
+    created_at:         string;
+}
+
+export interface RefundDTO {
+  chargesId:          string;
+  amount:             number;
+  booking_id:         string;
+}
+
