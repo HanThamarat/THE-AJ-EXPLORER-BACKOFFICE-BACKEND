@@ -33,6 +33,23 @@ const financialController = new FinancialController(financialService);
  *       required:
  *         - bookingId
  *         - amount
+ * 
+ *     CreateRefund:
+ *       type: object
+ *       properties:
+ *         chargesId:
+ *           type: string
+ *           example: "chargesId"
+ *         booking_id:
+ *           type: string
+ *           example: "booking_id"
+ *         amount:
+ *           type: integer
+ *           example: 10000
+ *       required:
+ *         - chargesId
+ *         - amount
+ *         - booking_id
  */
 
 /**
@@ -85,5 +102,24 @@ router.post("/pay/promptpay", financialController.generateQr.bind(financialContr
 *         description: Get charges info by charge id successfully.
 */
 router.get("/charges/:id", financialController.findChargesById.bind(financialController));
+
+/**
+* @swagger
+* /api/v1/financial/refund:
+*   post:
+*     tags: [Financial]
+*     summary: Create a new refund by charges id.
+*     description: Create a new refund by charges id.
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CreateRefund'
+*     responses:
+*       201:
+*         description: Creating a new refund by charge id successfully. 
+*/
+router.post('/refund', financialController.createRefund.bind(financialController));
 
 export default router;
