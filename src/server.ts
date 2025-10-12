@@ -39,8 +39,9 @@ const io = new Server(server, {
 
 setupSocket(io);
 
+const corsOrigins = process.env.CORS_URL?.split(",") || [];
 const corsOptions = {
-    origin: process.env.CORS_URL,
+    origin: corsOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Authorization', 'Origin', 'X-Requested-With', 'X-API-KEY'],
     credentials: true,
