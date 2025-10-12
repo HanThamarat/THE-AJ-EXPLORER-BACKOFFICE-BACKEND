@@ -15,6 +15,7 @@ export class PackageController {
         try {
             let fileBufferArr: any[] = [];
             let imageInBucket: packageImageSave[] = [];
+            console.log('test');
             const axios = await AxiosInstanceMultipart(req);
             const { packageName, packageTypeId, additional_description, description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
@@ -22,6 +23,12 @@ export class PackageController {
                 pkgOptionTypeId: Number(data.pkgOptionTypeId),
                 name: data.name,
                 description: data.description,
+                adultFromAge: data?.adultFromAge,
+                adultToAge: data?.adultToAge,
+                childFromAge: data?.childFromAge,
+                childToAge: data?.childToAge,
+                groupFromAge: data?.groupFromAge,
+                groupToAge: data?.groupToAge,
                 adultPrice: Number(data?.adultPrice),
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)
@@ -171,6 +178,12 @@ export class PackageController {
                 pkgOptionTypeId: Number(data.pkgOptionTypeId),
                 name: data.name,
                 description: data.description,
+                adultFromAge: data?.adultFromAge,
+                adultToAge: data?.adultToAge,
+                childFromAge: data?.childFromAge,
+                childToAge: data?.childToAge,
+                groupFromAge: data?.groupFromAge,
+                groupToAge: data?.groupToAge,
                 adultPrice: Number(data?.adultPrice),
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)

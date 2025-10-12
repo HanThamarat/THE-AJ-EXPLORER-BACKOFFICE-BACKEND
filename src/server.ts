@@ -40,11 +40,25 @@ const io = new Server(server, {
 setupSocket(io);
 
 const corsOptions = {
-    origin: '*',
+    origin: process.env.CORS_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Authorization', 'Origin', 'X-Requested-With', 'X-API-KEY'],
     credentials: true,
 };
+
+const helmetOption = {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", "*"],
+        connectSrc: ["'self'", "*"],
+        imgSrc: ["'self'", "data:", "*"],
+        styleSrc: ["'self'", "'unsafe-inline'", "*"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "*"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+};
+
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
@@ -59,7 +73,7 @@ app.use(bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true }));
 app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);
-app.use(helmet());
+app.use(helmet(helmetOption));
 
 app.set("trust proxy", 1);
 

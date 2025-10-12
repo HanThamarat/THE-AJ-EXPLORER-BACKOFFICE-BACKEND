@@ -40,6 +40,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 pkgOptionId: data.pkgOptionTypeId,
                 name: data.name,
                 description: data.description,
+                adultFromAge: data?.adultFromAge,
+                adultToAge: data?.adultToAge,
+                childFromAge: data?.childFromAge,
+                childToAge: data?.childToAge,
+                groupFromAge: data?.groupFromAge,
+                groupToAge: data?.groupToAge,
                 adultPrice: data?.adultPrice,
                 childPrice: data?.childPrice,
                 groupPrice: data?.groupPrice,
@@ -124,6 +130,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         adultPrice: true,
                         childPrice: true,
                         groupPrice: true,
+                        adultFromAge: true,
+                        adultToAge: true,
+                        childFromAge: true,
+                        childToAge: true,
+                        groupFromAge: true,
+                        groupToAge: true,
                     }
                 },
                 createBy: {
@@ -181,6 +193,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+                adultFromAge: data.adultFromAge ?? "",
+                adultToAge: data.adultToAge ?? "",
+                childFromAge: data.childFromAge ?? "",
+                childToAge: data.childToAge ?? "",
+                groupFromAge: data.groupFromAge ?? "",
+                groupToAge: data.groupToAge ?? ""
             })) : null,
             pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
                 attractionName: data.attractionName,
@@ -274,6 +292,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         adultPrice: true,
                         childPrice: true,
                         groupPrice: true,
+                        adultFromAge: true,
+                        adultToAge: true,
+                        childFromAge: true,
+                        childToAge: true,
+                        groupFromAge: true,
+                        groupToAge: true,
                     }
                 },
                 createBy: {
@@ -329,6 +353,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                     adultPrice: Number(data.adultPrice ?? 0),
                     childPrice: Number(data.childPrice ?? 0),
                     groupPrice: Number(data.groupPrice ?? 0),
+                    adultFromAge: data.adultFromAge ?? "",
+                    adultToAge: data.adultToAge ?? "",
+                    childFromAge: data.childFromAge ?? "",
+                    childToAge: data.childToAge ?? "",
+                    groupFromAge: data.groupFromAge ?? "",
+                    groupToAge: data.groupToAge ?? ""
                 })) : null,
                 pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
                     attractionName: data.attractionName,
@@ -432,6 +462,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         adultPrice: true,
                         childPrice: true,
                         groupPrice: true,
+                        adultFromAge: true,
+                        adultToAge: true,
+                        childFromAge: true,
+                        childToAge: true,
+                        groupFromAge: true,
+                        groupToAge: true,
                     }
                 },
                 createBy: {
@@ -508,6 +544,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+                adultFromAge: data.adultFromAge ?? "",
+                adultToAge: data.adultToAge ?? "",
+                childFromAge: data.childFromAge ?? "",
+                childToAge: data.childToAge ?? "",
+                groupFromAge: data.groupFromAge ?? "",
+                groupToAge: data.groupToAge ?? ""
             })) : null,
             pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
                 attractionName: data.attractionName,
@@ -576,6 +618,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 pkgOptionId: data.pkgOptionTypeId,
                 name: data.name,
                 description: data.description,
+                adultFromAge: data?.adultFromAge,
+                adultToAge: data?.adultToAge,
+                childFromAge: data?.childFromAge,
+                childToAge: data?.childToAge,
+                groupFromAge: data?.groupFromAge,
+                groupToAge: data?.groupToAge,
                 adultPrice: data?.adultPrice,
                 childPrice: data?.childPrice,
                 groupPrice: data?.groupPrice,
@@ -666,6 +714,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         adultPrice: true,
                         childPrice: true,
                         groupPrice: true,
+                        adultFromAge: true,
+                        adultToAge: true,
+                        childFromAge: true,
+                        childToAge: true,
+                        groupFromAge: true,
+                        groupToAge: true,
                     }
                 },
                 createBy: {
@@ -721,6 +775,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+                adultFromAge: data.adultFromAge ?? "",
+                adultToAge: data.adultToAge ?? "",
+                childFromAge: data.childFromAge ?? "",
+                childToAge: data.childToAge ?? "",
+                groupFromAge: data.groupFromAge ?? "",
+                groupToAge: data.groupToAge ?? ""
             })) : null,
             pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
                 attractionName: data.attractionName,
@@ -834,6 +894,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         adultPrice: true,
                         childPrice: true,
                         groupPrice: true,
+                        adultFromAge: true,
+                        adultToAge: true,
+                        childFromAge: true,
+                        childToAge: true,
+                        groupFromAge: true,
+                        groupToAge: true,
                     }
                 },
                 createBy: {
@@ -889,6 +955,12 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 adultPrice: Number(data.adultPrice ?? 0),
                 childPrice: Number(data.childPrice ?? 0),
                 groupPrice: Number(data.groupPrice ?? 0),
+                adultFromAge: data.adultFromAge ?? "",
+                adultToAge: data.adultToAge ?? "",
+                childFromAge: data.childFromAge ?? "",
+                childToAge: data.childToAge ?? "",
+                groupFromAge: data.groupFromAge ?? "",
+                groupToAge: data.groupToAge ?? ""
             })) : null,
             pakcageAttraction: result?.packageAttraction ? result.packageAttraction.map((data) => ({
                 attractionName: data.attractionName,
