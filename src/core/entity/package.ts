@@ -34,6 +34,12 @@ export interface packageOptionDTO {
     pkgOptionTypeId:    number;
     name:               string;
     description:        string;
+    adultFromAge?:      string;
+    adultToAge?:        string;
+    childFromAge?:      string;
+    childToAge?:        string;
+    groupFromAge?:      string;
+    groupToAge?:        string;
     adultPrice?:        number;
     childPrice?:        number;
     groupPrice?:        number;
@@ -99,9 +105,15 @@ export interface packageOptionEntity {
     pkgOptionType:      string;
     name:               string;
     description:        string;
+    adultFromAge?:      string;
+    adultToAge?:        string;
+    childFromAge?:      string;
+    childToAge?:        string;
+    groupFromAge?:      string;
+    groupToAge?:        string;
     adultPrice?:        number;
     childPrice?:        number;
     groupPrice?:        number;
-    created_at?:         Date;
-    updated_at?:         Date;
+    created_at?:        Date;
+    updated_at?:        Date;
 }

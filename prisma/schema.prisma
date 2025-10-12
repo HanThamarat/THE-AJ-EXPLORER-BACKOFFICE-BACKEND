@@ -208,6 +208,12 @@ model packageOption {
   pkgOptionId      Int
   name             String?        @db.VarChar(100)
   description      String?        @db.VarChar(6000)
+  adultFromAge     String?        @db.VarChar(10)
+  adultToAge       String?        @db.VarChar(10)
+  childFromAge     String?        @db.VarChar(10)
+  childToAge       String?        @db.VarChar(10)
+  groupFromAge     String?        @db.VarChar(10)
+  groupToAge       String?        @db.VarChar(10)
   adultPrice       Float?          
   childPrice       Float?    
   groupPrice       Float?      

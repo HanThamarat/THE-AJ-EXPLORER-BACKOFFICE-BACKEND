@@ -47,6 +47,24 @@ const packageController = new PackageController(packageService);
  *           type: number
  *           format: float
  *           example: 5000.00
+ *         adultFromAge:
+ *           type: string
+ *           example: "20"
+ *         adultToAge:
+ *           type: string
+ *           example: "70"
+ *         childFromAge:
+ *           type: string
+ *           example: "1"
+ *         childToAge:
+ *           type: string
+ *           example: "15"
+ *         groupFromAge:
+ *           type: string
+ *           example: "2"
+ *         groupToAge:
+ *           type: string
+ *           example: "100"
  *       required:
  *         - pkgOptionTypeId
  *         - name
