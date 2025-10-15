@@ -2,6 +2,9 @@
 
 export interface PromotionDTO {
     promoName:          string;
+    type:               'promotion' | 'coupon',
+    couponCode?:        string;
+    description?:       string;
     startDate:          Date;
     endDate:            Date;
     status:             boolean;
@@ -20,6 +23,9 @@ export interface PromotionLinkDTO {
 export interface Promotion {
     id:                 number;
     promoName:          string;
+    type:               'promotion' | 'coupon',
+    couponCode?:        string;
+    description?:       string;
     startDate:          Date | string;
     endDate:            Date | string;
     status:             boolean | string;

@@ -17,6 +17,9 @@ export const findPromoByID = async (id: number): Promise<Promotion | unknown> =>
                 updated_at: true,
                 updated_by: true,
                 status: true,
+                type: true,
+                description: true,
+                couponCode: true,
                 promoLink: {
                     select: {
                         id: true,
@@ -46,6 +49,9 @@ export const findPromoByID = async (id: number): Promise<Promotion | unknown> =>
         const responseFormated: Promotion = {
             id: response?.id ? response.id : 0,
             promoName: response?.promoName ? response.promoName : 'no data',
+            type: response?.type ? response.type : 'promotion',
+            couponCode: response?.couponCode ? response.couponCode : "no data",
+            description: response?.description ? response.description : "no data",
             startDate: response?.startDate ? response.startDate : 'no data',
             endDate: response?.endDate ? response.endDate : 'nodata',
             status: response?.status ? response.status : "no data",

@@ -9,7 +9,7 @@ export class PromoController {
 
     async createPromo(req: Request, res: Response) {
         try {
-            const { promoName, startDate, endDate, status, PromoLink } = req.body;
+            const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = await userInfo?.id;
             const PromoLinkArr: PromotionLinkDTO[] = PromoLink.map((data: PromotionLinkDTO) => ({
@@ -18,6 +18,9 @@ export class PromoController {
             }));
             
             const promoData: PromotionDTO = {
+                type: type,
+                couponCode: couponCode,
+                description: description,
                 promoName: promoName,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
@@ -90,7 +93,7 @@ export class PromoController {
     async updatePromo(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const { promoName, startDate, endDate, status, PromoLink } = req.body;
+            const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = await userInfo?.id;
             const PromoLinkArr: PromotionLinkDTO[] = PromoLink.map((data: PromotionLinkDTO) => ({
@@ -101,6 +104,9 @@ export class PromoController {
             
             const promoData: PromotionDTO = {
                 promoName: promoName,
+                type: type,
+                couponCode: couponCode,
+                description: description,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
                 status: status,
