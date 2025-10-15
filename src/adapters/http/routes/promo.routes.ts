@@ -55,6 +55,15 @@ const promotionController = new PromoController(promotionService);
  *         promoName:
  *           type: string
  *           example: "Summer"
+ *         type:
+ *           type: string
+ *           example: "promotion"
+ *         couponCode:
+ *           type: string
+ *           example: "HanThamaratCode"
+ *         description:
+ *           type: string
+ *           example: "Description"
  *         startDate:
  *           type: string
  *           example: "2023-08-15"

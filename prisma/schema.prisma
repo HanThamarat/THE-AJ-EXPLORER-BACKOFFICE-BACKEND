@@ -253,7 +253,10 @@ model packageOptionType {
 model packagePromo {
   id               Int              @id @default(autoincrement())
   promoName        String           @db.VarChar(100)
-  startDate        DateTime       
+  type             packagePromoType @default(promotion)
+  couponCode       String?          @db.VarChar(30)
+  description      String?          @db.VarChar(2000)
+  startDate        DateTime        
   endDate          DateTime
   status           Boolean?         @default(true)
   created_at       DateTime         @default(now())
@@ -293,4 +296,10 @@ model blog {
 
   insertBy         administrator  @relation("BlogUserInsert", fields: [created_by], references: [id], onDelete: Cascade)
   updateBy         administrator  @relation("BlogUserUpdate", fields: [updated_by], references: [id], onDelete: Cascade)
+}
+
+
+enum packagePromoType {
+  promotion
+  coupon
 }

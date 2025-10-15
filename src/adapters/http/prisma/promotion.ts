@@ -8,6 +8,9 @@ export class PromoPrismaORM implements PromoRepositoryPort {
         const createPromo = await prisma.packagePromo.create({
             data: {
                 promoName: promoDto.promoName,
+                type: promoDto.type,
+                couponCode: promoDto.couponCode,
+                description: promoDto.description,
                 startDate: promoDto.startDate,
                 endDate: promoDto.endDate,
                 status: promoDto.status,
@@ -50,6 +53,9 @@ export class PromoPrismaORM implements PromoRepositoryPort {
                 created_by: true,
                 updated_at: true,
                 updated_by: true,
+                description: true,
+                type: true,
+                couponCode: true,
                 status: true,
                 promoLink: {
                     select: {
@@ -80,6 +86,9 @@ export class PromoPrismaORM implements PromoRepositoryPort {
         const responseFormated: Promotion[] = result.map((response) => ({
             id: response?.id ? response.id : 0,
             promoName: response?.promoName ? response.promoName : 'no data',
+            type: response.type,
+            couponCode: response?.couponCode ? response.couponCode : "no data",
+            description: response?.description ? response.description : "no data",
             startDate: response?.startDate ? response.startDate : 'no data',
             endDate: response?.endDate ? response.endDate : 'nodata',
             status: response?.status ? response.status : "no data",
@@ -139,6 +148,9 @@ export class PromoPrismaORM implements PromoRepositoryPort {
             },
             data: {
                 promoName: promoDto.promoName,
+                type: promoDto.type,
+                couponCode: promoDto.couponCode,
+                description: promoDto.description,
                 startDate: promoDto.startDate,
                 endDate: promoDto.endDate,
                 status: promoDto.status,
