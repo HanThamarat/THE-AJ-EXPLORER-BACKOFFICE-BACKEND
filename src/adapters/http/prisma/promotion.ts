@@ -60,6 +60,7 @@ export class PromoPrismaORM implements PromoRepositoryPort {
                 promoLink: {
                     select: {
                         id: true,
+                        packageLink: true,
                         packagePromoLink: {
                             select: {
                                 packageName: true
@@ -94,6 +95,7 @@ export class PromoPrismaORM implements PromoRepositoryPort {
             status: response?.status ? response.status : "no data",
             packagePromoLink: response?.promoLink.length ? response?.promoLink.map<PromotionLink>((data) => ({
                 id: data?.id ? data.id : 0,
+                pakcageId: data?.packageLink ? data.packageLink : 0,
                 packageLink: data?.packagePromoLink?.packageName ? data?.packagePromoLink?.packageName : 'no data',
                 percentage: Number(data?.percentage) ? Number(data.percentage) : 0
             })) : 'no data',

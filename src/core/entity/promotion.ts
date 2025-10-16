@@ -39,5 +39,6 @@ export interface Promotion {
 export interface PromotionLink {
     id:             number;
     packageLink:    string;
+    pakcageId:      number;
     percentage:     number;
 }
