@@ -60,6 +60,8 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
+
+  userViewer  blogViewer[]  @relation("userView")
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -286,6 +288,7 @@ model promoLink {
 model blog {
   id               Int            @id @default(autoincrement())
   title            String         @db.VarChar(100)
+  thumnbnail       String?        @db.VarChar(1000)
   descrition       String?        @db.Text
   status           Boolean?       @default(true)
   created_by       Int
@@ -296,6 +299,19 @@ model blog {
 
   insertBy         administrator  @relation("BlogUserInsert", fields: [created_by], references: [id], onDelete: Cascade)
   updateBy         administrator  @relation("BlogUserUpdate", fields: [updated_by], references: [id], onDelete: Cascade)
+
+  viewer           blogViewer[]   @relation("blogView")
+}
+
+model blogViewer {
+  id              Int             @id @default(autoincrement())
+  blogId          Int
+  userId          String
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+
+  blogView        blog            @relation("blogView", fields: [blogId], references: [id])
+  userView        User            @relation("userView", fields: [userId], references: [id])
 }
 
 
