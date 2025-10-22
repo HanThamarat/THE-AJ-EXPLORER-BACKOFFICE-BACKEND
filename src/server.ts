@@ -21,6 +21,7 @@ import promoRoutes      from './adapters/http/routes/promo.routes';
 import pkgTypeRoutes    from './adapters/http/routes/pkgType.routes';
 import geolocatRoutes   from './adapters/http/routes/geolocat.routes';
 import financialRoutes  from './adapters/http/routes/financial.routes';
+import blogRoutes       from './adapters/http/routes/blog.routes';
 import { Server } from 'socket.io';
 
 
@@ -86,6 +87,7 @@ app.use('/api/v1/packagepromotion', passport.authenticate('jwt', { session: fals
 app.use('/api/v1/pkgtypemanagement', passport.authenticate('jwt', { session: false }), pkgTypeRoutes);
 app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }), geolocatRoutes);
 app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), financialRoutes);
+app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
