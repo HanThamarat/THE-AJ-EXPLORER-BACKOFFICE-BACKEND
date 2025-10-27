@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { userEntity } from "./user";
 
 export interface authEntity {
@@ -21,3 +22,18 @@ export interface authUserEntity {
     iat: number; // issued at (JWT)
     exp: number; // expiration time (JWT)
 }
+
+export interface googleProfileDTO {
+    email:          string;
+    name:           string;
+    images?:        string;
+    googleId:       string;
+}
+
+export interface userCredentialDTO {
+    email:          string;
+    name?:          string;
+    passsword:      string;
+}
+
+export type customerEntity = Prisma.UserGetPayload<{}>
