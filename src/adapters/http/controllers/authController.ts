@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../../../core/services/authService";
-import { authEntity } from "../../../core/entity/auth";
+import { authEntity, googleProfileDTO, userCredentialDTO } from "../../../core/entity/auth";
 import { Ecrypt } from "../../helpers/encrypt";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import passport from "passport";
@@ -52,6 +52,94 @@ export class AuthController {
         message: "authentication failed.",
         statusCode: 401,
         error: error,
+      });
+    }
+  }
+
+  async findOrCreateUserByGoogle(req: Request, res: Response) {
+    try {
+      const { email, name, picture, sub } = req.body;
+
+      if (!email || !name || !sub) throw "Missing Google profile details";
+
+      const user: googleProfileDTO = {
+        email,
+        name,
+        images: picture,
+        googleId: sub,
+      };
+
+      const response = await this.authService.findOrCreateUserByGoogle(user);
+
+      return setResponse({
+        res: res,
+        message: "authentication with google oauth successfully.",
+        statusCode: 200,
+        body: response
+      });
+    } catch (error) {
+      return setErrResponse({
+        res: res,
+        message: "authentication with google oauth failed.",
+        statusCode: 401,
+        error: error instanceof Error ? error.message : 'authentication with google oauth failed.',
+      });
+    } 
+  }
+
+  async createUserWithPassword(req: Request, res: Response) {
+    try {
+      const { email, name, password } = req.body;
+
+      const hashPassword = await Ecrypt.passwordEncrypt(password as string);
+
+      const user: userCredentialDTO = {
+        email,
+        name,
+        passsword: hashPassword
+      };
+
+      const response = await this.authService.createUserWithPassword(user);
+
+      return setResponse({
+        res: res,
+        message: "create user with password successfully.",
+        statusCode: 200,
+        body: response
+      });
+    } catch (error) {
+      return setErrResponse({
+        res: res,
+        message: "create user with password failed.",
+        statusCode: 401,
+        error: error instanceof Error ? error.message : 'create user with password failed.',
+      });
+    } 
+  }
+
+  async validateUserPassword(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      const user: userCredentialDTO = {
+        email,
+        passsword: password
+      };
+
+      const response = await this.authService.validateUserPassword(user);      
+
+      return setResponse({
+        res: res,
+        message: "sign in with password successfully.",
+        statusCode: 200,
+        body: response
+      });
+    } catch (error) {
+      return setErrResponse({
+        res: res,
+        message: "sign in with password failed.",
+        statusCode: 401,
+        error: error instanceof Error ? error.message : 'sign in with password failed.',
       });
     }
   }

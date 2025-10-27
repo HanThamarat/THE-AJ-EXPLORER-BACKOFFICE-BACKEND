@@ -34,6 +34,42 @@ const authController = new AuthController(authService);
 *           type: string
 *           example: password
 *           description: The passsword of username.
+*     GoogleAuthentication:
+*       type: object
+*       properties:
+*         email:
+*           type: string
+*           example: hanthamarat@gmail.com
+*         name:
+*           type: string
+*           example: some name
+*         picture:
+*           type: string
+*           example: image link from google
+*         sub:
+*           type: string
+*           example: goolge user id
+*     CreateCustomer:
+*       type: object
+*       properties:
+*         email:
+*           type: string
+*           example: hanthamarat@gmail.com
+*         name:
+*           type: string
+*           example: some name
+*         passowrd:
+*           type: string
+*           example: 123456
+*     CredentialSignin:
+*       type: object
+*       properties:
+*         email:
+*           type: string
+*           example: hanthamarat@gmail.com
+*         passowrd:
+*           type: string
+*           example: 123456
 */
 
 /**
@@ -55,6 +91,66 @@ const authController = new AuthController(authService);
 *         description: authentication successful
 */
 router.post('/signin', authController.authenticate.bind(authController));
+
+/**
+* @swagger
+* /api/v1/auth/google-signin:
+*   post:
+*     tags: [Authentication]
+*     summary: client auth with google oauth
+*     security:
+*       - BearerAuth: []
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/GoogleAuthentication'
+*     responses:
+*       200:
+*         description: sign in with google oauth successfully.
+*/
+router.post('/google-signin', authController.findOrCreateUserByGoogle.bind(authController));
+
+/**
+* @swagger
+* /api/v1/auth/create-customer:
+*   post:
+*     tags: [Authentication]
+*     summary: create client with credentail
+*     security:
+*       - BearerAuth: []
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CreateCustomer'
+*     responses:
+*       200:
+*         description: create client with credentail successfully.
+*/
+router.post('/create-customer', authController.createUserWithPassword.bind(authController));
+
+/**
+* @swagger
+* /api/v1/auth/signin-customer:
+*   post:
+*     tags: [Authentication]
+*     summary: sign in client with credentail
+*     security:
+*       - BearerAuth: []
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CredentialSignin'
+*     responses:
+*       200:
+*         description: sign in with credentail successfully.
+*/
+router.post('/signin-customer', authController.validateUserPassword.bind(authController));
 
 router.use("/providers", 
     ExpressAuth({ 
