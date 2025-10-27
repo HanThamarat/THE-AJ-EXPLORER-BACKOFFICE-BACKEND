@@ -42,6 +42,9 @@ const blogController = new BlogController(blogService);
  *         title:
  *           type: string
  *           example: "Phuket Adventure"
+ *         blogType:
+ *           type: integer
+ *           example: 1
  *         descrition:
  *           type: string
  *           example: "A 3-day adventure in Phuket"

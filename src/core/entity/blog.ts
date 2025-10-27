@@ -3,6 +3,7 @@ import { Request } from "express";
 
 export interface blogDTO {
     title:          string;
+    blogType:       number;
     thumnbnail:     imageDTO;
     descrition:     string;
     status:         boolean;
@@ -14,6 +15,7 @@ export interface blogDTO {
 export interface blogEntity {
     id:             number;
     title:          string;
+    blogtype:       string;
     thumnbnail:     imageEntity | string;
     descrition:     string;
     status:         boolean | string;
@@ -21,4 +23,11 @@ export interface blogEntity {
     created_at:     Date | string;
     updated_by:     string;
     updated_at:     Date | string;
+}
+
+export interface blogTypeEntity {
+    id:            number;
+    name:          string;
+    created_at?:    Date | string;
+    updated_at?:    Date | string;
 }
