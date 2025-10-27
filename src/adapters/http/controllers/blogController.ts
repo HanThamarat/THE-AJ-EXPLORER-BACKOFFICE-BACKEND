@@ -10,7 +10,7 @@ export class BlogController {
 
     async createBlog(req: Request, res: Response) {
         try {
-            const { title, thumnbnail, descrition, status } = req.body;
+            const { title, thumnbnail, descrition, status, blogType } = req.body;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId =  Number(userInfo?.id);
 
@@ -25,10 +25,14 @@ export class BlogController {
                 title,
                 descrition,
                 status,
+                blogType: Number(blogType),
                 thumnbnail: thumnbnailImage,
                 created_by: userId,
                 updated_by: userId,
             }
+
+            console.log(blogDATA);
+            
 
             const response = await this.blogService.createBlog(blogDATA);
 
@@ -93,7 +97,7 @@ export class BlogController {
     async updateBlog(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const { title, thumnbnail, descrition, status } = req.body;
+            const { title, thumnbnail, descrition, status, blogType } = req.body;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId =  Number(userInfo?.id);
 
@@ -108,6 +112,7 @@ export class BlogController {
                 title,
                 descrition,
                 status,
+                blogType: Number(blogType),
                 thumnbnail: thumnbnailImage,
                 created_by: userId,
                 updated_by: userId,

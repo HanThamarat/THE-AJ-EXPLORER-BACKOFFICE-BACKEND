@@ -22,6 +22,7 @@ export class BlogORM implements BlogRepositoryPort {
         const createNewBlog = prisma.blog.create({
             data: {
                 title: blogDTO.title,
+                blogType: blogDTO.blogType,
                 descrition: blogDTO.descrition,
                 thumnbnail: convertObjecttoString,
                 status: blogDTO.status,
@@ -50,6 +51,11 @@ export class BlogORM implements BlogRepositoryPort {
                 status: true,
                 created_at: true,
                 updated_at: true,
+                toBlogType: {
+                    select: {
+                        name: true,
+                    }
+                },
                 insertBy: {
                     select: {
                         firstName: true,
@@ -68,6 +74,7 @@ export class BlogORM implements BlogRepositoryPort {
         const responseFormetter: blogEntity[] = findAll.map((response) => ({
             id: response?.id ? response.id : 0,
             title: response?.title ? response.title : "no data",
+            blogtype: response?.toBlogType.name ? response.toBlogType.name : "no data",
             thumnbnail: response?.thumnbnail ? JSON.parse(response.thumnbnail) : "no data",
             descrition: response?.descrition ? response.descrition : "no data",
             status: response?.status ? response.status : "no data",
@@ -118,6 +125,7 @@ export class BlogORM implements BlogRepositoryPort {
                 descrition: blogDTO.descrition,
                 thumnbnail: imageUpdatedTostirng,
                 status: blogDTO.status,
+                blogType: blogDTO.blogType,
                 created_by: blogDTO.created_by,
                 updated_by: blogDTO.updated_by
             }
@@ -165,6 +173,11 @@ export class BlogORM implements BlogRepositoryPort {
                 status: true,
                 created_at: true,
                 updated_at: true,
+                toBlogType: {
+                    select: {
+                        name: true,
+                    }
+                },
                 insertBy: {
                     select: {
                         firstName: true,
@@ -184,6 +197,7 @@ export class BlogORM implements BlogRepositoryPort {
 
         const responsrFormatter: blogEntity = {
             id: response?.id ? response.id : 0,
+            blogtype: response?.toBlogType.name ? response.toBlogType.name : "no data",
             title: response?.title ? response.title : "no data",
             thumnbnail: {
                 file_name: convertStringImage.file_name,

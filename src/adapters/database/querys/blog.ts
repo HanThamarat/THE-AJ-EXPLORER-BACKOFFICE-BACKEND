@@ -21,6 +21,11 @@ export class BLOG_DATA_SOURCE {
                 status: true,
                 created_at: true,
                 updated_at: true,
+                toBlogType: {
+                    select: {
+                        name: true,
+                    }
+                },
                 insertBy: {
                     select: {
                         firstName: true,
@@ -58,6 +63,7 @@ export class BLOG_DATA_SOURCE {
         const responsrFormatter: blogEntity = {
             id: response?.id ? response.id : 0,
             title: response?.title ? response.title : "no data",
+            blogtype: response?.toBlogType.name ? response.toBlogType.name : "no data",
             thumnbnail: {
                 file_name: parseImage.file_name,
                 file_original_name: parseImage.file_original_name,
