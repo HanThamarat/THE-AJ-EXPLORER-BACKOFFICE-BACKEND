@@ -1,5 +1,10 @@
--- CreateEnum
-CREATE TYPE "packagePromoType" AS ENUM ('promotion', 'coupon');
+-- CreateEnum (safe version)
+DO $$
+BEGIN
+    CREATE TYPE "packagePromoType" AS ENUM ('promotion', 'coupon');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateTable
 CREATE TABLE "administrator" (
