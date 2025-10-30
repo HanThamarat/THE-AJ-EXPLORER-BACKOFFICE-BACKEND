@@ -30,7 +30,7 @@ model administrator {
 
   role        role      @relation("ToRole", fields: [roleId], references: [id], onDelete: Cascade)
 
-  blogInsert      blog[]           @relation("BlogUserInsert")
+  blogInsert      blog[]          @relation("BlogUserInsert")
   blogUpdate      blog[]          @relation("BlogUserUpdate")
   packageInsert   packages[]      @relation("packageInsert")
   packageupdate   packages[]      @relation("packageUpdate")
@@ -56,6 +56,7 @@ model User {
   email         String          @unique
   emailVerified DateTime?
   image         String?
+  phoneNumber   String?         @db.VarChar(10)
   password      String?
   accounts      Account[]
   sessions      Session[]
@@ -63,6 +64,8 @@ model User {
   Authenticator Authenticator[]
 
   userViewer  blogViewer[]  @relation("userView")
+  toBooking   Booking[]     @relation("booker")
+  toUserBank  UserBankAccount[] @relation("MyBankAcc")
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -326,6 +329,125 @@ model blogViewer {
   userView        User            @relation("userView", fields: [userId], references: [id])
 }
 
+model Booking {
+  id                Int          @id  @default(autoincrement())
+  bookingId         String       @unique @db.VarChar(50)
+  paymentRef        String?      @db.VarChar(60)
+  paymentStatus     payStatus    @default(panding)
+  bookingStatus     bkStatus     @default(panding)
+  userId            String
+  childPrice        Decimal? 
+  childQty          Int?
+  adultPrice        Decimal?
+  adultQty          Int?
+  groupPrice        Decimal?
+  groupQty          Int?
+  additionalDetail  String?      @db.VarChar(1000)
+  locationId        Int?
+  pickup_lat        Decimal
+  pickup_lgn        Decimal
+  trip_at           DateTime
+  policyAccept      Boolean      @default(false)
+  expire_at         DateTime
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
+
+  toReview          Review[]     @relation("bookingReview")
+  toCancel          CancalationBooking[] @relation("cancalationBooking")
+  toRefund          RefundBooking[] @relation("bookingRefund")
+
+  location          locationPoint?   @relation("pickuplocation", fields: [locationId], references: [id])
+  booker            User             @relation("booker", fields: [userId], references: [id])
+}
+
+model Review {
+  id                Int         @id @default(autoincrement())
+  bookingId         String
+  cleanliness       Int
+  staff             Int
+  location          Int
+  title             String      @db.VarChar(100)
+  samary            String      @db.VarChar(1000)
+  iamge             String      @db.Text
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt 
+
+  toBooking         Booking     @relation("bookingReview", fields: [bookingId], references: [bookingId])
+}
+
+model CancalationBooking {
+  id                Int         @id @default(autoincrement())
+  bookingId         String
+  cancelStatus      clStatus    @default(panding)
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+
+  toBooking         Booking     @relation("cancalationBooking", fields: [bookingId], references: [bookingId])
+}
+
+model RefundBooking {
+  id                Int         @id @default(autoincrement())
+  bookingId         String
+  paymentMethod     payMethod
+  amount            Decimal
+  resson            String?     @db.VarChar(600)
+  manualRefund      Int?
+  processed_at      DateTime
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+
+  toBooking         Booking     @relation("bookingRefund", fields: [bookingId], references: [bookingId])
+  toUserBankAcc     UserBankAccount? @relation("userBankAcc", fields: [manualRefund], references: [id])
+}
+
+model UserBankAccount {
+  id                Int         @id @default(autoincrement())
+  userId            String
+  bankName          String
+  accountName       String
+  accountNumber     String
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+
+  toRefund          RefundBooking[]  @relation("userBankAcc") 
+  
+  toUser            User        @relation("MyBankAcc", fields: [userId], references: [id])
+}
+
+model locationPoint {
+  id                Int         @id @default(autoincrement())
+  locationName      String      @db.VarChar(100)
+  lat               Decimal
+  lng               Decimal
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+
+  booking           Booking[]    @relation("pickuplocation")
+}
+
+enum payMethod {
+  qr_propmtpay
+  mobile_banking
+  card
+}
+
+enum clStatus {
+  panding
+  confirmed
+  failed
+}
+
+enum payStatus {
+  panding
+  paid
+  failed
+}
+
+enum bkStatus {
+  panding
+  confirmed
+  failed
+}
 
 enum packagePromoType {
   promotion
