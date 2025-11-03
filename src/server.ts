@@ -14,14 +14,15 @@ import { setupSocket } from './conf/socket';
 import helmet from 'helmet';
 
 // import routes  here
-import authRoutes       from './adapters/http/routes/auth.routes';
-import userRoutes       from './adapters/http/routes/user.routes';
-import packageRoutes    from './adapters/http/routes/package.routes';
-import promoRoutes      from './adapters/http/routes/promo.routes';
-import pkgTypeRoutes    from './adapters/http/routes/pkgType.routes';
-import geolocatRoutes   from './adapters/http/routes/geolocat.routes';
-import financialRoutes  from './adapters/http/routes/financial.routes';
-import blogRoutes       from './adapters/http/routes/blog.routes';
+import authRoutes               from './adapters/http/routes/auth.routes';
+import userRoutes               from './adapters/http/routes/user.routes';
+import packageRoutes            from './adapters/http/routes/package.routes';
+import promoRoutes              from './adapters/http/routes/promo.routes';
+import pkgTypeRoutes            from './adapters/http/routes/pkgType.routes';
+import geolocatRoutes           from './adapters/http/routes/geolocat.routes';
+import financialRoutes          from './adapters/http/routes/financial.routes';
+import blogRoutes               from './adapters/http/routes/blog.routes';
+import clientPackageRoutes      from "./adapters/http/routes/clientPackage.routes";
 import { Server } from 'socket.io';
 
 
@@ -88,6 +89,7 @@ app.use('/api/v1/pkgtypemanagement', passport.authenticate('jwt', { session: fal
 app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }), geolocatRoutes);
 app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), financialRoutes);
 app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
+app.use('/api/v1/client/package', clientPackageRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
