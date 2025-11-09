@@ -1,4 +1,4 @@
-import { blogDTO, blogEntity } from "../entity/blog";
+import { blogDTO, blogEntity, blogTypeEntity } from "../entity/blog";
 import { Request } from "express";
 
 export interface BlogRepositoryPort {
@@ -7,4 +7,5 @@ export interface BlogRepositoryPort {
     findBlogById(req: Request, id: string): Promise<blogEntity>;
     updateBlog(id: string, blogDTO: blogDTO): Promise<blogEntity>;
     deleteBlog(id: string): Promise<blogEntity>;
+    findAllBlogType(): Promise<blogTypeEntity[]>;
 }

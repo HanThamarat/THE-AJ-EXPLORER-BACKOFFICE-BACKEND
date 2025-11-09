@@ -1,5 +1,5 @@
 import { FILE_SCHEMA } from "../../../const/schema/file";
-import { blogDTO, blogEntity } from "../../../core/entity/blog";
+import { blogDTO, blogEntity, blogTypeEntity } from "../../../core/entity/blog";
 import { BlogRepositoryPort } from "../../../core/ports/blogRepositortPort";
 import { prisma } from "../../database/data-source";
 import { Convertion } from "../../helpers/convertion";
@@ -214,5 +214,11 @@ export class BlogORM implements BlogRepositoryPort {
         };
 
         return responsrFormatter;
+    }
+
+    async findAllBlogType(): Promise<blogTypeEntity[]> {
+        const result = await prisma.blogType.findMany({});
+
+        return result;
     }
 }
