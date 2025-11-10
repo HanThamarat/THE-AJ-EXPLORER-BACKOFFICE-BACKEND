@@ -15,6 +15,7 @@ export interface blogDTO {
 export interface blogEntity {
     id:             number;
     title:          string;
+    blogtype_id?:   number;
     blogtype:       string;
     thumnbnail:     imageEntity | string;
     descrition:     string;

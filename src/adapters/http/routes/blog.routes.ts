@@ -158,4 +158,16 @@ router.put("/blog/:id", blogController.updateBlog.bind(blogController));
  */
 router.delete("/blog/:id", blogController.deleteBlog.bind(blogController));
 
+/**
+* @swagger
+* /api/v1/blogmanagement/blog_type:
+*   get:
+*     tags: [Blog]
+*     summary: Get all blog type
+*     responses:
+*       200:
+*         description: Finding all blog types successfully.
+*/
+router.get("/blog_type", blogController.findAllBlogType.bind(blogController));
+
 export default router;

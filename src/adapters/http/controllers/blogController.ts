@@ -157,4 +157,25 @@ export class BlogController {
             });
         }
     }
+
+    async findAllBlogType(req: Request, res: Response) {
+        try {
+            
+            const response = await this.blogService.findAllBlogType();
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Finding all blog types successfully.",
+                body: response,
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Finding all blog types failed.",
+                error: error instanceof Error ? error.message : 'Finding all blog types failed.'
+            });
+        }
+    }
 }
