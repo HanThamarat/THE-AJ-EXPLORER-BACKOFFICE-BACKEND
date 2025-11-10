@@ -18,6 +18,7 @@ export class BLOG_DATA_SOURCE {
                 title: true,
                 thumnbnail: true,
                 descrition: true,
+                blogType: true,
                 status: true,
                 created_at: true,
                 updated_at: true,
@@ -64,6 +65,7 @@ export class BLOG_DATA_SOURCE {
             id: response?.id ? response.id : 0,
             title: response?.title ? response.title : "no data",
             blogtype: response?.toBlogType.name ? response.toBlogType.name : "no data",
+            blogtype_id: response?.blogType ? response.blogType : 0,
             thumnbnail: {
                 file_name: parseImage.file_name,
                 file_original_name: parseImage.file_original_name,
@@ -72,7 +74,7 @@ export class BLOG_DATA_SOURCE {
                 base64: imageBase64?.data?.body[0].file_base64
             },
             descrition: response?.descrition ? response.descrition : "no data",
-            status: response?.status ? response.status : "no data",
+            status: response?.status ? response.status : false,
             created_at: response?.created_at ? response.created_at : "no data",
             created_by: response?.insertBy.firstName ? `${response.insertBy.firstName} ${response.insertBy.lastName}` : "",
             updated_at: response?.updated_at ? response.updated_at : "no data",

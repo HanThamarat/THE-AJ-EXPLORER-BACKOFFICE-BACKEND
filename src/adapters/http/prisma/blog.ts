@@ -2,9 +2,6 @@ import { FILE_SCHEMA } from "../../../const/schema/file";
 import { blogDTO, blogEntity, blogTypeEntity } from "../../../core/entity/blog";
 import { BlogRepositoryPort } from "../../../core/ports/blogRepositortPort";
 import { prisma } from "../../database/data-source";
-import { Convertion } from "../../helpers/convertion";
-import FormData from 'form-data';
-import { AxiosInstanceMultipart } from "../../../hooks/axiosInstance";
 import { imageEntity } from "../../../const/schema/image";
 import { BLOG_DATA_SOURCE } from "../../database/querys/blog";
 import { Request } from "express";
@@ -77,7 +74,7 @@ export class BlogORM implements BlogRepositoryPort {
             blogtype: response?.toBlogType.name ? response.toBlogType.name : "no data",
             thumnbnail: response?.thumnbnail ? JSON.parse(response.thumnbnail) : "no data",
             descrition: response?.descrition ? response.descrition : "no data",
-            status: response?.status ? response.status : "no data",
+            status: response?.status ? response.status : false,
             created_at: response?.created_at ? response.created_at : "no data",
             created_by: response?.insertBy.firstName ? `${response.insertBy.firstName} ${response.insertBy.lastName}` : "",
             updated_at: response?.updated_at ? response.updated_at : "no data",
@@ -206,7 +203,7 @@ export class BlogORM implements BlogRepositoryPort {
                 mainFile: convertStringImage.mainFile,
             },
             descrition: response?.descrition ? response.descrition : "no data",
-            status: response?.status ? response.status : "no data",
+            status: response?.status ? response.status : false,
             created_at: response?.created_at ? response.created_at : "no data",
             created_by: response?.insertBy.firstName ? `${response.insertBy.firstName} ${response.insertBy.lastName}` : "",
             updated_at: response?.updated_at ? response.updated_at : "no data",
