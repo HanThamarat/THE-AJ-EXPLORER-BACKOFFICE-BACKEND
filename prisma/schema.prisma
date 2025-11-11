@@ -38,6 +38,12 @@ model administrator {
   PromoUserUpdate packagePromo[]  @relation("PromoUserUpdate")
   pkgTypeCreated  packageType[]   @relation("createdPackageTypeBy")
   pkgTypeUpdated  packageType[]   @relation("updatedPackageTypeBy")
+
+  @@index([id])
+  @@index([email])
+  @@index([username])
+  @@index([password])
+  @@index([status])
 }
 
 model role {
@@ -193,6 +199,10 @@ model packages {
   packagePromoLink  promoLink[]         @relation("packagePromoLink")
   packageOption     packageOption[]     @relation("ToPackage")
   packageAttraction packageAttraction[] @relation("packageAttraction")
+
+  @@index([id])
+  @@index([packageName])
+  @@index([status])
 }
 
 model packageAttraction {
@@ -275,6 +285,12 @@ model packagePromo {
   userUpdate       administrator?   @relation("PromoUserUpdate", fields: [updated_by], references: [id])
 
   promoLink        promoLink[]      @relation("packagePromo")
+
+  @@index([id])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([status])
+  @@index([promoName])
 }
 
 model promoLink {
@@ -307,6 +323,10 @@ model blog {
   toBlogType       blogType       @relation("toBlogType", fields: [blogType], references: [id])
 
   viewer           blogViewer[]   @relation("blogView")
+
+  @@index([id])
+  @@index([title])
+  @@index([status])
 }
 
 model blogType {
@@ -358,6 +378,12 @@ model Booking {
 
   location          locationPoint?   @relation("pickuplocation", fields: [locationId], references: [id])
   booker            User             @relation("booker", fields: [userId], references: [id])
+
+  @@index([id])
+  @@index([bookingId])
+  @@index([paymentRef])
+  @@index([bookingStatus])
+  @@index([paymentStatus])
 }
 
 model Review {
@@ -373,6 +399,8 @@ model Review {
   updated_at        DateTime    @updatedAt 
 
   toBooking         Booking     @relation("bookingReview", fields: [bookingId], references: [bookingId])
+
+  @@index([id])
 }
 
 model CancalationBooking {
@@ -383,6 +411,9 @@ model CancalationBooking {
   updated_at        DateTime    @updatedAt
 
   toBooking         Booking     @relation("cancalationBooking", fields: [bookingId], references: [bookingId])
+
+  @@index([id])
+  @@index([cancelStatus])
 }
 
 model RefundBooking {
@@ -398,6 +429,10 @@ model RefundBooking {
 
   toBooking         Booking     @relation("bookingRefund", fields: [bookingId], references: [bookingId])
   toUserBankAcc     UserBankAccount? @relation("userBankAcc", fields: [manualRefund], references: [id])
+
+  @@index([id])
+  @@index([paymentMethod])
+  @@index([amount])
 }
 
 model UserBankAccount {
@@ -412,6 +447,8 @@ model UserBankAccount {
   toRefund          RefundBooking[]  @relation("userBankAcc") 
   
   toUser            User        @relation("MyBankAcc", fields: [userId], references: [id])
+
+  @@index([id])
 }
 
 model locationPoint {
