@@ -406,7 +406,11 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: true,
                 packageName: true,
                 description: true,
+                provinceId: true,
+                districtId: true,
+                subDistrictId: true,
                 additional_description: true,
+                packageTypeId: true,
                 depart_point_lat: true,
                 depart_point_lon: true,
                 end_point_lat: true,
@@ -453,6 +457,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                         id: true,
                         name: true,
                         packageId: true,
+                        pkgOptionId: true,
                         packageOptionType: {
                             select: {
                                 name: true
@@ -522,11 +527,15 @@ export class PackagePrismaORM implements PackageRepositoryPort {
         const resultFormat: packageEntity = {
             id: result?.id ? result.id : 0,
             packageName: result?.packageName ? result.packageName : 'no data',
+            packageTypeId: result?.packageTypeId ? result.packageTypeId : 0,
             packageType: result?.pacakgeType?.name ? result.pacakgeType.name : 'no data',
             description: result?.description ? result.description : 'no data',
             additional_description: result?.additional_description ? result.additional_description : 'no data',
+            provinceId: result?.provinceId ? result.provinceId : 0,
             province: result?.province?.nameEn ? result?.province?.nameEn : 'no data',
+            districtId: result?.districtId ? result.districtId : 0,
             district: result?.district?.nameEn ? result.district.nameEn : 'no data', 
+            subDistrictId: result?.subDistrictId ? result.subDistrictId : 0,
             subDistrict: result?.subdistrict?.nameEn ? result.subdistrict.nameEn : 'no data',
             depart_point_lat: result?.depart_point_lat ? result.depart_point_lat : 'no data',
             depart_point_lon: result?.depart_point_lon ? result.depart_point_lon : 'no dara',
@@ -539,6 +548,7 @@ export class PackagePrismaORM implements PackageRepositoryPort {
                 id: data.id,
                 packageId: data.packageId,
                 pkgOptionType: data.packageOptionType?.name ?? "",
+                pkgOptionTypeId: data.pkgOptionId ?? "",
                 name: data.name ?? "",
                 description: data.description ?? "",
                 adultPrice: Number(data.adultPrice ?? 0),

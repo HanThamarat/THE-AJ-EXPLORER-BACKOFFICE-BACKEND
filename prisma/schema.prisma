@@ -362,6 +362,7 @@ model Booking {
   adultQty          Int?
   groupPrice        Decimal?
   groupQty          Int?
+  amount            Decimal
   additionalDetail  String?      @db.VarChar(1000)
   locationId        Int?
   pickup_lat        Decimal

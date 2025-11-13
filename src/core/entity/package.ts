@@ -70,12 +70,16 @@ export interface packageImageSave {
 export interface packageEntity {
     id:                         number;
     packageName:                string;
+    packageTypeId?:             number;
     packageType:                string;
     description?:               string;
     additional_description?:    string;
     province:                   string;
+    provinceId?:                number;
     district:                   string;
+    districtId?:                number;
     subDistrict:                string;
+    subDistrictId?:             number;
     packageImage:               packageImageSave[] | [];
     depart_point_lon:           string;
     depart_point_lat:           string;
@@ -102,6 +106,7 @@ export interface packageAttractionEntity {
 export interface packageOptionEntity {
     id:                 number;
     packageId:          number;
+    pkgOptionTypeId?:   number;
     pkgOptionType:      string;
     name:               string;
     description:        string;
