@@ -4,7 +4,7 @@ import { BookingRepositoryPort } from "../ports/bookingRepositoryPort";
 export class BookingService {
     constructor(private readonly bookingRepositoryPort: BookingRepositoryPort) {}
 
-    // createNewBooking(booking: bookingEntity): Promise<bookingEntity> {
-    //     return this.bookingRepositoryPort.createNewBooking(booking);
-    // }
+    createNewBooking(booking: bookingEntity): Promise<bookingEntity | null> {
+        return this.bookingRepositoryPort.createNewBooking(booking);
+    }
 }

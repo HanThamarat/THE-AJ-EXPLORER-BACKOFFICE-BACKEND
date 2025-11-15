@@ -23,6 +23,7 @@ import geolocatRoutes           from './adapters/http/routes/geolocat.routes';
 import financialRoutes          from './adapters/http/routes/financial.routes';
 import blogRoutes               from './adapters/http/routes/blog.routes';
 import clientPackageRoutes      from "./adapters/http/routes/clientPackage.routes";
+import bookingRoutes            from './adapters/http/routes/booking.routes';
 import { Server } from 'socket.io';
 
 
@@ -64,7 +65,7 @@ const limiter = rateLimit({
 
 app.use(bodyParser.json({ limit: 200 * 1024 * 1024 })); // 200 MB
 app.use(bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true }));
-app.use(morgan('dev'));
+process.env.NODE_ENV !== 'test' && app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);
 app.use(helmet(helmetOption));
@@ -81,6 +82,7 @@ app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }),
 app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), financialRoutes);
 app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
 app.use('/api/v1/client/package', clientPackageRoutes);
+app.use('/api/v1/client/booking_service', bookingRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {

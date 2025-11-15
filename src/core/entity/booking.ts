@@ -5,6 +5,7 @@ export interface bookingEntity {
     paymentRef?:        string;
     paymentStatus:      "panding" | "paid" | "failed";
     bookingStatus:      "panding" | "confirmed" | "failed";
+    packageId:          number;
     userId:             string;
     childPrice?:        number;
     childQty?:          number;
