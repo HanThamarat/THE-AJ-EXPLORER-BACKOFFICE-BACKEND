@@ -61,7 +61,7 @@ export const findPromoByID = async (id: number): Promise<Promotion | unknown> =>
                 pakcageId: data?.packageLink ? data.packageLink : 0,
                 packageLink: data?.packagePromoLink?.packageName ? data?.packagePromoLink?.packageName : 'no data',
                 percentage: Number(data?.percentage) ? Number(data.percentage) : 0
-            })) : 'no data',
+            })) : [],
             created_by: response?.userCreate?.firstName || response?.userCreate?.lastName ? `${response?.userCreate?.firstName} ${response?.userCreate.lastName}` : 'no data',
             created_at: response?.created_at ? response.created_at : 'no data',
             updated_at: response?.updated_at ? response.updated_at : 'no data',

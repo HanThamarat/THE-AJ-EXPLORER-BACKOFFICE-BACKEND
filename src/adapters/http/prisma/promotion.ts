@@ -5,31 +5,34 @@ import { findPromoByID } from "../../database/querys/promo";
 
 export class PromoPrismaORM implements PromoRepositoryPort {
     async create(promoDto: PromotionDTO): Promise<Promotion> {
-        const createPromo = await prisma.packagePromo.create({
-            data: {
-                promoName: promoDto.promoName,
-                type: promoDto.type,
-                couponCode: promoDto.couponCode,
-                description: promoDto.description,
-                startDate: promoDto.startDate,
-                endDate: promoDto.endDate,
-                status: promoDto.status,
-                created_by: Number(promoDto.created_by),
-                updated_by: Number(promoDto.updated_by)
-            }
+
+        const createPromo = await prisma.$transaction(async (tx) => {
+            const Promo = await tx.packagePromo.create({
+                data: {
+                    promoName: promoDto.promoName,
+                    type: promoDto.type,
+                    couponCode: promoDto.couponCode,
+                    description: promoDto.description,
+                    startDate: promoDto.startDate,
+                    endDate: promoDto.endDate,
+                    status: promoDto.status,
+                    created_by: Number(promoDto.created_by),
+                    updated_by: Number(promoDto.updated_by)
+                }
+            });
+
+            await tx.promoLink.createMany({
+                data: promoDto.packagePromoLink.map((data: PromotionLinkDTO) => ({
+                    percentage: data.percentage,
+                    packageLink: data.packageLink,
+                    promoId: Promo.id
+                }))
+            });
+
+            return Promo;
         });
 
-        if (!createPromo) throw new Error("Creating a promotion failed.");
-
-        const createPackageLink = await prisma.promoLink.createMany({
-            data: promoDto.packagePromoLink.map((data: PromotionLinkDTO) => ({
-                percentage: data.percentage,
-                packageLink: data.packageLink,
-                promoId: createPromo.id
-            }))
-        });
-
-        if (!createPackageLink) throw new Error("Creating a promotion link failed."); 
+        if (!createPromo) throw new Error("Creating a promotion link failed."); 
 
         const response = await findPromoByID(createPromo.id);
 
@@ -98,7 +101,7 @@ export class PromoPrismaORM implements PromoRepositoryPort {
                 pakcageId: data?.packageLink ? data.packageLink : 0,
                 packageLink: data?.packagePromoLink?.packageName ? data?.packagePromoLink?.packageName : 'no data',
                 percentage: Number(data?.percentage) ? Number(data.percentage) : 0
-            })) : 'no data',
+            })) : [],
             created_by: response?.userCreate?.firstName || response?.userCreate?.lastName ? `${response?.userCreate?.firstName} ${response?.userCreate.lastName}` : 'no data',
             created_at: response?.created_at ? response.created_at : 'no data',
             updated_at: response?.updated_at ? response.updated_at : 'no data',
@@ -144,81 +147,85 @@ export class PromoPrismaORM implements PromoRepositoryPort {
 
         if (recheckPromotionName && recheckPromotion.promoName.toLocaleLowerCase !== promoDto.promoName.toLocaleLowerCase) throw new Error("This promotion name already in the system.");
 
-        const updatePromo = await prisma.packagePromo.update({
-            where: {
-                id: Number(id),
-            },
-            data: {
-                promoName: promoDto.promoName,
-                type: promoDto.type,
-                couponCode: promoDto.couponCode,
-                description: promoDto.description,
-                startDate: promoDto.startDate,
-                endDate: promoDto.endDate,
-                status: promoDto.status,
-                updated_by: Number(promoDto.updated_by)
+        const updatePro = await prisma.$transaction(async (tx) => {
+            const updatePromo = await tx.packagePromo.update({
+                where: {
+                    id: Number(id),
+                },
+                data: {
+                    promoName: promoDto.promoName,
+                    type: promoDto.type,
+                    couponCode: promoDto.couponCode,
+                    description: promoDto.description,
+                    startDate: promoDto.startDate,
+                    endDate: promoDto.endDate,
+                    status: promoDto.status,
+                    updated_by: Number(promoDto.updated_by)
+                }
+            });
+
+            if (!updatePromo) throw new Error("Updating a promotion failed.");
+
+            const getPromoLink = await tx.promoLink.findMany({
+                where: {
+                    promoId: updatePromo.id
+                }
+            });
+
+            const promoLink: PromotionLinkDTO[] = getPromoLink.map((data) => ({
+                id: data.id,
+                promoId: data.promoId,
+                percentage: data.percentage,
+                packageLink: data.packageLink
+            }));
+
+            const existingIds = new Set(promoDto.packagePromoLink.map((p) => p.id));
+
+            // filter data
+            const promoLinkCreatArr = promoDto.packagePromoLink.filter((p) => p.id === undefined);
+            const promoLinkDeleteArr = promoLink.filter((p) => !existingIds.has(p.id));
+            const promoLinkUpdateArr = promoLink.filter((p) => existingIds.has(p.id));
+            
+            if (promoLinkDeleteArr.length !== 0) {
+                for (const promoLink of promoLinkDeleteArr) {
+                    await tx.promoLink.delete({
+                        where: {
+                            id: promoLink.id
+                        }
+                    });
+                }
             }
-        });
 
-        if (!updatePromo) throw new Error("Updating a promotion failed.");
-
-        const getPromoLink = await prisma.promoLink.findMany({
-            where: {
-                promoId: updatePromo.id
+            if (promoLinkUpdateArr.length !== 0) {
+                for (const promoLinkUpdate of promoLinkUpdateArr) {
+                    await tx.promoLink.update({
+                        where: {
+                            id: promoLinkUpdate.id
+                        },
+                        data: {
+                            percentage: promoLinkUpdate.percentage,
+                            packageLink: promoLinkUpdate.packageLink 
+                        }
+                    });
+                }
             }
-        });
 
-        const promoLink: PromotionLinkDTO[] = getPromoLink.map((data) => ({
-            id: data.id,
-            promoId: data.promoId,
-            percentage: data.percentage,
-            packageLink: data.packageLink
-        }));
-
-        const existingIds = new Set(promoDto.packagePromoLink.map((p) => p.id));
-
-        // filter data
-        const promoLinkCreatArr = promoDto.packagePromoLink.filter((p) => p.id === undefined);
-        const promoLinkDeleteArr = promoLink.filter((p) => !existingIds.has(p.id));
-        const promoLinkUpdateArr = promoLink.filter((p) => existingIds.has(p.id));
-        
-        if (promoLinkDeleteArr.length !== 0) {
-            for (const promoLink of promoLinkDeleteArr) {
-                await prisma.promoLink.delete({
-                    where: {
-                        id: promoLink.id
-                    }
-                });
+            if (promoLinkCreatArr.length !== 0) {
+                for (const promoLinkCreat of promoLinkCreatArr) {
+                    await tx.promoLink.create({
+                        data: {
+                            percentage: promoLinkCreat.percentage,
+                            packageLink: promoLinkCreat.packageLink,
+                            promoId: updatePromo.id
+                        }
+                    })
+                }
             }
-        }
 
-        if (promoLinkUpdateArr.length !== 0) {
-            for (const promoLinkUpdate of promoLinkUpdateArr) {
-                await prisma.promoLink.update({
-                    where: {
-                        id: promoLinkUpdate.id
-                    },
-                    data: {
-                        percentage: promoLinkUpdate.percentage,
-                        packageLink: promoLinkUpdate.packageLink 
-                    }
-                });
-            }
-        }
+            return updatePromo;
+        })
 
-        if (promoLinkCreatArr.length !== 0) {
-            for (const promoLinkCreat of promoLinkCreatArr) {
-                await prisma.promoLink.create({
-                    data: {
-                        percentage: promoLinkCreat.percentage,
-                        packageLink: promoLinkCreat.packageLink,
-                        promoId: updatePromo.id
-                    }
-                })
-            }
-        }
-
-        const response = await findPromoByID(updatePromo.id);
+        const response = await findPromoByID(updatePro.id);
 
         return response as Promotion;
     }

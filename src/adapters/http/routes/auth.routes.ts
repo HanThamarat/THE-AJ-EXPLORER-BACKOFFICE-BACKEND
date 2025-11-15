@@ -2,10 +2,10 @@ import * as express from 'express';
 import { AuthPrismaORM } from '../prisma/auth';
 import { AuthService } from '../../../core/services/authService';
 import { AuthController } from '../controllers/authController';
-import { ExpressAuth } from '@auth/express';
-import Google from '@auth/express/providers/google';
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from '../../database/data-source';
+// import { ExpressAuth } from '@auth/express';
+// import Google from '@auth/express/providers/google';
+// import { PrismaAdapter } from "@auth/prisma-adapter"
+// import { prisma } from '../../database/data-source';
 
 const router = express.Router();
 const authRepository = new AuthPrismaORM();
@@ -152,23 +152,23 @@ router.post('/create-customer', authController.createUserWithPassword.bind(authC
 */
 router.post('/signin-customer', authController.validateUserPassword.bind(authController));
 
-router.use("/providers", 
-    ExpressAuth({ 
-        adapter: PrismaAdapter(prisma),
-        providers: [ Google ],
-        callbacks: {
-            async signIn({ user, account, profile }) {
-                console.log("User signed in:", user);
-                return true;
-            },
-            async session({ session, token }) {
-                console.log("Session:", session);
-                return session;
-            },
-        },
-        session: {
-            strategy: 'database'
-        }
-}));
+// router.use("/providers", 
+//     ExpressAuth({ 
+//         adapter: PrismaAdapter(prisma),
+//         providers: [ Google ],
+//         callbacks: {
+//             async signIn({ user, account, profile }) {
+//                 console.log("User signed in:", user);
+//                 return true;
+//             },
+//             async session({ session, token }) {
+//                 console.log("Session:", session);
+//                 return session;
+//             },
+//         },
+//         session: {
+//             strategy: 'database'
+//         }
+// }));
 
 export default router;

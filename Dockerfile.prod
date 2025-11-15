@@ -1,5 +1,5 @@
 # -----------------------
-# 1️⃣ BUILD STAGE
+# 1 BUILD STAGE
 # -----------------------
 FROM node:lts-slim AS builder
 
@@ -20,7 +20,30 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # -----------------------
-# 2️⃣ RUN STAGE
+# 2 TEST STAGE
+# -----------------------
+FROM node:lts-slim AS test
+
+WORKDIR /app
+
+# Copy everything from builder (includes dev dependencies)
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/jest.config.js ./
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tests ./tests
+
+# Set test environment
+ENV NODE_ENV=test
+
+# Run tests (build will fail if tests fail)
+RUN npm test
+
+
+# -----------------------
+# 3 RUN STAGE
 # -----------------------
 FROM node:lts-slim AS production
 

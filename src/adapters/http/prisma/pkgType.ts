@@ -225,12 +225,9 @@ export class PkgTypePrismaORM implements PkgTypeRepositoryPort {
         
         if (!recheckPkgType) throw new Error("This package type id not found in the system.");
 
-        const result = await prisma.packageType.update({
+        const result = await prisma.packageType.delete({
             where: {
                 id: Number(id),
-            },
-            data: {
-                deleted_at: new Date(),
             },
             select: {
                 id: true,

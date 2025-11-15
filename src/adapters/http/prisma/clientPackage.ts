@@ -3,8 +3,10 @@ import { ClientPacakgeRepositoryPort } from "../../../core/ports/clientPackagePo
 import { prisma } from "../../database/data-source";
 
 export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
+    constructor(private db: typeof prisma) {}
+
     async findProvinceByPackage(): Promise<findProvinceByPackageEntity> {
-        const result : any = prisma.$queryRaw`
+        const result : any = this.db.$queryRaw`
             select p."nameEn" as provinceName, p."id" as provinceId,
                 json_agg(
                     json_build_object(
