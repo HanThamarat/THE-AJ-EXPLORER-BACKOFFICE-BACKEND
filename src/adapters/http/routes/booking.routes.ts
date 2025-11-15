@@ -1,0 +1,99 @@
+import express from 'express';
+import { BookingDataSource } from '../prisma/booking';
+import { BookingService } from '../../../core/services/bookingService';
+import { BookingContorller } from '../controllers/bookingController';
+import { prisma as db } from '../../database/data-source';
+
+const router = express.Router();
+const bookingRepository = new BookingDataSource(db);
+const bookingService = new BookingService(bookingRepository);
+const bookingController = new BookingContorller(bookingService);
+
+/**
+ * @swagger
+ * tags:
+ *   name: Booking
+ *   description: Booking Service
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateBooking:
+ *       type: object
+ *       properties:
+ *         userId:
+ *           type: string
+ *           example: "cmi0escrq0000s7vu1ymxfb80"
+ *         packageId:
+ *           type: integer
+ *           example: 1
+ *         childPrice:
+ *           type: integer
+ *           example: 70000
+ *         childQty:
+ *           type: integer
+ *           example: 2
+ *         adultPrice:
+ *           type: integer
+ *           example: 150000
+ *         adultQty:
+ *           type: integer
+ *           example: 3
+ *         groupPrice:
+ *           type: integer
+ *           example: 0
+ *         groupQty:
+ *           type: integer
+ *           example: 0
+ *         amount:
+ *           type: integer
+ *           example: 590000
+ *         additionalDetail:
+ *           type: string
+ *           example: "A 3-day adventure in Phuket"
+ *         locationId:
+ *           type: integer
+ *           example: 0
+ *         pickup_lat:
+ *           type: float
+ *           example: 13.9312082
+ *         pickup_lgn:
+ *           type: float
+ *           example: 100.6307107
+ *         trip_at:
+ *           type: string
+ *           example: "2025-12-15"
+ *         policyAccept:
+ *           type: boolean
+ *           example: true
+ *       required:
+ *         - userId
+ *         - amount
+ *         - pickup_lat
+ *         - pickup_lgn
+ *         - trip_at
+ *         - policyAccept
+ */
+
+/**
+* @swagger
+* /api/v1/client/booking_service/booking:
+*   post:
+*     tags: [Booking]
+*     summary: Create a new booking
+*     description: Create a new booking in the system.
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CreateBooking'
+*     responses:
+*       201:
+*         description: booking created
+*/
+router.post('/booking', bookingController.createBooking.bind(bookingController));
+
+export default router;

@@ -199,6 +199,7 @@ model packages {
   packagePromoLink  promoLink[]         @relation("packagePromoLink")
   packageOption     packageOption[]     @relation("ToPackage")
   packageAttraction packageAttraction[] @relation("packageAttraction")
+  ToBbooking        Booking[]           @relation("bookingRelation")
 
   @@index([id])
   @@index([packageName])
@@ -352,17 +353,18 @@ model blogViewer {
 model Booking {
   id                Int          @id  @default(autoincrement())
   bookingId         String       @unique @db.VarChar(50)
+  packageId         Int
   paymentRef        String?      @db.VarChar(60)
   paymentStatus     payStatus    @default(panding)
   bookingStatus     bkStatus     @default(panding)
   userId            String
-  childPrice        Decimal? 
+  childPrice        Int? 
   childQty          Int?
-  adultPrice        Decimal?
+  adultPrice        Int?
   adultQty          Int?
-  groupPrice        Decimal?
+  groupPrice        Int?
   groupQty          Int?
-  amount            Decimal
+  amount            Int
   additionalDetail  String?      @db.VarChar(1000)
   locationId        Int?
   pickup_lat        Decimal
@@ -377,6 +379,7 @@ model Booking {
   toCancel          CancalationBooking[] @relation("cancalationBooking")
   toRefund          RefundBooking[] @relation("bookingRefund")
 
+  ToPackage         packages         @relation("bookingRelation", fields: [packageId], references: [id])
   location          locationPoint?   @relation("pickuplocation", fields: [locationId], references: [id])
   booker            User             @relation("booker", fields: [userId], references: [id])
 
