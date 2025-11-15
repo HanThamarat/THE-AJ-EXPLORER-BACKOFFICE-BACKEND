@@ -17,8 +17,8 @@ export class PackageService {
         return this.packageRepository.findPackageById(id, req);
     }
 
-    async updatePackage(id: string, packageDto: packageDTO): Promise<packageEntity> {
-        return this.packageRepository.updatePackage(id, packageDto);
+    async updatePackage(id: string, packageDto: packageDTO, req: Request): Promise<packageEntity> {
+        return this.packageRepository.updatePackage(id, packageDto, req);
     }
 
     async deletePackage(id: string): Promise<packageEntity> {

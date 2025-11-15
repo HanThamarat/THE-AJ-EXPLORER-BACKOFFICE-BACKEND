@@ -26,20 +26,11 @@ import clientPackageRoutes      from "./adapters/http/routes/clientPackage.route
 import { Server } from 'socket.io';
 
 
-dotenv.config();
-
-const app = express();
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-const server = http.createServer(app);
-
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-    },
+dotenv.config({
+    quiet: process.env.NODE_ENV === 'test'
 });
 
-setupSocket(io);
+const app = express();
 
 const corsOrigins = process.env.CORS_URL?.split(",") || [];
 const corsOptions = {
@@ -109,11 +100,29 @@ app.get('/', (req: Request, res: Response) => {
     }
 })
 
-server.listen(port, () => {
-    try {
-        AutoinitializeData();
-        console.log('Server is runing on port :', port);
-    } catch (error) {
-        return console.log('Server is not runing : ', error);
-    }
-});
+if (process.env.NODE_ENV !== "test") {
+    const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+    const server = http.createServer(app);
+
+    const io = new Server(server, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"],
+        },
+    });
+
+
+    setupSocket(io);
+
+    server.listen(port, () => {
+        try {
+            AutoinitializeData();
+            console.log('Server is runing on port :', port);
+        } catch (error) {
+            return console.log('Server is not runing : ', error);
+        }
+    });
+}
+
+
+export default app;

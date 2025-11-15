@@ -2,9 +2,10 @@ import express from "express";
 import { ClientPackageDataSource } from "../prisma/clientPackage";
 import { ClientPackageService } from "../../../core/services/clientPackage";
 import { ClientPackageController } from "../controllers/clientPackageController";
+import { prisma as db } from "../../database/data-source";
 
 const router = express.Router();
-const clientPackageRepository = new ClientPackageDataSource();
+const clientPackageRepository = new ClientPackageDataSource(db);
 const clientPackageService = new ClientPackageService(clientPackageRepository);
 const clientPackageController = new ClientPackageController(clientPackageService);
 

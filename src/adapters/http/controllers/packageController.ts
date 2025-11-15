@@ -15,7 +15,6 @@ export class PackageController {
         try {
             let fileBufferArr: any[] = [];
             let imageInBucket: packageImageSave[] = [];
-            console.log('test');
             const axios = await AxiosInstanceMultipart(req);
             const { packageName, packageTypeId, additional_description, description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
@@ -171,8 +170,12 @@ export class PackageController {
 
     async updatePackage(req: Request, res: Response) {
         try {
+            let fileBufferArr: any[] = [];
+            let imageInBucket: packageImageSave[] = [];
+            const axios = await AxiosInstanceMultipart(req);
             const { id } = req.params;
             const { packageName, packageTypeId, description, additional_description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
+           
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
                 packageId: Number(data.packageId),
                 pkgOptionTypeId: Number(data.pkgOptionTypeId),
@@ -188,6 +191,7 @@ export class PackageController {
                 childPrice: Number(data?.childPrice),
                 groupPrice: Number(data?.groupPrice)
             }));
+
             const attractionArr: packageAttractionDTO[] = attraction.map((data: packageAttractionDTO) => ({
                 packageId: Number(data.packageId),
                 attractionName: data.attractionName,
@@ -195,15 +199,54 @@ export class PackageController {
                 description: data.description,
                 status: data.status
             }));
+            
             const pakcageBenefitIncludeArr: packageInclude[] = benefit_include.map((data: packageInclude) => ({
                 detail: data.detail
             }));
+
             const pakcageBenefitNotIncludeArr: packageNotInclude[] = benefit_not_include.map((data: packageNotInclude) => ({
                 detail: data.detail
             }));
+
+            const packageImageArr: packageImageDTO[] = packageImage.map((data: packageImageDTO) => ({
+                base64: data.base64,
+                fileName: data.fileName,
+                mainFile: data.mainFile
+            }));
+
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = userInfo?.id;
 
+            for (const file of packageImageArr) {
+                const fileConverted = await Convertion.Decodebase64(file.base64);
+                fileBufferArr.push({
+                    buffer: fileConverted,
+                    fileName: file.fileName,
+                    mainFile: file.mainFile
+                });
+            }
+
+            for (const fileBuffer of fileBufferArr) {
+                const form = new FormData();
+                form.append("file", fileBuffer.buffer, {
+                    filename: fileBuffer.fileName,
+                });
+                form.append("file_path", FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);
+
+                const response = await axios?.post('/upload', form);
+
+                if (response?.status === 201) {
+                    imageInBucket.push({
+                        file_name: response?.data?.body?.file_name,
+                        file_original_name: response?.data?.body?.file_original_name,
+                        file_path: response?.data?.body?.file_path,
+                        mainFile: fileBuffer?.mainFile,
+                    });
+                }
+            }
+
+            
+            const packageImg = JSON.stringify(imageInBucket);
             const packageBenefitInclude = JSON.stringify(pakcageBenefitIncludeArr);
             const packageBenefitNotInclude = JSON.stringify(pakcageBenefitNotIncludeArr);
             const packageData: packageDTO = {
@@ -221,13 +264,13 @@ export class PackageController {
                 benefit_include: packageBenefitInclude,
                 benefit_not_include: packageBenefitNotInclude,
                 status: status,
-                packageImage: packageImage,
+                packageImage: packageImg,
                 packageOption: packageOptionArr,
                 packageAttraction: attractionArr,
                 updated_by: userId
             };
 
-            const updatePackage = await this.packageService.updatePackage(id, packageData);
+            const updatePackage = await this.packageService.updatePackage(id, packageData, req);
 
             return setResponse({
                 res: res,

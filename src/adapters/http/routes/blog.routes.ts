@@ -2,9 +2,10 @@ import express from "express";
 import { BlogORM } from "../prisma/blog";
 import { BlogController } from "../controllers/blogController";
 import { BlogService } from "../../../core/services/blogService";
+import { prisma as db } from "../../database/data-source";
 
 const router = express.Router();
-const blogRepositortPort = new BlogORM();
+const blogRepositortPort = new BlogORM(db);
 const blogService = new BlogService(blogRepositortPort);
 const blogController = new BlogController(blogService);
 

@@ -10,65 +10,65 @@ import { PACKAGE_SCHEMA } from "../../../const/schema/package";
 export class PackagePrismaORM implements PackageRepositoryPort {
     
     async createPacakge(packageDto: packageDTO): Promise<packageEntity> {
-        const createpackage = await prisma.packages.create({
-            data: {
-                packageName: packageDto.packageName,
-                packageTypeId: packageDto.packageTypeId,
-                description: packageDto.description,
-                additional_description: packageDto.additional_description,
-                provinceId: packageDto.provinceId,
-                districtId: packageDto.districtId,
-                subDistrictId: packageDto.subDistrictId,
-                depart_point_lat: packageDto.depart_point_lat,
-                depart_point_lon: packageDto.depart_point_lon,
-                end_point_lat: packageDto.end_point_lat,
-                end_point_lon: packageDto.end_point_lon,
-                benefit_include: packageDto.benefit_include,
-                benefit_not_include: packageDto.benefit_not_include,
-                packageImages: packageDto.packageImage,
-                status: packageDto.status,
-                created_by: Number(packageDto.created_by),
-                updated_by: Number(packageDto.updated_by)
-            }
+        const createPackage = await prisma.$transaction(async (tx) => {
+            const pkg = await tx.packages.create({
+                data: {
+                    packageName: packageDto.packageName,
+                    packageTypeId: packageDto.packageTypeId,
+                    description: packageDto.description,
+                    additional_description: packageDto.additional_description,
+                    provinceId: packageDto.provinceId,
+                    districtId: packageDto.districtId,
+                    subDistrictId: packageDto.subDistrictId,
+                    depart_point_lat: packageDto.depart_point_lat,
+                    depart_point_lon: packageDto.depart_point_lon,
+                    end_point_lat: packageDto.end_point_lat,
+                    end_point_lon: packageDto.end_point_lon,
+                    benefit_include: packageDto.benefit_include,
+                    benefit_not_include: packageDto.benefit_not_include,
+                    packageImages: packageDto.packageImage,
+                    status: packageDto.status,
+                    created_by: Number(packageDto.created_by),
+                    updated_by: Number(packageDto.updated_by)
+                }
+            });
+
+            await tx.packageOption.createMany({
+                data: packageDto.packageOption.map((data) => ({
+                    packageId: pkg.id,
+                    pkgOptionId: data.pkgOptionTypeId,
+                    name: data.name,
+                    description: data.description,
+                    adultFromAge: data?.adultFromAge,
+                    adultToAge: data?.adultToAge,
+                    childFromAge: data?.childFromAge,
+                    childToAge: data?.childToAge,
+                    groupFromAge: data?.groupFromAge,
+                    groupToAge: data?.groupToAge,
+                    adultPrice: data?.adultPrice,
+                    childPrice: data?.childPrice,
+                    groupPrice: data?.groupPrice,
+                }))
+            });
+
+            await tx.packageAttraction.createMany({
+                data: packageDto.packageAttraction.map((data) => ({
+                    packageId: pkg.id,
+                    attractionName: data.attractionName,
+                    attractionTime: data.attractionTime,
+                    description: data?.description,
+                    status: data.status
+                }))
+            });
+
+            return pkg;
         });
 
-        if (!createpackage) throw new Error("Creating a package something wrong.");
-
-        const createPkgOption = await prisma.packageOption.createMany({
-            data: packageDto.packageOption.map((data) => ({
-                packageId: createpackage.id,
-                pkgOptionId: data.pkgOptionTypeId,
-                name: data.name,
-                description: data.description,
-                adultFromAge: data?.adultFromAge,
-                adultToAge: data?.adultToAge,
-                childFromAge: data?.childFromAge,
-                childToAge: data?.childToAge,
-                groupFromAge: data?.groupFromAge,
-                groupToAge: data?.groupToAge,
-                adultPrice: data?.adultPrice,
-                childPrice: data?.childPrice,
-                groupPrice: data?.groupPrice,
-            }))
-        });
-
-        if (!createPkgOption) throw new Error("Creating a package option something wrong.");
-
-        const createPkgAttraction = await prisma.packageAttraction.createMany({
-            data: packageDto.packageAttraction.map((data) => ({
-                packageId: createpackage.id,
-                attractionName: data.attractionName,
-                attractionTime: data.attractionTime,
-                description: data?.description,
-                status: data.status
-            }))
-        });
-
-        if (!createPkgAttraction) throw new Error("Creating a pkg attraction something wrong.");
+        if (!createPackage) throw new Error("Have something worng in creating a package, plase try again.");
 
         const result = await prisma.packages.findFirst({
             where: {
-                id: createpackage.id
+                id: createPackage.id
             },
             select: {
                 id: true,
@@ -580,89 +580,104 @@ export class PackagePrismaORM implements PackageRepositoryPort {
         return resultFormat;
     }
 
-    async updatePackage(id: string, packageDto: packageDTO): Promise<packageEntity> {
-        const recheckPackage = await prisma.packages.count({
+    async updatePackage(id: string, packageDto: packageDTO, req: Request): Promise<packageEntity> {
+        const axios = AxiosInstance(req);
+
+        const recheckPackage = await prisma.packages.findFirst({
             where: {
                 id: Number(id),
                 deleted_at: null
             }
         });
 
-        if (recheckPackage === 0) throw new Error("This package id not found in the system.");
+        if (!recheckPackage) throw new Error("This package id not found in the system.");
 
-        const createpackage = await prisma.packages.update({
-            where: {
-                id: Number(id)
-            },
-            data: {
-                packageName: packageDto.packageName,
-                packageTypeId: packageDto.packageTypeId,
-                description: packageDto.description,
-                additional_description: packageDto.additional_description,
-                provinceId: packageDto.provinceId,
-                districtId: packageDto.districtId,
-                subDistrictId: packageDto.subDistrictId,
-                depart_point_lat: packageDto.depart_point_lat,
-                depart_point_lon: packageDto.depart_point_lon,
-                end_point_lat: packageDto.end_point_lat,
-                end_point_lon: packageDto.end_point_lon,
-                benefit_include: packageDto.benefit_include,
-                benefit_not_include: packageDto.benefit_not_include,
-                packageImages: packageDto.packageImage,
-                status: packageDto.status,
-                updated_by: Number(packageDto.updated_by)
-            }
+        const oldPackageImmages: packageImageSave[] = JSON.parse(recheckPackage.packageImages as string);
+        let imgArr: Array<string> = []
+
+        for (const Image of oldPackageImmages) {
+            imgArr.push(Image.file_name);
+        }
+
+        await axios?.post('/deletefiles', {
+            file_name: imgArr,
+            file_path: FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH
         });
 
-        if (!createpackage) throw new Error("Updating a package something wrong.");
 
-        await prisma.packageOption.deleteMany({
-            where: {
-                packageId: Number(id)
-            }
+        const updatePackage = await prisma.$transaction(async (tx) => {
+            const updatePkg = await tx.packages.update({
+                where: {
+                    id: Number(id)
+                },
+                data: {
+                    packageName: packageDto.packageName,
+                    packageTypeId: packageDto.packageTypeId,
+                    description: packageDto.description,
+                    additional_description: packageDto.additional_description,
+                    provinceId: packageDto.provinceId,
+                    districtId: packageDto.districtId,
+                    subDistrictId: packageDto.subDistrictId,
+                    depart_point_lat: packageDto.depart_point_lat,
+                    depart_point_lon: packageDto.depart_point_lon,
+                    end_point_lat: packageDto.end_point_lat,
+                    end_point_lon: packageDto.end_point_lon,
+                    benefit_include: packageDto.benefit_include,
+                    benefit_not_include: packageDto.benefit_not_include,
+                    packageImages: packageDto.packageImage,
+                    status: packageDto.status,
+                    updated_by: Number(packageDto.updated_by)
+                }
+            });
+
+            await tx.packageOption.deleteMany({
+                where: {
+                    packageId: Number(id)
+                }
+            });
+
+            await tx.packageOption.createMany({
+                data: packageDto.packageOption.map((data) => ({
+                    packageId: updatePkg.id,
+                    pkgOptionId: data.pkgOptionTypeId,
+                    name: data.name,
+                    description: data.description,
+                    adultFromAge: data?.adultFromAge,
+                    adultToAge: data?.adultToAge,
+                    childFromAge: data?.childFromAge,
+                    childToAge: data?.childToAge,
+                    groupFromAge: data?.groupFromAge,
+                    groupToAge: data?.groupToAge,
+                    adultPrice: data?.adultPrice,
+                    childPrice: data?.childPrice,
+                    groupPrice: data?.groupPrice,
+                }))
+            });
+
+            await prisma.packageAttraction.deleteMany({
+                where: {
+                    packageId: Number(id)
+                },
+            });
+
+            await tx.packageAttraction.createMany({
+                data: packageDto.packageAttraction.map((data) => ({
+                    packageId: updatePkg.id,
+                    attractionName: data.attractionName,
+                    attractionTime: data.attractionTime,
+                    description: data?.description,
+                    status: data.status
+                }))
+            });
+
+            return updatePkg;
         });
 
-        const createPkgOption = await prisma.packageOption.createMany({
-            data: packageDto.packageOption.map((data) => ({
-                packageId: createpackage.id,
-                pkgOptionId: data.pkgOptionTypeId,
-                name: data.name,
-                description: data.description,
-                adultFromAge: data?.adultFromAge,
-                adultToAge: data?.adultToAge,
-                childFromAge: data?.childFromAge,
-                childToAge: data?.childToAge,
-                groupFromAge: data?.groupFromAge,
-                groupToAge: data?.groupToAge,
-                adultPrice: data?.adultPrice,
-                childPrice: data?.childPrice,
-                groupPrice: data?.groupPrice,
-            }))
-        });
-
-        if (!createPkgOption) throw new Error("Updating a package option something wrong.");
-
-        await prisma.packageAttraction.deleteMany({
-            where: {
-                packageId: Number(id)
-            },
-        });
-
-        const createPkgAttraction = await prisma.packageAttraction.createMany({
-            data: packageDto.packageAttraction.map((data) => ({
-                packageId: createpackage.id,
-                attractionName: data.attractionName,
-                attractionTime: data.attractionTime,
-                description: data?.description,
-                status: data.status
-            }))
-        });
-
-        if (!createPkgAttraction) throw new Error("Updating a pkg attraction something wrong.");
+        if (!updatePackage) throw new Error("Updating a pkg something wrong, please try again later.");
 
         const result = await prisma.packages.findFirst({
             where: {
-                id: createpackage.id
+                id: updatePackage.id
             },
             select: {
                 id: true,

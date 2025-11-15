@@ -4,13 +4,16 @@ import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
 
 export class BookingORM implements BookingRepositoryPort {
+    constructor(private db: typeof prisma) {}
+
     async createNewBooking(booking: bookingEntity): Promise<bookingEntity> {
+
 
         const generateBookId = await Generate.generateBookingId();
         const date = new Date();
         const extendedTome = new Date(date.getTime() + 15 * 60000);
 
-        const createBook = await prisma.booking.create({
+        const createBook = await this.db.booking.create({
             data: {
                 bookingId: generateBookId,
                 paymentStatus: booking.paymentStatus,

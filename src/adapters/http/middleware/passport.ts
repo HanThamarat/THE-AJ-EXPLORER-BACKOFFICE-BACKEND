@@ -17,7 +17,7 @@ passport.use(new LocalStorategy({
         passwordField: 'password'
     },
     async (username: string, password: string, cb: any) => {
-        try {
+        try {    
             const user = await prisma.administrator.findFirst({
                 where: {
                     OR: [

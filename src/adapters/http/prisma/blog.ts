@@ -8,6 +8,8 @@ import { Request } from "express";
 import { Bucket } from "../../database/bucket";
 
 export class BlogORM implements BlogRepositoryPort {
+    constructor(private db: typeof prisma) {}
+
     async createBlog(blogDTO: blogDTO): Promise<blogEntity> {
 
         if (!blogDTO.thumnbnail) throw new Error("Plase attract file before submition.");
@@ -16,7 +18,7 @@ export class BlogORM implements BlogRepositoryPort {
 
         const convertObjecttoString = JSON.stringify(uploadThumnail);
         
-        const createNewBlog = prisma.blog.create({
+        const createNewBlog = this.db.blog.create({
             data: {
                 title: blogDTO.title,
                 blogType: blogDTO.blogType,
@@ -36,7 +38,7 @@ export class BlogORM implements BlogRepositoryPort {
     };
 
     async findAllBlogs(): Promise<blogEntity[]> {
-        const findAll = await prisma.blog.findMany({
+        const findAll = await this.db.blog.findMany({
             where: {
                 deleted_at: null
             },
@@ -113,7 +115,7 @@ export class BlogORM implements BlogRepositoryPort {
             }
         }
 
-        const updateBlog = await prisma.blog.update({
+        const updateBlog = await this.db.blog.update({
             where: {
                 id: blogId
             },
@@ -138,7 +140,7 @@ export class BlogORM implements BlogRepositoryPort {
     async deleteBlog(id: string): Promise<blogEntity> {
         const blogId = Number(id);
 
-        const recheckBlog = await prisma.blog.count({
+        const recheckBlog = await this.db.blog.count({
             where: {
                 id: blogId,
                 deleted_at: null
@@ -147,7 +149,7 @@ export class BlogORM implements BlogRepositoryPort {
 
         if (recheckBlog === 0) throw new Error("This blog id not found data in the system.");
 
-        const deleteBlog = await prisma.blog.update({
+        const deleteBlog = await this.db.blog.update({
             where: {
                 id: blogId
             },
@@ -158,7 +160,7 @@ export class BlogORM implements BlogRepositoryPort {
 
         if (!deleteBlog) throw new Error("Deting has somethong worng.");
 
-        const response = await prisma.blog.findFirst({
+        const response = await this.db.blog.findFirst({
             where: {
                 id: blogId,
             },
