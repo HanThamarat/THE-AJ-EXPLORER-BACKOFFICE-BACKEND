@@ -206,4 +206,16 @@ router.put("/promotion/:id", promotionController.updatePromo.bind(promotionContr
  */
 router.delete("/promotion/:id", promotionController.deletePromo.bind(promotionController));
 
+/**
+* @swagger
+* /api/v1/packagepromotion/promotion_day:
+*   get:
+*     tags: [Promotion]
+*     summary: Get all package promotion day
+*     responses:
+*       200:
+*         description: Fetch a list of all package promotion day from the system.
+*/
+router.get("/promotion_day", promotionController.findPromoDay.bind(promotionController));
+
 export default router;

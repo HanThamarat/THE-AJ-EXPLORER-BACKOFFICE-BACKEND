@@ -58,4 +58,11 @@ describe("Package Promotion Service", () => {
 
         expect(response.status).toBe(200);
     });
+
+    it("Get all promotion day /api/v1/packagepromotion/promotion_day should list of romotion day", async () => {
+        const response = await request(app)
+        .get(`/api/v1/packagepromotion/promotion_day`);
+
+        expect(response.status).toBe(200);
+    });
 });

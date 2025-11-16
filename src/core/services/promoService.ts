@@ -1,4 +1,4 @@
-import { Promotion, PromotionDTO } from "../entity/promotion";
+import { Promotion, promotionDay, PromotionDTO } from "../entity/promotion";
 import { PromoRepositoryPort } from "../ports/promoRepositoryPort";
 
 export class PromoService {
@@ -22,5 +22,9 @@ export class PromoService {
 
     async delete(id: string): Promise<Promotion> {
         return this.promotionRepo.delete(id);
+    }
+
+    async findPromoDay(): Promise<promotionDay[]> {
+        return this.promotionRepo.findPromoDay();
     }
 }

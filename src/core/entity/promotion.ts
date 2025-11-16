@@ -42,3 +42,9 @@ export interface PromotionLink {
     pakcageId:      number;
     percentage:     number;
 }
+
+export interface promotionDay {
+    id:             number;
+    startDate:      string | Date;
+    endDate:        string | Date;
+}

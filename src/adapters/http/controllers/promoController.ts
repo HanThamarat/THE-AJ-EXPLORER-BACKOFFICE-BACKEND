@@ -154,4 +154,24 @@ export class PromoController {
             });
         }
     }
+
+    async findPromoDay(req: Request, res: Response) {
+        try {
+            const response = await this.promoService.findPromoDay();
+
+            return setResponse({
+                res: res,
+                message: "Finding the promotion day successfully.",
+                body: response,
+                statusCode: 200
+            });
+        } catch (err) {
+            return setErrResponse({
+                res: res,
+                message: "Finding the promotion day failed.",
+                error: err instanceof Error ? err.message : 'Finding the promotion day failed.',
+                statusCode: 500
+            });
+        }
+    }
 }
