@@ -1,4 +1,4 @@
-import { PromotionDTO, Promotion, PromotionLinkDTO, PromotionLink } from "../../../core/entity/promotion";
+import { PromotionDTO, Promotion, PromotionLinkDTO, PromotionLink, promotionDay } from "../../../core/entity/promotion";
 import { PromoRepositoryPort } from "../../../core/ports/promoRepositoryPort";
 import { prisma } from "../../database/data-source";
 import { findPromoByID } from "../../database/querys/promo";
@@ -254,5 +254,17 @@ export class PromoPrismaORM implements PromoRepositoryPort {
         const response = await findPromoByID(deletedPromo.id);
 
         return response as Promotion;
+    }
+
+    async findPromoDay(): Promise<promotionDay[]> {
+        const result = await prisma.packagePromo.findMany({
+            select: {
+                id: true,
+                startDate: true,
+                endDate: true
+            }
+        });
+
+        return result;
     }
 }
