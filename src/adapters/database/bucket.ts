@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { AxiosInstance, AxiosInstanceMultipart } from "../../hooks/axiosInstance";
+import { AxiosInstance, AxiosInstanceForFindBucket, AxiosInstanceMultipart } from "../../hooks/axiosInstance";
 import { imageDTO, imageEntity } from "../../const/schema/image";
 import { Convertion } from "../helpers/convertion";
 import FormData from 'form-data';
@@ -26,6 +26,58 @@ export class Bucket {
         } catch (error: any) {
             return error as Error;
         }
+    }
+
+    static async findMany(req: Request, image: imageEntity[], file_path: string): Promise<imageEntity[] | Error> {
+        try {
+            const axios = await AxiosInstance(req);
+            let imgArr: Array<string> = [];
+
+            for (const file of image) { 
+                imgArr.push(file.file_name);
+            }                        
+    
+            const imageBase64 = await axios?.post('/findfiles', {
+                file_name: imgArr,
+                file_path: file_path
+            });
+
+            // merge origin image arr and push base64 to arr
+            const mergedImage: imageEntity[] = image.map(original => {
+                const match = imageBase64?.data?.body?.find((imgs: any) => imgs.file_name === original.file_name);
+                return match
+                    ? { ...original, file_base64: match.file_base64 }
+                    : original;
+            }); 
+    
+            return mergedImage;
+        } catch (error) {
+            return error as Error;
+        }
+    }
+
+    static async findManyWithoutToken(image: imageEntity[], file_path: string): Promise<imageEntity[]> {
+        const axios = await AxiosInstanceForFindBucket();
+        let imgArr: Array<string> = [];
+
+        for (const file of image) { 
+            imgArr.push(file.file_name);
+        }                        
+
+        const imageBase64 = await axios?.post('/findfiles', {
+            file_name: imgArr,
+            file_path: file_path
+        });
+
+        // merge origin image arr and push base64 to arr
+        const mergedImage: imageEntity[] = image.map(original => {
+            const match = imageBase64?.data?.body?.find((imgs: any) => imgs.file_name === original.file_name);
+            return match
+                ? { ...original, file_base64: match.file_base64 }
+                : original;
+        }); 
+
+        return mergedImage;
     }
 
     static async upload(req: Request, image: imageDTO, file_path: string): Promise<imageEntity | Error> {
