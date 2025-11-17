@@ -74,7 +74,8 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                             packagePromo: {
                                 select: {
                                     startDate: true,
-                                    endDate: true
+                                    endDate: true,
+                                    type: true,
                                 }
                             }
                         }
@@ -95,7 +96,8 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
 
             const filterPromo = item.packagePromoLink.filter(
                 (b) => currentDate.isAfter(dayjs(b.packagePromo.startDate, 'day')) && 
-                currentDate.isBefore(dayjs(b.packagePromo.endDate), 'day')
+                currentDate.isBefore(dayjs(b.packagePromo.endDate), 'day') && 
+                b.packagePromo.type === "promotion"
             );
 
             const findMinPrice = item.packageOption.map(data => {
