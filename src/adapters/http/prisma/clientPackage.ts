@@ -1,6 +1,11 @@
-import { findProvinceByPackageEntity } from "../../../core/entity/clientPackage";
+import { log } from "node:console";
+import { FILE_SCHEMA } from "../../../const/schema/file";
+import { imageEntity } from "../../../const/schema/image";
+import { findProvinceByPackageEntity, packageClientResponse, packageListEntity, packageSearchParams } from "../../../core/entity/clientPackage";
 import { ClientPacakgeRepositoryPort } from "../../../core/ports/clientPackagePort";
+import { Bucket } from "../../database/bucket";
 import { prisma } from "../../database/data-source";
+import dayjs from "dayjs"; 
 
 export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -18,5 +23,110 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
         `;
 
         return result as findProvinceByPackageEntity;
+    }
+
+    async findBySearch(params: packageSearchParams): Promise<packageClientResponse> {
+        const currentDate = dayjs();
+        const skip: number = (params.page - 1) * params.limit;
+        const take: number = params.limit;
+        let result: packageListEntity[] = [];
+
+        const [items, total] =  await Promise.all([
+            prisma.packages.findMany({
+                skip,
+                take,
+                where: {
+                    OR: [
+                        {
+                            packageName: {
+                                contains: params.packageName,
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            provinceId: params.provinceId
+                        }
+                    ]
+                },
+                select: {
+                    id: true,
+                    packageName: true,
+                    packageImages: true,
+                    province: {
+                        select: {
+                            nameEn: true
+                        }
+                    },
+                    packageOption: {
+                        select: {
+                            adultPrice: true,
+                            childPrice: true,
+                            groupPrice: true,
+                        }
+                    },
+                    ToBbooking: {
+                        select: {
+                            toReview: true
+                        }
+                    },
+                    packagePromoLink: {
+                        select: {
+                            percentage: true,
+                            packagePromo: {
+                                select: {
+                                    startDate: true,
+                                    endDate: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }),
+            prisma.packages.count()
+        ]);
+
+        for (const item of items) {
+            let reviewQty: number = 0;
+            const imageArr: imageEntity[] = await JSON.parse(item.packageImages as string) ?? [];
+            const imgFromBuckets = await Bucket.findManyWithoutToken(imageArr, FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);
+
+            for (const booking of item.ToBbooking) {
+                reviewQty = booking.toReview.length;
+            }
+
+            const filterPromo = item.packagePromoLink.filter(
+                (b) => currentDate.isAfter(dayjs(b.packagePromo.startDate, 'day')) && 
+                currentDate.isBefore(dayjs(b.packagePromo.endDate), 'day')
+            );
+
+            const findMinPrice = item.packageOption.map(data => {
+                return Math.min(data?.adultPrice ?? 0, data?.childPrice ?? 0, data?.groupPrice ?? 0);
+            });
+
+            const calPromoPrice: number = filterPromo.length !== 0 ? 
+            (findMinPrice[0] * (1 - filterPromo[0].percentage / 100)) : 0;
+            
+            await result.push({
+                packageId: item.id,
+                packageName: item.packageName as string,
+                province: item.province?.nameEn as string,
+                starAvg: 0,
+                reviewQty: reviewQty,
+                fromAmount: findMinPrice[0],
+                promoAmount: calPromoPrice,
+                packageImage: imgFromBuckets
+            });
+            reviewQty = 0;
+        }
+        
+        return {
+            page: params.page,
+            limit: params.limit,
+            total: total,
+            totalPage: Math.ceil(total / params.limit),
+            nextPage: params.page * params.limit < total ? params.page + 1 : null,
+            prevPage: params.page > 1 ? params.page - 1 : null,
+            items: result
+        } as packageClientResponse;
     }
 }
