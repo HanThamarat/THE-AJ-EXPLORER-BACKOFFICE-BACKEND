@@ -7,11 +7,12 @@
     "resolveJsonModule": true,    // Allow importing JSON files
     "strict": true,               // Enable strict mode
     "outDir": "dist",             // Output folder
-    "rootDir": "src" ,            // Source folder
+    "rootDir": "." ,            // Source folder
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "isolatedModules": true,
+    "types": ["node", "jest"]
   },
-  "include": ["src"],
+  "include": ["src", "tests"],
   "exclude": ["node_modules", "dist"]
 }
