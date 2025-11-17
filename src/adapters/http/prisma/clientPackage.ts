@@ -1,4 +1,3 @@
-import { log } from "node:console";
 import { FILE_SCHEMA } from "../../../const/schema/file";
 import { imageEntity } from "../../../const/schema/image";
 import { findProvinceByPackageEntity, packageClientResponse, packageListEntity, packageSearchParams } from "../../../core/entity/clientPackage";
@@ -75,7 +74,8 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                             packagePromo: {
                                 select: {
                                     startDate: true,
-                                    endDate: true
+                                    endDate: true,
+                                    type: true,
                                 }
                             }
                         }
@@ -96,11 +96,20 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
 
             const filterPromo = item.packagePromoLink.filter(
                 (b) => currentDate.isAfter(dayjs(b.packagePromo.startDate, 'day')) && 
-                currentDate.isBefore(dayjs(b.packagePromo.endDate), 'day')
+                currentDate.isBefore(dayjs(b.packagePromo.endDate), 'day') && 
+                b.packagePromo.type === "promotion"
             );
 
             const findMinPrice = item.packageOption.map(data => {
-                return Math.min(data?.adultPrice ?? 0, data?.childPrice ?? 0, data?.groupPrice ?? 0);
+                if (data.adultPrice && data.adultPrice) {
+                    return Math.min(data.adultPrice as number, data.childPrice as number);
+                }
+
+                if (data.groupPrice && data.groupPrice !== 0) {
+                    return Math.min(data.groupPrice as number);
+                }
+
+                return 0;
             });
 
             const calPromoPrice: number = filterPromo.length !== 0 ? 
