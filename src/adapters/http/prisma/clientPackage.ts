@@ -88,7 +88,7 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
         for (const item of items) {
             let reviewQty: number = 0;
             const imageArr: imageEntity[] = await JSON.parse(item.packageImages as string) ?? [];
-            const imgFromBuckets = await Bucket.findManyWithoutToken(imageArr, FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);
+            const imgFromBuckets = await Bucket.findManyWithoutToken(imageArr.slice(0, 4), FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);
 
             for (const booking of item.ToBbooking) {
                 reviewQty = booking.toReview.length;
