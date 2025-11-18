@@ -261,7 +261,8 @@ export class PromoPrismaORM implements PromoRepositoryPort {
             select: {
                 id: true,
                 startDate: true,
-                endDate: true
+                endDate: true,
+                type: true
             }
         });
 

@@ -47,4 +47,5 @@ export interface promotionDay {
     id:             number;
     startDate:      string | Date;
     endDate:        string | Date;
+    type:           'promotion' | 'coupon',
 }
