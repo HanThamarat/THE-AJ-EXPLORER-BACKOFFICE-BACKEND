@@ -22,8 +22,10 @@ import pkgTypeRoutes            from './adapters/http/routes/pkgType.routes';
 import geolocatRoutes           from './adapters/http/routes/geolocat.routes';
 import financialRoutes          from './adapters/http/routes/financial.routes';
 import blogRoutes               from './adapters/http/routes/blog.routes';
-import clientPackageRoutes      from "./adapters/http/routes/clientPackage.routes";
 import bookingRoutes            from './adapters/http/routes/booking.routes';
+import clientPackageRoutes      from "./adapters/http/routes/clientPackage.routes";
+import clientbookingRoutes      from './adapters/http/routes/clientBooking.routes';
+
 import { Server } from 'socket.io';
 
 
@@ -81,8 +83,9 @@ app.use('/api/v1/pkgtypemanagement', passport.authenticate('jwt', { session: fal
 app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }), geolocatRoutes);
 app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), financialRoutes);
 app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
+app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: false }), bookingRoutes);
 app.use('/api/v1/client/package', clientPackageRoutes);
-app.use('/api/v1/client/booking_service', bookingRoutes);
+app.use('/api/v1/client/booking_service', clientbookingRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {

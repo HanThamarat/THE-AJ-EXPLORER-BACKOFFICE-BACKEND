@@ -1,10 +1,10 @@
-import { bookingEntity } from "../entity/booking";
-import { BookingRepositoryPort } from "../ports/bookingRepositoryPort";
+import { bkEntity } from "../entity/booking";
+import { BkRepositortPort } from "../ports/bookingRepository";
 
-export class BookingService {
-    constructor(private readonly bookingRepositoryPort: BookingRepositoryPort) {}
+export class BkService {
+    constructor(private readonly bkRepositoryPort: BkRepositortPort) {}
 
-    createNewBooking(booking: bookingEntity): Promise<bookingEntity | null> {
-        return this.bookingRepositoryPort.createNewBooking(booking);
+    findAllBooking(): Promise<bkEntity[]> {
+        return this.bkRepositoryPort.findAllBooking();
     }
 }
