@@ -1,73 +1,50 @@
-import { bookingEntity } from "../../../core/entity/booking";
-import { BookingRepositoryPort } from "../../../core/ports/bookingRepositoryPort";
+import { bkEntity } from "../../../core/entity/booking";
+import { BkRepositortPort } from "../../../core/ports/bookingRepository";
 import { prisma } from "../../database/data-source";
-import { Generate } from "../../helpers/generate";
-import { transporterMailer } from "../../helpers/nodemailer";
-import { NormalBookingSumary, GroupBookingSumary } from "../../helpers/templetes/book";
 
-export class BookingDataSource implements BookingRepositoryPort {
+export class BkDataSource implements BkRepositortPort {
     constructor(private db: typeof prisma) {}
 
-    async createNewBooking(booking: bookingEntity): Promise<bookingEntity | null> {
-
-
-        const generateBookId = await Generate.generateBookingId();
-        const date = new Date();
-        const extendedTime = new Date(date.getTime() + 15 * 60000);
-
-        const createBook = await this.db.booking.create({
-            data: {
-                bookingId: generateBookId,
-                packageId: booking.packageId,
-                paymentStatus: booking.paymentStatus,
-                bookingStatus: booking.bookingStatus,
-                userId: booking.userId,
-                childPrice: booking.childPrice,
-                childQty: booking.childQty,
-                adultPrice: booking.adultPrice,
-                adultQty: booking.adultQty,
-                groupPrice: booking.groupPrice,
-                groupQty: booking.groupQty,
-                amount: booking.amount,
-                additionalDetail: booking.additionalDetail,
-                locationId: booking.locationId,
-                pickup_lat: booking.pickup_lat,
-                pickup_lgn: booking.pickup_lgn,
-                trip_at: new Date(booking.trip_at),
-                expire_at: extendedTime
+    async findAllBooking(): Promise<bkEntity[]> {
+        const bkresult = await this.db.booking.findMany({
+            orderBy: {
+                id: 'desc'
             },
-            include: {
-                booker: true,
+            select: {
+                id: true,
+                bookingId: true,
+                paymentRef: true,
+                bookingStatus: true,
+                paymentStatus: true,
+                trip_at: true,
+                created_at: true,
+                updated_at: true,
+                booker: {
+                    select: {
+                        name: true
+                    }
+                },
+                ToPackage: {
+                    select: {
+                        packageName: true
+                    }
+                }
             }
         });
 
-        if (!createBook) throw new Error("booking failed.");
+        const resultFormat: bkEntity[] = bkresult.map((data) => ({
+            id: data.id,
+            packageName: data.ToPackage.packageName,
+            bookingId: data.bookingId,
+            name: data.booker.name,
+            paymentRef: data.paymentRef,
+            paymentStatus: data.paymentStatus,
+            bookingStatus: data.bookingStatus,
+            trip_at: data.trip_at,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+        }));
 
-
-        if (createBook.adultPrice || createBook.childPrice) {
-            const bookedMail = await transporterMailer.sendMail({
-                from: "The Aj Explorer Support.",
-                to: createBook.booker.email as string,
-                subject: `Booking #${createBook.bookingId}`,
-                text: `Your Booking (#${createBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
-                html: NormalBookingSumary(createBook)
-            });
-
-            console.log("Message sent:", bookedMail.messageId);
-        }
-
-        if (createBook.groupPrice) {
-            const bookedMail = await transporterMailer.sendMail({
-                from: "The Aj Explorer Support.",
-                to: createBook.booker.email as string,
-                subject: `Booking #${createBook.bookingId}`,
-                text: `Your Booking (#${createBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
-                html: GroupBookingSumary(createBook)
-            });
-
-            console.log("Message sent:", bookedMail.messageId);
-        }
-
-        return null;
+        return resultFormat;
     }
 }
