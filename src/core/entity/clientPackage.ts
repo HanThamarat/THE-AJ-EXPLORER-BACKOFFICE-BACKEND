@@ -47,6 +47,7 @@ export interface packageClientResponse {
 export interface packageListEntity {
     packageId:          number;
     packageName:        string;
+    packageDes:         string;
     province:           string;
     fromAmount:         number;
     promoAmount?:       number;

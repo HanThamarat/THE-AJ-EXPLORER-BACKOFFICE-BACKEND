@@ -51,6 +51,7 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                     id: true,
                     packageName: true,
                     packageImages: true,
+                    description: true,
                     province: {
                         select: {
                             nameEn: true
@@ -118,6 +119,7 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
             await result.push({
                 packageId: item.id,
                 packageName: item.packageName as string,
+                packageDes: item.description as string,
                 province: item.province?.nameEn as string,
                 starAvg: 0,
                 reviewQty: reviewQty,
