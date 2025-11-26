@@ -1,57 +1,65 @@
-import { packageEntity } from "./package";
 import { Request } from "express";
+import { z } from "zod";
+import { packageEntitySchema, packageImageSaveSchema } from "./package";
 
-export interface findPackageByProviuceEntity {
-    provinceId:         number;
-    provinceName:       string;
-    pakcages:           packageEntity[]
-}
+const shotPackageEntitySchema = z.object({
+    packageId: z.number().int(),
+    packageName: z.string(),
+});
 
-interface ShotpackageEntity {
-    packageId:          number;
-    packageName:        string;
-}
+export const findPackageByProviuceEntitySchema = z.object({
+    provinceId: z.number().int(),
+    provinceName: z.string(),
+    pakcages: z.array(packageEntitySchema),
+});
 
-export interface findProvinceByPackageEntity {
-    provinceId:         number;
-    provinceName:       string;
-    packages:           ShotpackageEntity[];
-}
+export type findPackageByProviuceEntity = z.infer<typeof findPackageByProviuceEntitySchema>;
 
-export interface packageImageSave {
-    file_name:          string;
-    file_original_name: string;
-    file_path:          string;
-    mainFile:           boolean;
-    base64?:            string | null;
-}
+export const findProvinceByPackageEntitySchema = z.object({
+    provinceId: z.number().int(),
+    provinceName: z.string(),
+    packages: z.array(shotPackageEntitySchema),
+});
 
-export interface packageSearchParams {
-    req:                Request;
-    provinceId?:        number;
-    packageName?:       string;
-    page:               number;
-    limit:              number;
-}
+export type findProvinceByPackageEntity = z.infer<typeof findProvinceByPackageEntitySchema>;
 
-export interface packageClientResponse {
-    page:               number;
-    limit:              number;
-    total:              number;
-    totalPage:          number;
-    nextPage:           number;
-    prevPage:           number;
-    items:              packageListEntity[] | [];
-}
+export type packageImageSave = z.infer<typeof packageImageSaveSchema>;
 
-export interface packageListEntity {
-    packageId:          number;
-    packageName:        string;
-    packageDes:         string;
-    province:           string;
-    fromAmount:         number;
-    promoAmount?:       number;
-    starAvg:            number;
-    reviewQty:          number;
-    packageImage:       packageImageSave[] | [];
-}
+export const packageSearchQuerySchema = z.object({
+    provinceId: z.coerce.number().int().optional(),
+    packageName: z.string().optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).default(10),
+});
+
+export type PackageSearchQuery = z.infer<typeof packageSearchQuerySchema>;
+
+export type packageSearchParams = PackageSearchQuery & {
+    req: Request;
+};
+
+export const packageListEntitySchema = z.object({
+    packageId: z.number().int(),
+    packageName: z.string(),
+    packageDes: z.string(),
+    province: z.string(),
+    fromAmount: z.number(),
+    promoAmount: z.number().optional(),
+    starAvg: z.number(),
+    reviewQty: z.number().int(),
+    packageImage: z.array(packageImageSaveSchema),
+});
+
+export type packageListEntity = z.infer<typeof packageListEntitySchema>;
+
+export const packageClientResponseSchema = z.object({
+    page: z.number().int(),
+    limit: z.number().int(),
+    total: z.number().int(),
+    totalPage: z.number().int(),
+    nextPage: z.number().int(),
+    prevPage: z.number().int(),
+    items: z.array(packageListEntitySchema),
+});
+
+export type packageClientResponse = z.infer<typeof packageClientResponseSchema>;

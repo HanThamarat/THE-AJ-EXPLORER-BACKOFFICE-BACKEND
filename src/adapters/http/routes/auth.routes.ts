@@ -2,6 +2,8 @@ import * as express from 'express';
 import { AuthPrismaORM } from '../prisma/auth';
 import { AuthService } from '../../../core/services/authService';
 import { AuthController } from '../controllers/authController';
+import { validateRequest } from '../middleware/validateRequest';
+import { createCustomerSchema, credentialSigninSchema, googleSigninSchema, localSigninSchema } from '../../../core/entity/auth';
 // import { ExpressAuth } from '@auth/express';
 // import Google from '@auth/express/providers/google';
 // import { PrismaAdapter } from "@auth/prisma-adapter"
@@ -90,7 +92,11 @@ const authController = new AuthController(authService);
 *       200:
 *         description: authentication successful
 */
-router.post('/signin', authController.authenticate.bind(authController));
+router.post(
+  '/signin',
+  validateRequest({ body: localSigninSchema }),
+  authController.authenticate.bind(authController)
+);
 
 /**
 * @swagger
@@ -110,7 +116,11 @@ router.post('/signin', authController.authenticate.bind(authController));
 *       200:
 *         description: sign in with google oauth successfully.
 */
-router.post('/google-signin', authController.findOrCreateUserByGoogle.bind(authController));
+router.post(
+  '/google-signin',
+  validateRequest({ body: googleSigninSchema }),
+  authController.findOrCreateUserByGoogle.bind(authController)
+);
 
 /**
 * @swagger
@@ -130,7 +140,11 @@ router.post('/google-signin', authController.findOrCreateUserByGoogle.bind(authC
 *       200:
 *         description: create client with credentail successfully.
 */
-router.post('/create-customer', authController.createUserWithPassword.bind(authController));
+router.post(
+  '/create-customer',
+  validateRequest({ body: createCustomerSchema }),
+  authController.createUserWithPassword.bind(authController)
+);
 
 /**
 * @swagger
@@ -150,7 +164,11 @@ router.post('/create-customer', authController.createUserWithPassword.bind(authC
 *       200:
 *         description: sign in with credentail successfully.
 */
-router.post('/signin-customer', authController.validateUserPassword.bind(authController));
+router.post(
+  '/signin-customer',
+  validateRequest({ body: credentialSigninSchema }),
+  authController.validateUserPassword.bind(authController)
+);
 
 // router.use("/providers", 
 //     ExpressAuth({ 

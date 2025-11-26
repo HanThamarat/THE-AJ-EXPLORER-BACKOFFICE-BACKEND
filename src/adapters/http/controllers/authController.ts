@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../../../core/services/authService";
-import { authEntity, googleProfileDTO, userCredentialDTO } from "../../../core/entity/auth";
+import { authEntity, googleProfileDTO, userCredentialDTO, GoogleSigninBody, CreateCustomerBody, CredentialSigninBody } from "../../../core/entity/auth";
 import { Ecrypt } from "../../helpers/encrypt";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import passport from "passport";
@@ -58,7 +58,7 @@ export class AuthController {
 
   async findOrCreateUserByGoogle(req: Request, res: Response) {
     try {
-      const { email, name, picture, sub } = req.body;
+      const { email, name, picture, sub } = req.body as GoogleSigninBody;
 
       if (!email || !name || !sub) throw "Missing Google profile details";
 
@@ -89,7 +89,7 @@ export class AuthController {
 
   async createUserWithPassword(req: Request, res: Response) {
     try {
-      const { email, name, password } = req.body;
+      const { email, name, password } = req.body as CreateCustomerBody;
 
       const hashPassword = await Ecrypt.passwordEncrypt(password as string);
 
@@ -119,7 +119,7 @@ export class AuthController {
 
   async validateUserPassword(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
+      const { email, password } = req.body as CredentialSigninBody;
 
       const user: userCredentialDTO = {
         email,

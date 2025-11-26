@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../../../core/services/userService";
-import { userEntity, userDTO } from "../../../core/entity/user";
+import { UserCreateBody, UserUpdateBody, userEntity, userDTO } from "../../../core/entity/user";
 import { Ecrypt } from "../../helpers/encrypt";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 
@@ -9,7 +9,7 @@ export class UserController {
 
     async createUser(req: Request, res: Response) {
         try {
-            const { firstName, lastName, email, username, password, roleId } = req.body;
+            const { firstName, lastName, email, username, password, roleId } = req.body as UserCreateBody;
         
             const passwordHashing = await Ecrypt.passwordEncrypt(password);
 
@@ -106,7 +106,7 @@ export class UserController {
 
     async updateUser(req: Request, res: Response) {
         try {
-            const { firstName, lastName, email, username, password, roleId, currentPassword } = req.body;
+            const { firstName, lastName, email, username, password, roleId, currentPassword } = req.body as UserUpdateBody;
             const { id } = req.params;
             
             const userDraf : userDTO =  {

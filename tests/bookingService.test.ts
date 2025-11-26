@@ -8,7 +8,6 @@ describe("Booking Service", () => {
         .send({
             email: "hanthamarat@gmail.com",
             name: "Thamarat Laosen",
-            picture: null,
             sub: "goolge user id"
         });
 

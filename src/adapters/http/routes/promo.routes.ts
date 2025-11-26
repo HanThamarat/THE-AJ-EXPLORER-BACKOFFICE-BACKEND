@@ -2,6 +2,8 @@ import * as express from "express";
 import { PromoPrismaORM } from "../prisma/promotion";
 import { PromoService } from "../../../core/services/promoService";
 import { PromoController } from "../controllers/promoController";
+import { validateRequest } from "../middleware/validateRequest";
+import { promotionCreateBodySchema, promotionIdParamSchema, promotionUpdateBodySchema } from "../../../core/entity/promotion";
 
 const router = express.Router();
 const promotionRepository = new PromoPrismaORM();
@@ -126,7 +128,11 @@ const promotionController = new PromoController(promotionService);
 *       201:
 *         description: package promotion created
 */
-router.post("/promotion", promotionController.createPromo.bind(promotionController));
+router.post(
+  "/promotion",
+  validateRequest({ body: promotionCreateBodySchema }),
+  promotionController.createPromo.bind(promotionController)
+);
 
 /**
 * @swagger
@@ -158,7 +164,11 @@ router.get("/promotion", promotionController.findAllPromo.bind(promotionControll
 *       200:
 *         description: Fetch a list of package promo info usinng promo id from the system.
 */
-router.get("/promotion/:id", promotionController.findPromoById.bind(promotionController));
+router.get(
+  "/promotion/:id",
+  validateRequest({ params: promotionIdParamSchema }),
+  promotionController.findPromoById.bind(promotionController)
+);
 
 /**
 * @swagger
@@ -184,7 +194,11 @@ router.get("/promotion/:id", promotionController.findPromoById.bind(promotionCon
 *       200:
 *         description: update Promotion by Promotion id successfully
 */
-router.put("/promotion/:id", promotionController.updatePromo.bind(promotionController));
+router.put(
+  "/promotion/:id",
+  validateRequest({ params: promotionIdParamSchema, body: promotionUpdateBodySchema }),
+  promotionController.updatePromo.bind(promotionController)
+);
 
 /**
  * @swagger
@@ -204,7 +218,11 @@ router.put("/promotion/:id", promotionController.updatePromo.bind(promotionContr
  *       200:
  *         description: deleting package promo by id successfully
  */
-router.delete("/promotion/:id", promotionController.deletePromo.bind(promotionController));
+router.delete(
+  "/promotion/:id",
+  validateRequest({ params: promotionIdParamSchema }),
+  promotionController.deletePromo.bind(promotionController)
+);
 
 /**
 * @swagger

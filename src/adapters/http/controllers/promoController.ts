@@ -2,14 +2,14 @@ import { PromoService } from "../../../core/services/promoService";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import { Request, Response } from "express";
 import { Ecrypt } from "../../helpers/encrypt";
-import { PromotionDTO, PromotionLinkDTO } from "../../../core/entity/promotion";
+import { PromotionCreateBody, PromotionDTO, PromotionLinkDTO, PromotionUpdateBody } from "../../../core/entity/promotion";
 
 export class PromoController {
     constructor(private promoService: PromoService) {}
 
     async createPromo(req: Request, res: Response) {
         try {
-            const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body;
+            const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body as PromotionCreateBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = await userInfo?.id;
             const PromoLinkArr: PromotionLinkDTO[] = PromoLink.map((data: PromotionLinkDTO) => ({
@@ -93,7 +93,7 @@ export class PromoController {
     async updatePromo(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body;
+            const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body as PromotionUpdateBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = await userInfo?.id;
             const PromoLinkArr: PromotionLinkDTO[] = PromoLink.map((data: PromotionLinkDTO) => ({

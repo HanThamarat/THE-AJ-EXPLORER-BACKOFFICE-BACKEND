@@ -3,6 +3,8 @@ import { BlogORM } from "../prisma/blog";
 import { BlogController } from "../controllers/blogController";
 import { BlogService } from "../../../core/services/blogService";
 import { prisma as db } from "../../database/data-source";
+import { validateRequest } from "../middleware/validateRequest";
+import { blogCreateBodySchema, blogIdParamSchema, blogUpdateBodySchema } from "../../../core/entity/blog";
 
 const router = express.Router();
 const blogRepositortPort = new BlogORM(db);
@@ -79,7 +81,11 @@ const blogController = new BlogController(blogService);
 *       201:
 *         description: Create a new blog successfully.
 */
-router.post("/blog", blogController.createBlog.bind(blogController));
+router.post(
+    "/blog",
+    validateRequest({ body: blogCreateBodySchema }),
+    blogController.createBlog.bind(blogController)
+);
 
 /**
 * @swagger
@@ -111,7 +117,11 @@ router.get("/blog", blogController.findAllBlog.bind(blogController));
 *       200:
 *         description: Getting blog by id successfully.
 */
-router.get("/blog/:id", blogController.findBlogById.bind(blogController));
+router.get(
+    "/blog/:id",
+    validateRequest({ params: blogIdParamSchema }),
+    blogController.findBlogById.bind(blogController)
+);
 
 /**
 * @swagger
@@ -137,7 +147,11 @@ router.get("/blog/:id", blogController.findBlogById.bind(blogController));
 *       200:
 *         description: update blog by blog id successfully
 */
-router.put("/blog/:id", blogController.updateBlog.bind(blogController));
+router.put(
+    "/blog/:id",
+    validateRequest({ params: blogIdParamSchema, body: blogUpdateBodySchema }),
+    blogController.updateBlog.bind(blogController)
+);
 
 /**
  * @swagger
@@ -157,7 +171,11 @@ router.put("/blog/:id", blogController.updateBlog.bind(blogController));
  *       200:
  *         description: deleting blog by id successfully
  */
-router.delete("/blog/:id", blogController.deleteBlog.bind(blogController));
+router.delete(
+    "/blog/:id",
+    validateRequest({ params: blogIdParamSchema }),
+    blogController.deleteBlog.bind(blogController)
+);
 
 /**
 * @swagger

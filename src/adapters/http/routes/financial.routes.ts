@@ -3,6 +3,8 @@ import express from "express";
 import { FinancialORM } from "../prisma/financial";
 import { FinancialService } from "../../../core/services/financialService";
 import { FinancialController } from "../controllers/financialController";
+import { validateRequest } from "../middleware/validateRequest";
+import { chargeDTOSchema, financialIdParamSchema, refundDTOSchema } from "../../../core/entity/financial";
 
 const router = express.Router();
 
@@ -81,7 +83,11 @@ router.get("/balance", financialController.balance.bind(financialController));
 *       201:
 *         description: Create a new charges for generate qr code promptpay successfully.
 */
-router.post("/pay/promptpay", financialController.generateQr.bind(financialController));
+router.post(
+  "/pay/promptpay",
+  validateRequest({ body: chargeDTOSchema }),
+  financialController.generateQr.bind(financialController)
+);
 
 /**
 * @swagger
@@ -101,7 +107,11 @@ router.post("/pay/promptpay", financialController.generateQr.bind(financialContr
 *       200:
 *         description: Get charges info by charge id successfully.
 */
-router.get("/charges/:id", financialController.findChargesById.bind(financialController));
+router.get(
+  "/charges/:id",
+  validateRequest({ params: financialIdParamSchema }),
+  financialController.findChargesById.bind(financialController)
+);
 
 /**
 * @swagger
@@ -120,6 +130,10 @@ router.get("/charges/:id", financialController.findChargesById.bind(financialCon
 *       201:
 *         description: Creating a new refund by charge id successfully. 
 */
-router.post('/refund', financialController.createRefund.bind(financialController));
+router.post(
+  '/refund',
+  validateRequest({ body: refundDTOSchema }),
+  financialController.createRefund.bind(financialController)
+);
 
 export default router;

@@ -2,6 +2,8 @@ import * as express from 'express';
 import { UserPrismaORM } from '../prisma/user';
 import { UserService } from '../../../core/services/userService';
 import { UserController } from '../controllers/userController';
+import { validateRequest } from '../middleware/validateRequest';
+import { userCreateBodySchema, userIdParamSchema, userUpdateBodySchema } from '../../../core/entity/user';
 
 const router = express.Router();
 const userRepository = new UserPrismaORM();
@@ -69,7 +71,11 @@ const userController = new UserController(userService);
 *       201:
 *         description: User created
 */
-router.post('/create_user', userController.createUser.bind(userController));
+router.post(
+  '/create_user',
+  validateRequest({ body: userCreateBodySchema }),
+  userController.createUser.bind(userController)
+);
 
 /**
 * @swagger
@@ -101,7 +107,11 @@ router.get('/users', userController.findAllUser.bind(userController));
 *       200:
 *         description: Fetch a list of user info usinng user id from the system.
 */
-router.get('/user/:id', userController.findUserById.bind(userController));
+router.get(
+  '/user/:id',
+  validateRequest({ params: userIdParamSchema }),
+  userController.findUserById.bind(userController)
+);
 
 /**
 * @swagger
@@ -139,7 +149,11 @@ router.get('/currentuser', userController.findUserByJWT.bind(userController));
 *       200:
 *         description: update user by user id successfully
 */
-router.put('/user/:id', userController.updateUser.bind(userController));
+router.put(
+  '/user/:id',
+  validateRequest({ params: userIdParamSchema, body: userUpdateBodySchema }),
+  userController.updateUser.bind(userController)
+);
 
 /**
  * @swagger
@@ -159,6 +173,10 @@ router.put('/user/:id', userController.updateUser.bind(userController));
  *       200:
  *         description: deleting User by id successfully
  */
-router.delete('/user/:id', userController.deleteUser.bind(userController));
+router.delete(
+  '/user/:id',
+  validateRequest({ params: userIdParamSchema }),
+  userController.deleteUser.bind(userController)
+);
 
 export default router;

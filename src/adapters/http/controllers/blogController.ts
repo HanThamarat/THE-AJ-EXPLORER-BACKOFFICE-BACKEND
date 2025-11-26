@@ -3,14 +3,14 @@ import { Request, Response } from "express";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import { Ecrypt } from "../../helpers/encrypt";
 import { imageDTO } from "../../../const/schema/image";
-import { blogDTO } from "../../../core/entity/blog";
+import { BlogCreateBody, BlogUpdateBody, blogDTO } from "../../../core/entity/blog";
 
 export class BlogController {
     constructor(private blogService: BlogService) {}
 
     async createBlog(req: Request, res: Response) {
         try {
-            const { title, thumnbnail, descrition, status, blogType } = req.body;
+            const { title, thumnbnail, descrition, status, blogType } = req.body as BlogCreateBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId =  Number(userInfo?.id);
 
@@ -25,14 +25,11 @@ export class BlogController {
                 title,
                 descrition,
                 status,
-                blogType: Number(blogType),
+                blogType,
                 thumnbnail: thumnbnailImage,
                 created_by: userId,
                 updated_by: userId,
             }
-
-            console.log(blogDATA);
-            
 
             const response = await this.blogService.createBlog(blogDATA);
 
@@ -97,7 +94,7 @@ export class BlogController {
     async updateBlog(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const { title, thumnbnail, descrition, status, blogType } = req.body;
+            const { title, thumnbnail, descrition, status, blogType } = req.body as BlogUpdateBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId =  Number(userInfo?.id);
 
@@ -112,7 +109,7 @@ export class BlogController {
                 title,
                 descrition,
                 status,
-                blogType: Number(blogType),
+                blogType,
                 thumnbnail: thumnbnailImage,
                 created_by: userId,
                 updated_by: userId,

@@ -28,11 +28,11 @@ export class FinancialController {
 
     async generateQr(req: Request, res: Response) {
         try {
-            const { bookingId, amount } = req.body;
+            const { bookingId, amount } = req.body as chargeDTO;
 
             const chargeDATA: chargeDTO = {
-                amount: Number(amount),
-                bookingId: bookingId
+                amount,
+                bookingId
             }
 
             const response = await this.financialService.generateQr(chargeDATA);
@@ -77,12 +77,12 @@ export class FinancialController {
 
     async createRefund(req: Request, res: Response) {
         try {
-            const { chargesId, amount, booking_id } = req.body;
+            const { chargesId, amount, booking_id } = req.body as RefundDTO;
 
             const RefundDTOFormetter: RefundDTO = {
-                chargesId: chargesId,
-                amount: Number(amount),
-                booking_id: booking_id
+                chargesId,
+                amount,
+                booking_id
             };
 
             const response = await this.financialService.createRefund(RefundDTOFormetter);
