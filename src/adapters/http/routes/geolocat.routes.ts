@@ -3,6 +3,8 @@ import express from "express";
 import { GeolocatPrismaORM } from "../prisma/geolocation";
 import { GeolocatService } from "../../../core/services/geolocatService";
 import { GeolocatController } from "../controllers/geolocatController";
+import { validateRequest } from "../middleware/validateRequest";
+import { geolocationIdParamSchema } from "../../../core/entity/geolocation";
 
 const router = express.Router();
 
@@ -47,6 +49,10 @@ router.get("/provinces", geolocationController.finnAllprovince.bind(geolocationC
 *       200:
 *         description:  Get all district by province successfully.
 */
-router.get("/district/:id", geolocationController.findDistrictByProId.bind(geolocationController));
+router.get(
+  "/district/:id",
+  validateRequest({ params: geolocationIdParamSchema }),
+  geolocationController.findDistrictByProId.bind(geolocationController)
+);
 
 export default router;

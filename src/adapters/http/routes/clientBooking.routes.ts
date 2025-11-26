@@ -3,6 +3,8 @@ import { BookingDataSource } from '../prisma/clientBooking';
 import { BookingService } from '../../../core/services/clientBookingService';
 import { BookingContorller } from '../controllers/clientBookingController';
 import { prisma as db } from '../../database/data-source';
+import { validateRequest } from '../middleware/validateRequest';
+import { clientBookingCreateSchema } from '../../../core/entity/clientBooking';
 
 const router = express.Router();
 const bookingRepository = new BookingDataSource(db);
@@ -94,6 +96,10 @@ const bookingController = new BookingContorller(bookingService);
 *       201:
 *         description: booking created
 */
-router.post('/booking', bookingController.createBooking.bind(bookingController));
+router.post(
+  '/booking',
+  validateRequest({ body: clientBookingCreateSchema }),
+  bookingController.createBooking.bind(bookingController)
+);
 
 export default router;

@@ -2,6 +2,8 @@ import * as express from 'express';
 import { PkgTypePrismaORM } from '../prisma/pkgType';
 import { PkgTypeService } from '../../../core/services/pkgTypeService';
 import { PkgTypeController } from '../controllers/pkgTypeController';
+import { validateRequest } from '../middleware/validateRequest';
+import { packageTypeBodySchema, packageTypeIdParamSchema } from '../../../core/entity/packageType';
 
 const router = express.Router();
 const pkgTypeRepository = new PkgTypePrismaORM();
@@ -51,7 +53,11 @@ const pkgTypeController = new PkgTypeController(pkgTypeService);
 *       201:
 *         description: package type created
 */
-router.post('/pkgtype', pkgTypeController.createPkgType.bind(pkgTypeController));
+router.post(
+  '/pkgtype',
+  validateRequest({ body: packageTypeBodySchema }),
+  pkgTypeController.createPkgType.bind(pkgTypeController)
+);
 
 /**
 * @swagger
@@ -83,7 +89,11 @@ router.get('/pkgtype' , pkgTypeController.findAllPkgType.bind(pkgTypeController)
 *       200:
 *         description: Fetch a list of package type info usinng package type id from the system.
 */
-router.get('/pkgtype/:id', pkgTypeController.findPkgTypeById.bind(pkgTypeController));
+router.get(
+  '/pkgtype/:id',
+  validateRequest({ params: packageTypeIdParamSchema }),
+  pkgTypeController.findPkgTypeById.bind(pkgTypeController)
+);
 
 /**
 * @swagger
@@ -109,7 +119,11 @@ router.get('/pkgtype/:id', pkgTypeController.findPkgTypeById.bind(pkgTypeControl
 *       200:
 *         description: update package type by package type id successfully
 */
-router.put('/pkgtype/:id', pkgTypeController.updatePkgType.bind(pkgTypeController));
+router.put(
+  '/pkgtype/:id',
+  validateRequest({ params: packageTypeIdParamSchema, body: packageTypeBodySchema }),
+  pkgTypeController.updatePkgType.bind(pkgTypeController)
+);
 
 /**
  * @swagger
@@ -129,6 +143,10 @@ router.put('/pkgtype/:id', pkgTypeController.updatePkgType.bind(pkgTypeControlle
  *       200:
  *         description: deleting package type by id successfully
  */
-router.delete('/pkgtype/:id', pkgTypeController.deletePkgType.bind(pkgTypeController));
+router.delete(
+  '/pkgtype/:id',
+  validateRequest({ params: packageTypeIdParamSchema }),
+  pkgTypeController.deletePkgType.bind(pkgTypeController)
+);
 
 export default router;

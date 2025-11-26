@@ -1,230 +1,265 @@
+import { z } from "zod";
 
+export const transactionFeesSchema = z.object({
+    fee_flat: z.string(),
+    fee_rate: z.string(),
+    vat_rate: z.string(),
+});
 
-export interface omiseFinancialEntity {
-    object:         string;
-    livemode?:       boolean;
-    location?:       string;
-    currency:       string;
-    total:          number | string;
-    transferable:   number | string;
-    reserve:        number;
-    created_at:     string | Date;
-}
+export type TransactionFees = z.infer<typeof transactionFeesSchema>;
 
-export interface omiseSourceEntity {
-    object:                         string;
-    id:                             string;
-    livemode:                       boolean;
-    location:                       string;
-    amount:                         number;
-    barcode:                        string | null;
-    bank:                           string | null;
-    created_at:                     string;
-    currency:                       string;
-    email:                          string | null;
-    flow:                           string;
-    installment_term:               string | null;
-    ip:                             string | null;
-    absorption_type:                string | null;
-    name:                           string | null;
-    mobile_number:                  string | null;
-    phone_number:                   string | null;
-    platform_type:                  string | null;
-    scannable_code:                 string | null;
-    qr_settings:                    string | null;
-    billing:                        string | null;
-    shipping:                       string | null;
-    items?:                         [];
-    references:                     string | null;
-    provider_references:            string | null;
-    store_id:                       string | null;
-    store_name:                     string | null;
-    terminal_id:                    string | null;
-    type:                           string | null;
-    zero_interest_installments:     string | null;
-    charge_status:                  string | null;
-    receipt_amount:                 string | null;
-    discounts:                      [];
-    promotion_code:                 string | null;
-}
+export const platformFeeSchema = z.object({
+    fixed: z.unknown(),
+    percentage: z.unknown(),
+});
 
-export interface chargeDTO {
-    bookingId:      string;
-    amount:         number;
-}
+export type PlatformFee = z.infer<typeof platformFeeSchema>;
 
-export interface omiseChargeEntity {
-  object: string
-  id: string
-  location: string
-  amount: number
-  net: number
-  interest: number
-  interest_vat: number
-  refunded_amount: number
-  platform_fee: PlatformFee
-  currency: string
-  ip: any
-  refunds: Refunds
-  link: any
-  description: any
-  metadata: Metadata
-  card: any
-  source: Source
-  schedule: any
-  linked_account: any
-  customer: any
-  dispute: any
-  transaction: any
-  failure_code: any
-  failure_message: any
-  status: string
-  authorize_uri: string
-  return_uri: any
-  created_at: string
-  paid_at: any
-  expires_at: string
-  expired_at: any
-  reversed_at: any
-  zero_interest_installments: boolean
-  branch: any
-  terminal: any
-  device: any
-  authorized: boolean
-  capturable: boolean
-  capture: boolean
-  disputable: boolean
-  livemode: boolean
-  refundable: boolean
-  reversed: boolean
-  reversible: boolean
-  voided: boolean
-  paid: boolean
-  expired: boolean
-}
+export const refundsSchema = z.object({
+    object: z.string(),
+    data: z.array(z.unknown()),
+    limit: z.number(),
+    offset: z.number(),
+    total: z.number(),
+    location: z.string(),
+    order: z.string(),
+    from: z.string(),
+    to: z.string(),
+});
 
-export interface TransactionFees {
-  fee_flat: string
-  fee_rate: string
-  vat_rate: string
-}
+export type Refunds = z.infer<typeof refundsSchema>;
 
-export interface PlatformFee {
-  fixed: any
-  percentage: any
-}
+export const imageSchema = z.object({
+    object: z.string(),
+    livemode: z.boolean(),
+    id: z.string(),
+    deleted: z.boolean(),
+    filename: z.string(),
+    location: z.string(),
+    kind: z.string().optional(),
+    download_uri: z.string(),
+    created_at: z.string(),
+});
 
-export interface Refunds {
-  object: string
-  data: any[]
-  limit: number
-  offset: number
-  total: number
-  location: string
-  order: string
-  from: string
-  to: string
-}
+export type Image = z.infer<typeof imageSchema>;
 
-export interface Metadata {}
+export const scannableCodeSchema = z.object({
+    object: z.string(),
+    type: z.string(),
+    image: imageSchema,
+    raw_data: z.unknown().optional(),
+});
 
-export interface Source {
-  object: string
-  id: string
-  livemode: boolean
-  location: string
-  amount: number
-  barcode: any
-  bank?: any
-  created_at: string
-  currency: string
-  email: any
-  flow: string
-  installment_term: any
-  ip?: any
-  absorption_type?: any
-  name: any
-  mobile_number: any
-  phone_number: any
-  platform_type?: any
-  scannable_code: ScannableCode
-  qr_settings?: any
-  billing: any
-  shipping: any
-  items: any[]
-  references: References
-  provider_references?: ProviderReferences
-  store_id: any
-  store_name: any
-  terminal_id: any
-  type: string
-  zero_interest_installments: any
-  charge_status: string
-  receipt_amount?: any
-  discounts?: any[]
-  promotion_code: any
-}
+export type ScannableCode = z.infer<typeof scannableCodeSchema>;
 
-export interface ScannableCode {
-  object: string
-  type: string
-  image: Image
-  raw_data?: any
-}
+export const referencesSchema = z.object({
+    expires_at: z.unknown(),
+    device_id: z.unknown(),
+    customer_amount: z.unknown(),
+    customer_currency: z.unknown(),
+    customer_exchange_rate: z.unknown(),
+    omise_tax_id: z.unknown(),
+    reference_number_1: z.string(),
+    reference_number_2: z.unknown(),
+    barcode: z.unknown(),
+    payment_code: z.unknown(),
+    va_code: z.unknown(),
+});
 
-export interface Image {
-  object: string
-  livemode: boolean
-  id: string
-  deleted: boolean
-  filename: string
-  location: string
-  kind?: string
-  download_uri: string
-  created_at: string
-}
+export type References = z.infer<typeof referencesSchema>;
 
-export interface References {
-  expires_at: any
-  device_id: any
-  customer_amount: any
-  customer_currency: any
-  customer_exchange_rate: any
-  omise_tax_id: any
-  reference_number_1: string
-  reference_number_2: any
-  barcode: any
-  payment_code: any
-  va_code: any
-}
+export const providerReferencesSchema = z.object({
+    reference_number_1: z.string(),
+    reference_number_2: z.unknown(),
+    buyer_name: z.unknown(),
+});
 
-export interface ProviderReferences {
-  reference_number_1: string
-  reference_number_2: any
-  buyer_name: any
-}
+export type ProviderReferences = z.infer<typeof providerReferencesSchema>;
 
-export interface OmiseRefundEntiry {
-    object:             string;
-    id:                 string;
-    location:           string;
-    livemode:           boolean;
-    voided:             boolean;
-    currency:           string;
-    amount:             number;
-    metadata:           any;
-    charge:             string;
-    terminal?:          null;
-    transaction:        string;
-    status?:            string;
-    funding_amount?:    number;
-    funding_currency?:  string;
-    created_at:         string;
-}
+export const metadataSchema = z.record(z.unknown());
 
-export interface RefundDTO {
-  chargesId:          string;
-  amount:             number;
-  booking_id:         string;
-}
+export type Metadata = z.infer<typeof metadataSchema>;
 
+export const sourceSchema = z.object({
+    object: z.string(),
+    id: z.string(),
+    livemode: z.boolean(),
+    location: z.string(),
+    amount: z.number(),
+    barcode: z.unknown().nullable(),
+    bank: z.unknown().optional(),
+    created_at: z.string(),
+    currency: z.string(),
+    email: z.unknown(),
+    flow: z.string(),
+    installment_term: z.unknown(),
+    ip: z.unknown().optional(),
+    absorption_type: z.unknown().optional(),
+    name: z.unknown(),
+    mobile_number: z.unknown(),
+    phone_number: z.unknown(),
+    platform_type: z.unknown().optional(),
+    scannable_code: scannableCodeSchema,
+    qr_settings: z.unknown().optional(),
+    billing: z.unknown(),
+    shipping: z.unknown(),
+    items: z.array(z.unknown()),
+    references: referencesSchema,
+    provider_references: providerReferencesSchema.optional(),
+    store_id: z.unknown(),
+    store_name: z.unknown(),
+    terminal_id: z.unknown(),
+    type: z.string(),
+    zero_interest_installments: z.unknown(),
+    charge_status: z.string(),
+    receipt_amount: z.unknown().optional(),
+    discounts: z.array(z.unknown()).optional(),
+    promotion_code: z.unknown(),
+});
+
+export type Source = z.infer<typeof sourceSchema>;
+
+export const omiseChargeEntitySchema = z.object({
+    object: z.string(),
+    id: z.string(),
+    location: z.string(),
+    amount: z.number(),
+    net: z.number(),
+    interest: z.number(),
+    interest_vat: z.number(),
+    refunded_amount: z.number(),
+    platform_fee: platformFeeSchema,
+    currency: z.string(),
+    ip: z.unknown(),
+    refunds: refundsSchema,
+    link: z.unknown(),
+    description: z.unknown(),
+    metadata: metadataSchema,
+    card: z.unknown(),
+    source: sourceSchema,
+    schedule: z.unknown(),
+    linked_account: z.unknown(),
+    customer: z.unknown(),
+    dispute: z.unknown(),
+    transaction: z.unknown(),
+    failure_code: z.unknown(),
+    failure_message: z.unknown(),
+    status: z.string(),
+    authorize_uri: z.string(),
+    return_uri: z.unknown(),
+    created_at: z.string(),
+    paid_at: z.unknown(),
+    expires_at: z.string(),
+    expired_at: z.unknown(),
+    reversed_at: z.unknown(),
+    zero_interest_installments: z.boolean(),
+    branch: z.unknown(),
+    terminal: z.unknown(),
+    device: z.unknown(),
+    authorized: z.boolean(),
+    capturable: z.boolean(),
+    capture: z.boolean(),
+    disputable: z.boolean(),
+    livemode: z.boolean(),
+    refundable: z.boolean(),
+    reversed: z.boolean(),
+    reversible: z.boolean(),
+    voided: z.boolean(),
+    paid: z.boolean(),
+    expired: z.boolean(),
+});
+
+export type omiseChargeEntity = z.infer<typeof omiseChargeEntitySchema>;
+
+export const omiseFinancialEntitySchema = z.object({
+    object: z.string(),
+    livemode: z.boolean().optional(),
+    location: z.string().optional(),
+    currency: z.string(),
+    total: z.union([z.number(), z.string()]),
+    transferable: z.union([z.number(), z.string()]),
+    reserve: z.number(),
+    created_at: z.union([z.string(), z.date()]),
+});
+
+export type omiseFinancialEntity = z.infer<typeof omiseFinancialEntitySchema>;
+
+export const omiseSourceEntitySchema = z.object({
+    object: z.string(),
+    id: z.string(),
+    livemode: z.boolean(),
+    location: z.string(),
+    amount: z.number(),
+    barcode: z.string().nullable(),
+    bank: z.string().nullable(),
+    created_at: z.string(),
+    currency: z.string(),
+    email: z.string().nullable(),
+    flow: z.string(),
+    installment_term: z.string().nullable(),
+    ip: z.string().nullable(),
+    absorption_type: z.string().nullable(),
+    name: z.string().nullable(),
+    mobile_number: z.string().nullable(),
+    phone_number: z.string().nullable(),
+    platform_type: z.string().nullable(),
+    scannable_code: z.string().nullable(),
+    qr_settings: z.string().nullable(),
+    billing: z.string().nullable(),
+    shipping: z.string().nullable(),
+    items: z.array(z.unknown()).optional(),
+    references: z.string().nullable(),
+    provider_references: z.string().nullable(),
+    store_id: z.string().nullable(),
+    store_name: z.string().nullable(),
+    terminal_id: z.string().nullable(),
+    type: z.string().nullable(),
+    zero_interest_installments: z.string().nullable(),
+    charge_status: z.string().nullable(),
+    receipt_amount: z.string().nullable(),
+    discounts: z.array(z.unknown()).optional(),
+    promotion_code: z.string().nullable(),
+});
+
+export type omiseSourceEntity = z.infer<typeof omiseSourceEntitySchema>;
+
+export const chargeDTOSchema = z.object({
+    bookingId: z.string(),
+    amount: z.number().positive(),
+});
+
+export type chargeDTO = z.infer<typeof chargeDTOSchema>;
+
+export const omiseRefundEntitySchema = z.object({
+    object: z.string(),
+    id: z.string(),
+    location: z.string(),
+    livemode: z.boolean(),
+    voided: z.boolean(),
+    currency: z.string(),
+    amount: z.number(),
+    metadata: z.unknown(),
+    charge: z.string(),
+    terminal: z.unknown().optional(),
+    transaction: z.string(),
+    status: z.string().optional(),
+    funding_amount: z.number().optional(),
+    funding_currency: z.string().optional(),
+    created_at: z.string(),
+});
+
+export type OmiseRefundEntiry = z.infer<typeof omiseRefundEntitySchema>;
+
+export const refundDTOSchema = z.object({
+    chargesId: z.string(),
+    amount: z.number().positive(),
+    booking_id: z.string(),
+});
+
+export type RefundDTO = z.infer<typeof refundDTOSchema>;
+
+export const financialIdParamSchema = z.object({
+    id: z.string().min(1, "Charge id is required."),
+});
+
+export type FinancialIdParams = z.infer<typeof financialIdParamSchema>;

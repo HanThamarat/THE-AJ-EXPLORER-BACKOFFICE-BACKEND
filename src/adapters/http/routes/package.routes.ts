@@ -2,6 +2,8 @@ import * as express from 'express';
 import { PackagePrismaORM } from '../prisma/package';
 import { PackageService } from '../../../core/services/packageService';
 import { PackageController } from '../controllers/packageController';
+import { validateRequest } from '../middleware/validateRequest';
+import { packageIdParamSchema, packageRequestSchema, packageUpdateRequestSchema } from '../../../core/entity/package';
 
 const router = express.Router();
 const packageRepository = new PackagePrismaORM();
@@ -214,7 +216,11 @@ const packageController = new PackageController(packageService);
 *       201:
 *         description: package created
 */
-router.post('/package', packageController.createPackage.bind(packageController));
+router.post(
+    '/package',
+    validateRequest({ body: packageRequestSchema }),
+    packageController.createPackage.bind(packageController)
+);
 
 /**
 * @swagger
@@ -246,7 +252,11 @@ router.get('/package', packageController.findPackages.bind(packageController));
 *       200:
 *         description: Fetch a list of package info usinng package id from the system.
 */
-router.get('/package/:id', packageController.findPackageByid.bind(packageController));
+router.get(
+    '/package/:id',
+    validateRequest({ params: packageIdParamSchema }),
+    packageController.findPackageByid.bind(packageController)
+);
 
 /**
 * @swagger
@@ -272,7 +282,11 @@ router.get('/package/:id', packageController.findPackageByid.bind(packageControl
 *       200:
 *         description: update package by package id successfully
 */
-router.put('/package/:id', packageController.updatePackage.bind(packageController));
+router.put(
+    '/package/:id',
+    validateRequest({ params: packageIdParamSchema, body: packageUpdateRequestSchema }),
+    packageController.updatePackage.bind(packageController)
+);
 
 /**
  * @swagger
@@ -292,6 +306,10 @@ router.put('/package/:id', packageController.updatePackage.bind(packageControlle
  *       200:
  *         description: deleting package by id successfully
  */
-router.delete('/package/:id', packageController.deletePacakge.bind(packageController));
+router.delete(
+    '/package/:id',
+    validateRequest({ params: packageIdParamSchema }),
+    packageController.deletePacakge.bind(packageController)
+);
 
 export default router;

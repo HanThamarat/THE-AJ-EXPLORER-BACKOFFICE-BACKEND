@@ -1,7 +1,7 @@
 import { BookingService } from "../../../core/services/clientBookingService";
 import { Request, Response } from "express";
 import { setErrResponse, setResponse } from "../../../hooks/response";
-import { bookingEntity } from "../../../core/entity/clientBooking";
+import { ClientBookingCreateBody, bookingEntity } from "../../../core/entity/clientBooking";
 
 export class BookingContorller {
     constructor(private bookingService: BookingService) {}
@@ -12,7 +12,7 @@ export class BookingContorller {
                 userId, childPrice, childQty, adultPrice, adultQty,
                 groupPrice, groupQty, amount, additionalDetail, locationId,
                 pickup_lat, pickup_lgn, trip_at, policyAccept, packageId
-            } = req.body;
+            } = req.body as ClientBookingCreateBody;
 
             const bookData: bookingEntity = {
                 userId,

@@ -1,7 +1,7 @@
 import { PackageService } from "../../../core/services/packageService";
 import { Request, Response } from "express";
 import { setResponse, setErrResponse } from "../../../hooks/response";
-import { packageAttractionDTO, packageDTO, packageImageDTO, packageImageSave, packageInclude, packageNotInclude, packageOptionDTO } from "../../../core/entity/package";
+import { PackageRequestBody, packageAttractionDTO, packageDTO, packageImageDTO, packageImageSave, packageInclude, packageNotInclude, packageOptionDTO } from "../../../core/entity/package";
 import { Ecrypt } from "../../helpers/encrypt";
 import { Convertion } from "../../helpers/convertion";
 import { AxiosInstanceMultipart } from "../../../hooks/axiosInstance";
@@ -16,7 +16,7 @@ export class PackageController {
             let fileBufferArr: any[] = [];
             let imageInBucket: packageImageSave[] = [];
             const axios = await AxiosInstanceMultipart(req);
-            const { packageName, packageTypeId, additional_description, description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
+            const { packageName, packageTypeId, additional_description, description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body as PackageRequestBody;
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
                 packageId: Number(data.packageId),
                 pkgOptionTypeId: Number(data.pkgOptionTypeId),
@@ -174,7 +174,7 @@ export class PackageController {
             let imageInBucket: packageImageSave[] = [];
             const axios = await AxiosInstanceMultipart(req);
             const { id } = req.params;
-            const { packageName, packageTypeId, description, additional_description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body;
+            const { packageName, packageTypeId, description, additional_description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body as PackageRequestBody;
            
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
                 packageId: Number(data.packageId),

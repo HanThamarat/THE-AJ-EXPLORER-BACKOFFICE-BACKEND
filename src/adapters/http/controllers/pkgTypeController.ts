@@ -2,7 +2,7 @@ import { PkgTypeService } from "../../../core/services/pkgTypeService";
 import { Request, Response } from "express";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import { Ecrypt } from "../../helpers/encrypt";
-import { packageTypeDTO } from "../../../core/entity/packageType";
+import { PackageTypeBody, packageTypeDTO } from "../../../core/entity/packageType";
 import { prisma } from "../../database/data-source";
 
 export class PkgTypeController {
@@ -10,7 +10,7 @@ export class PkgTypeController {
 
     async createPkgType(req: Request, res: Response) {
         try {
-            const { name, status } = req.body;
+            const { name, status } = req.body as PackageTypeBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = userInfo?.id;
 
@@ -84,7 +84,7 @@ export class PkgTypeController {
 
     async updatePkgType(req: Request, res: Response) {
         try {
-            const { name, status } = req.body;
+            const { name, status } = req.body as PackageTypeBody;
             const { id } = req.params;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = userInfo?.id;
