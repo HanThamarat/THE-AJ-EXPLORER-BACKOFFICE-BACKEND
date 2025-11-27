@@ -1,14 +1,34 @@
 -- CreateEnum
-CREATE TYPE "payMethod" AS ENUM ('qr_propmtpay', 'mobile_banking', 'card');
+DO $$
+BEGIN
+    CREATE TYPE "payMethod" AS ENUM ('qr_propmtpay', 'mobile_banking', 'card');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "clStatus" AS ENUM ('panding', 'confirmed', 'failed');
+DO $$
+BEGIN
+    CREATE TYPE "clStatus" AS ENUM ('panding', 'confirmed', 'failed');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "payStatus" AS ENUM ('panding', 'paid', 'failed');
+DO $$
+BEGIN
+    CREATE TYPE "payStatus" AS ENUM ('panding', 'paid', 'failed');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "bkStatus" AS ENUM ('panding', 'confirmed', 'failed');
+DO $$
+BEGIN
+    CREATE TYPE "bkStatus" AS ENUM ('panding', 'confirmed', 'failed');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "phoneNumber" VARCHAR(10);
