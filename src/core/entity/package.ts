@@ -9,7 +9,7 @@ export const packageImageDTOSchema = z.object({
 export type packageImageDTO = z.infer<typeof packageImageDTOSchema>;
 
 export const packageOptionDTOSchema = z.object({
-    packageId: z.coerce.number().int(),
+    packageId: z.coerce.number().int().optional().nullable(),
     pkgOptionTypeId: z.coerce.number().int(),
     name: z.string(),
     description: z.string(),
