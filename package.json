@@ -19,6 +19,7 @@
     "@auth/express": "^0.11.0",
     "@auth/prisma-adapter": "^2.10.0",
     "@prisma/client": "^6.17.1",
+    "@prisma/config": "^7.0.1",
     "@types/express": "^5.0.3",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
