@@ -61,4 +61,24 @@ router.get("/province_package", clientPackageController.findProvinceByPackages.b
 */
 router.get('/packages', clientPackageController.findBySearch.bind(clientPackageController));
 
+/**
+* @swagger
+* /api/v1/client/package/package_detail/{id}:
+*   get:
+*     tags: [ClientPackage]
+*     summary: Get package info by package id
+*     parameters:
+*       - in: path
+*         name: id
+*         required: true
+*         description: The ID of the get package info by package id.
+*         schema:
+*           type: string
+*     requestBody:
+*     responses:
+*       200:
+*         description: Fetch a list of package info usinng package id from the system.
+*/
+router.get('/package_detail/:id', clientPackageController.findPackageDetail.bind(clientPackageController));
+
 export default router;
