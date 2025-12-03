@@ -55,4 +55,26 @@ export class ClientPackageController {
             });
         }
     }
+
+    async findPackageDetail(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+
+            const response = await this.clientPackagService.findPackageDetail(Number(id), req);
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Finding paackage detail successfully.",
+                body: response
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Finding paackage detail failed.",
+                error:  error instanceof Error ? error.message : 'Finding paackage detail failed.',
+            });
+        }
+    }
 }
