@@ -7,7 +7,7 @@ import { Bucket } from "../../database/bucket";
 import { prisma } from "../../database/data-source";
 import dayjs from "dayjs"; 
 import { CacheHelper } from "../../helpers/redisCache";
-import { AxiosInstance } from "../../../hooks/axiosInstance";
+import { AxiosInstance, AxiosInstanceForFindBucket } from "../../../hooks/axiosInstance";
 import { PACKAGE_SCHEMA } from "../../../const/schema/package";
 import { Request } from "express";
 
@@ -40,6 +40,7 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                 skip,
                 take,
                 where: {
+                    deleted_at: null,
                     OR: [
                         {
                             packageName: {
@@ -88,7 +89,11 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                     }
                 }
             }),
-            prisma.packages.count()
+            prisma.packages.count({
+                where: {
+                    deleted_at: null
+                }
+            })
         ]);
 
         for (const item of items) {
@@ -146,15 +151,15 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
         } as packageClientResponse;
     }
 
-    async findPackageDetail(id: number, req: Request): Promise<packageEntity> {
+    async findPackageDetail(id: number): Promise<packageEntity> {
         const packageIdCache = await CacheHelper.getCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
         
-        if (packageIdCache !== null) {
-            const parsePackage = JSON.parse(packageIdCache);
-            return parsePackage as packageEntity;
-        }
+        // if (packageIdCache !== null) {
+        //     const parsePackage = JSON.parse(packageIdCache);
+        //     return parsePackage as packageEntity;
+        // }
 
-        const axios = await AxiosInstance(req);
+        const axios = await AxiosInstanceForFindBucket();
         const recheckPackage = await prisma.packages.count({
             where: {
                 id: Number(id),
@@ -252,6 +257,18 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                         firstName: true,
                         lastName: true,
                     }
+                },
+                packagePromoLink: {
+                    select: {
+                        percentage: true,
+                        packagePromo: {
+                            select: {
+                                startDate: true,
+                                endDate: true,
+                                type: true,
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -290,6 +307,13 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                 : original;
         }); 
 
+        const currentDate = dayjs();
+        const filterPromo = result ? result.packagePromoLink.filter(
+            (b) => currentDate.isAfter(dayjs(b.packagePromo.startDate, 'day')) && 
+            currentDate.isBefore(dayjs(b.packagePromo.endDate), 'day') && 
+            b.packagePromo.type === "promotion"
+        ) : [];
+
         const resultFormat: packageEntity = {
             id: result?.id ? result.id : 0,
             packageName: result?.packageName ? result.packageName : 'no data',
@@ -318,8 +342,11 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                 name: data.name ?? "",
                 description: data.description ?? "",
                 adultPrice: Number(data.adultPrice ?? 0),
+                adultPromoPrice: data.adultPrice ? (filterPromo.length !== 0 ? (data.adultPrice * (1 - filterPromo[0].percentage / 100)) : 0) : 0,
                 childPrice: Number(data.childPrice ?? 0),
+                childPromoPrice: data.childPrice ? (filterPromo.length !== 0 ? (data.childPrice * (1 - filterPromo[0].percentage / 100)) : 0) : 0,
                 groupPrice: Number(data.groupPrice ?? 0),
+                groupPromoPrice: data.groupPrice ? (filterPromo.length !== 0 ? (data.groupPrice * (1 - filterPromo[0].percentage / 100)) : 0) : 0,
                 adultFromAge: data.adultFromAge ?? "",
                 adultToAge: data.adultToAge ?? "",
                 childFromAge: data.childFromAge ?? "",

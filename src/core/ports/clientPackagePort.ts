@@ -5,5 +5,5 @@ import { packageEntity } from "../entity/package";
 export interface ClientPacakgeRepositoryPort {
     findProvinceByPackage(): Promise<findProvinceByPackageEntity>;
     findBySearch(params: packageSearchParams): Promise<packageClientResponse>;
-    findPackageDetail(id: number, req: Request): Promise<packageEntity>;
+    findPackageDetail(id: number): Promise<packageEntity>;
 }

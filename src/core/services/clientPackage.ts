@@ -14,7 +14,7 @@ export class ClientPackageService {
         return this.clientPacakgeRepositoryPort.findBySearch(params);
     }
 
-    async findPackageDetail(id: number, req: Request): Promise<packageEntity> {
-        return this.clientPacakgeRepositoryPort.findPackageDetail(id, req);
+    async findPackageDetail(id: number): Promise<packageEntity> {
+        return this.clientPacakgeRepositoryPort.findPackageDetail(id);
     }
 }

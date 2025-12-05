@@ -60,7 +60,7 @@ export class ClientPackageController {
         try {
             const { id } = req.params;
 
-            const response = await this.clientPackagService.findPackageDetail(Number(id), req);
+            const response = await this.clientPackagService.findPackageDetail(Number(id));
 
             return setResponse({
                 res: res,
