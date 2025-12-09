@@ -21,7 +21,8 @@ export class BkDataSource implements BkRepositortPort {
                 updated_at: true,
                 booker: {
                     select: {
-                        name: true
+                        firstName: true,
+                        lastName: true
                     }
                 },
                 ToPackage: {
@@ -36,7 +37,7 @@ export class BkDataSource implements BkRepositortPort {
             id: data.id,
             packageName: data.ToPackage.packageName,
             bookingId: data.bookingId,
-            name: data.booker.name,
+            name: `${data.booker.firstName} ${data.booker.lastName}`,
             paymentRef: data.paymentRef,
             paymentStatus: data.paymentStatus,
             bookingStatus: data.bookingStatus,

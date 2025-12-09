@@ -9,13 +9,13 @@ export class BookingContorller {
     async createBooking(req: Request, res: Response) {
         try {
             const {
-                userId, childPrice, childQty, adultPrice, adultQty,
+                childPrice, childQty, adultPrice, adultQty,
                 groupPrice, groupQty, amount, additionalDetail, locationId,
-                pickup_lat, pickup_lgn, trip_at, policyAccept, packageId
+                pickup_lat, pickup_lgn, trip_at, policyAccept, packageId, contractBooking
             } = req.body as ClientBookingCreateBody;
 
             const bookData: bookingEntity = {
-                userId,
+                contractBooking,
                 childPrice,
                 childQty,
                 adultPrice,

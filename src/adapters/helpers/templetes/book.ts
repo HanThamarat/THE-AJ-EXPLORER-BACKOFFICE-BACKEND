@@ -2,8 +2,22 @@ import { Prisma } from "@prisma/client";
 import { CurrencyConvert } from "../currencyConvertion";
 
 type BookType = Prisma.BookingGetPayload<{
-  include: {
-    booker: true
+  select: {
+      bookingId: true,
+      adultPrice: true,
+      adultQty: true,
+      childPrice: true,
+      childQty: true,
+      amount: true,
+      groupPrice: true,
+      groupQty: true,
+      booker: {
+          select: {
+              email: true,
+              firstName: true,
+              lastName: true
+          }
+      }
   }
 }>;
 
@@ -27,7 +41,7 @@ export const NormalBookingSumary = (bookData: BookType) => `
       </tr>
       <tr>
         <td style="background:#fff; border-radius:20px; padding:20px;">
-          <p style="font-size:20px; color:#6b7280;">Hi ${bookData.booker.name},</p>
+          <p style="font-size:20px; color:#6b7280;">Hi ${bookData.booker.firstName} ${bookData.booker.lastName},</p>
           <p style="font-size:20px; color:#6b7280;">Thank you for your booking.</p>
 
           <p style="margin-top:20px; color:#6b7280; font-size:14px;">
@@ -98,7 +112,7 @@ export const GroupBookingSumary = (bookData: BookType) => `
       <!-- GREETING -->
       <tr>
         <td style="background:#fff; border-radius:20px; padding:20px;">
-          <p style="font-size:20px; color:#6b7280;">Hi ${bookData.booker.name},</p>
+          <p style="font-size:20px; color:#6b7280;">Hi ${bookData.booker.firstName} ${bookData.booker.lastName},</p>
           <p style="font-size:20px; color:#6b7280;">Thank you for your booking.</p>
 
           <p style="margin-top:20px; color:#6b7280; font-size:14px;">

@@ -15,33 +15,56 @@ export class BookingDataSource implements BookingRepositoryPort {
         const date = new Date();
         const extendedTime = new Date(date.getTime() + 15 * 60000);
 
-        const createBook = await this.db.booking.create({
-            data: {
-                bookingId: generateBookId,
-                packageId: booking.packageId,
-                paymentStatus: booking.paymentStatus,
-                bookingStatus: booking.bookingStatus,
-                userId: booking.userId,
-                childPrice: booking.childPrice,
-                childQty: booking.childQty,
-                adultPrice: booking.adultPrice,
-                adultQty: booking.adultQty,
-                groupPrice: booking.groupPrice,
-                groupQty: booking.groupQty,
-                amount: booking.amount,
-                additionalDetail: booking.additionalDetail,
-                locationId: booking.locationId,
-                pickup_lat: booking.pickup_lat,
-                pickup_lgn: booking.pickup_lgn,
-                trip_at: new Date(booking.trip_at),
-                expire_at: extendedTime
-            },
-            include: {
-                booker: true,
-            }
-        });
+        const createBook = await prisma.$transaction(async (tx) => {
+            
+            const createContractBook = await this.db.contractBooking.create({
+                data: booking.contractBooking
+            });
 
-        if (!createBook) throw new Error("booking failed.");
+            const createBook = await this.db.booking.create({
+                data: {
+                    bookingId: generateBookId,
+                    packageId: booking.packageId,
+                    paymentStatus: booking.paymentStatus,
+                    bookingStatus: booking.bookingStatus,
+                    ContractBookingId: createContractBook.id,
+                    childPrice: booking.childPrice,
+                    childQty: booking.childQty,
+                    adultPrice: booking.adultPrice,
+                    adultQty: booking.adultQty,
+                    groupPrice: booking.groupPrice,
+                    groupQty: booking.groupQty,
+                    amount: booking.amount,
+                    additionalDetail: booking.additionalDetail,
+                    locationId: booking.locationId,
+                    pickup_lat: booking.pickup_lat,
+                    pickup_lgn: booking.pickup_lgn,
+                    trip_at: new Date(booking.trip_at),
+                    expire_at: extendedTime
+                },
+                select: {
+                    bookingId: true,
+                    adultPrice: true,
+                    adultQty: true,
+                    childPrice: true,
+                    childQty: true,
+                    amount: true,
+                    groupPrice: true,
+                    groupQty: true,
+                    booker: {
+                        select: {
+                            email: true,
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            });
+
+            if (!createBook) throw new Error("booking failed.");
+
+            return createBook;
+        });
 
 
         if (createBook.adultPrice || createBook.childPrice) {
