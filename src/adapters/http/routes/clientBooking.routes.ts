@@ -25,9 +25,27 @@ const bookingController = new BookingContorller(bookingService);
  *     CreateBooking:
  *       type: object
  *       properties:
- *         userId:
- *           type: string
- *           example: "cmi0escrq0000s7vu1ymxfb80"
+ *         contractBooking:
+ *           type: object
+ *           properties:
+ *            userId:
+ *             type: string
+ *             example: "cmi0escrq0000s7vu1ymxfb80"
+ *            firstName:
+ *             type: string
+ *             example: "Thamarat"
+ *            lastName:
+ *             type: string
+ *             example: "Laosen"
+ *            email:
+ *             type: string
+ *             example: "hanthamarat@gmail.com"
+ *            country:
+ *             type: string
+ *             example: "TH"
+ *            phoneNumber:
+ *             type: string
+ *             example: "0917128484"
  *         packageId:
  *           type: integer
  *           example: 1
@@ -71,7 +89,6 @@ const bookingController = new BookingContorller(bookingService);
  *           type: boolean
  *           example: true
  *       required:
- *         - userId
  *         - amount
  *         - pickup_lat
  *         - pickup_lgn

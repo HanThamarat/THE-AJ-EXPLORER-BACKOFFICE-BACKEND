@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+export const contractBookingSchema = z.object({
+    id: z.number().int().optional(),
+    firstName: z.string().min(3),
+    lastName: z.string().min(3),
+    email: z.string().email(),
+    country: z.string(),
+    phoneNumber: z.string().min(10).max(10),
+    userId: z.string().optional(),
+    created_at: z.union([z.date(), z.string()]).optional(),
+    updated_at: z.union([z.date(), z.string()]).optional(),
+});
+
+export type contractBookingEntity = z.infer<typeof contractBookingSchema>;
+
 export const bookingEntitySchema = z.object({
     id: z.number().int().optional(),
     bookingId: z.string().optional(),
@@ -7,7 +21,7 @@ export const bookingEntitySchema = z.object({
     paymentStatus: z.enum(["panding", "paid", "failed"]),
     bookingStatus: z.enum(["panding", "confirmed", "failed"]),
     packageId: z.number().int(),
-    userId: z.string(),
+    contractBooking: contractBookingSchema,
     childPrice: z.number().optional(),
     childQty: z.number().int().optional(),
     adultPrice: z.number().optional(),
@@ -29,7 +43,6 @@ export const bookingEntitySchema = z.object({
 export type bookingEntity = z.infer<typeof bookingEntitySchema>;
 
 export const clientBookingCreateSchema = z.object({
-    userId: z.string().min(1),
     packageId: z.coerce.number().int(),
     childPrice: z.coerce.number().optional(),
     childQty: z.coerce.number().int().optional(),
@@ -43,6 +56,7 @@ export const clientBookingCreateSchema = z.object({
     pickup_lat: z.coerce.number(),
     pickup_lgn: z.coerce.number(),
     trip_at: z.union([z.date(), z.string()]),
+    contractBooking: contractBookingSchema,
     policyAccept: z.boolean(),
 });
 
