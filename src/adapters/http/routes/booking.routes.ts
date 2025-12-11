@@ -29,4 +29,24 @@ const bkController = new BkController(bkService);
 */
 router.get("/booking", bkController.findBooking.bind(bkController));
 
+/**
+* @swagger
+* /api/v1/booking_management/booking_avg/{type}:
+*   get:
+*     tags: [Booking]
+*     summary: Finding booking the avg
+*     parameters:
+*       - in: path
+*         name: type
+*         required: true
+*         description: Get type to get
+*         schema:
+*           type: string
+*     requestBody:
+*     responses:
+*       200:
+*         description: Finding booking the avg successfully.
+*/
+router.get("/booking_avg/:type", bkController.findBookingAvg.bind(bkController));
+
 export default router;
