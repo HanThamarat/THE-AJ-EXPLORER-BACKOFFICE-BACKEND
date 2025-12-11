@@ -24,4 +24,26 @@ export class BkController {
             });
         }
     }
+
+    async findBookingAvg(req: Request, res: Response) {
+        try {
+            const { type } = req.params;
+
+            const response = await this.bkService.findBookingAvg(type as "Weekly" | "Monthly" | "Yearly");
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Finding bookings avg successfully.",
+                body: response
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Finding bookings avg failed.",
+                error: error instanceof Error ? error.message : 'Finding bookings avg failed.'
+            });
+        }
+    }
 }

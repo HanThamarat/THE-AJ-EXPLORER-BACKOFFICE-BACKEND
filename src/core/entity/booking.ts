@@ -14,3 +14,17 @@ export const bkEntitySchema = z.object({
 });
 
 export type bkEntity = z.infer<typeof bkEntitySchema>;
+
+export const bookingAvgDataSchema = z.object({
+    name: z.string(),
+    avg: z.number()
+})
+
+export type bookingAvgDataType = z.infer<typeof bookingAvgDataSchema>;
+
+export const bookingAvgSchema = z.object({
+    type: z.string(),
+    data: z.array(bookingAvgDataSchema),
+});
+
+export type bookingAvgEntity = z.infer<typeof bookingAvgSchema>;
