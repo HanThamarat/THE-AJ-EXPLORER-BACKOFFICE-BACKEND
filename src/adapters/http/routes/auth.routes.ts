@@ -60,7 +60,7 @@ const authController = new AuthController(authService);
 *         name:
 *           type: string
 *           example: some name
-*         passowrd:
+*         password:
 *           type: string
 *           example: 123456
 *     CredentialSignin:
@@ -69,7 +69,7 @@ const authController = new AuthController(authService);
 *         email:
 *           type: string
 *           example: hanthamarat@gmail.com
-*         passowrd:
+*         password:
 *           type: string
 *           example: 123456
 */

@@ -76,4 +76,14 @@ export const credentialSigninSchema = z.object({
 
 export type CredentialSigninBody = z.infer<typeof credentialSigninSchema>;
 
-export type customerEntity = Prisma.UserGetPayload<{}>;
+export const customerEntitySchema = z.object({
+    id: z.string(),
+    name: z.string().nullable(),
+    email: z.string().email(),
+    emailVerified: z.date().nullable(),
+    image: z.string().nullable(),
+    phoneNumber: z.string().nullable(),
+    authToken: z.string().optional()
+});
+
+export type customerEntity = z.infer<typeof customerEntitySchema>;
