@@ -21,7 +21,23 @@ export class AuthPrismaORM implements AuthRepositoryPort {
             }
         });
 
-        if (account) return account.user as customerEntity;
+        if (account) {
+            const format: customerEntity = {
+                id: account.user.id,
+                name: account.user.name,
+                email: account.user.email,
+                emailVerified: account.user.emailVerified,
+                image: account.user.image,
+                phoneNumber: account.user.phoneNumber
+            } 
+
+            const genAccessToken = await Ecrypt.generateToken(format);
+
+            return {
+                ...format,
+                authToken: genAccessToken,
+            }
+        }
 
         let user = await prisma.user.findUnique({
             where: {
@@ -70,7 +86,21 @@ export class AuthPrismaORM implements AuthRepositoryPort {
             }
         });
 
-        return newUser;
+        const format: customerEntity = {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            emailVerified: newUser.emailVerified,
+            image: newUser.image,
+            phoneNumber: newUser.phoneNumber
+        } 
+
+        const genAccessToken = await Ecrypt.generateToken(format);
+
+        return {
+            ...format,
+            authToken: genAccessToken,
+        }
     }
 
     async createUserWithPassword(userDTO: userCredentialDTO): Promise<customerEntity> {
@@ -86,14 +116,14 @@ export class AuthPrismaORM implements AuthRepositoryPort {
             data: {
                 email: userDTO.email,
                 name: userDTO.name,
-                password: userDTO.email,
+                password: userDTO.passsword,
                 emailVerified: null
             }
         });
 
         if (!user) throw new Error("Have somethong problem in creating user progress");
 
-       return user;
+        return user;
     }
 
     async validateUserPassword(userDTO: userCredentialDTO): Promise<customerEntity | null> {
@@ -101,15 +131,25 @@ export class AuthPrismaORM implements AuthRepositoryPort {
             where: { email: userDTO.email },
         });
 
-        if (!user || !user.password) {
-            return null;
-        }
+        if (!user || !user.password) throw new Error("Don't have account in the system.");
 
         const isMatch = await Ecrypt.passwordDecrypt(userDTO.passsword, user.password);
-        if (!isMatch) {
-            return null;
-        }
+        if (!isMatch) throw new Error("Invalid your passsword");
 
-        return user;
+        const format: customerEntity = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            image: user.image,
+            phoneNumber: user.phoneNumber
+        } 
+
+        const genAccessToken = await Ecrypt.generateToken(format);
+
+        return {
+            ...format,
+            authToken: genAccessToken,
+        }
     }
 }
