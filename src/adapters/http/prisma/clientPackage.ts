@@ -41,6 +41,7 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
                 take,
                 where: {
                     deleted_at: null,
+                    status: true,
                     OR: [
                         {
                             packageName: {
@@ -154,10 +155,10 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
     async findPackageDetail(id: number): Promise<packageEntity> {
         const packageIdCache = await CacheHelper.getCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
         
-        // if (packageIdCache !== null) {
-        //     const parsePackage = JSON.parse(packageIdCache);
-        //     return parsePackage as packageEntity;
-        // }
+        if (packageIdCache !== null) {
+            const parsePackage = JSON.parse(packageIdCache);
+            return parsePackage as packageEntity;
+        }
 
         const axios = await AxiosInstanceForFindBucket();
         const recheckPackage = await prisma.packages.count({
@@ -171,7 +172,8 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
 
             const result = await prisma.packages.findFirst({
             where: {
-                id: Number(id)
+                id: Number(id),
+                status: true,
             },
             select: {
                 id: true,
