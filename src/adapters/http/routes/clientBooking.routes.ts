@@ -73,6 +73,9 @@ const bookingController = new BookingContorller(bookingService);
  *         additionalDetail:
  *           type: string
  *           example: "A 3-day adventure in Phuket"
+ *         pickupLocation:
+ *           type: string
+ *           example: "Panon hotel"
  *         locationId:
  *           type: integer
  *           example: 0

@@ -30,6 +30,7 @@ export const bookingEntitySchema = z.object({
     groupQty: z.number().int().optional(),
     amount: z.number(),
     additionalDetail: z.string().optional(),
+    pickupLocation: z.string().optional(),
     locationId: z.number().int().optional(),
     pickup_lat: z.number(),
     pickup_lgn: z.number(),
@@ -56,6 +57,7 @@ export const clientBookingCreateSchema = z.object({
     pickup_lat: z.coerce.number(),
     pickup_lgn: z.coerce.number(),
     trip_at: z.union([z.date(), z.string()]),
+    pickupLocation: z.string().optional(),
     contractBooking: contractBookingSchema,
     policyAccept: z.boolean(),
 });
