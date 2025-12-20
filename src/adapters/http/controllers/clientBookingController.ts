@@ -11,7 +11,7 @@ export class BookingContorller {
             const {
                 childPrice, childQty, adultPrice, adultQty,
                 groupPrice, groupQty, amount, additionalDetail, locationId,
-                pickup_lat, pickup_lgn, trip_at, policyAccept, packageId, contractBooking
+                pickup_lat, pickup_lgn, trip_at, policyAccept, packageId, contractBooking, pickupLocation
             } = req.body as ClientBookingCreateBody;
 
             const bookData: bookingEntity = {
@@ -29,6 +29,7 @@ export class BookingContorller {
                 pickup_lgn,
                 trip_at,
                 policyAccept,
+                pickupLocation,
                 packageId: Number(packageId),
                 paymentStatus: "panding",
                 bookingStatus: "panding"

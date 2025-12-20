@@ -366,6 +366,7 @@ model Booking {
   groupQty          Int?
   amount            Int
   additionalDetail  String?      @db.VarChar(1000)
+  pickupLocation    String?      @db.VarChar(200)
   locationId        Int?
   pickup_lat        Decimal
   pickup_lgn        Decimal

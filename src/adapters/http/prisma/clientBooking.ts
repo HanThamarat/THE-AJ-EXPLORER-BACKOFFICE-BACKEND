@@ -36,6 +36,7 @@ export class BookingDataSource implements BookingRepositoryPort {
                     groupQty: booking.groupQty,
                     amount: booking.amount,
                     additionalDetail: booking.additionalDetail,
+                    pickupLocation: booking.pickupLocation,
                     locationId: booking.locationId,
                     pickup_lat: booking.pickup_lat,
                     pickup_lgn: booking.pickup_lgn,
