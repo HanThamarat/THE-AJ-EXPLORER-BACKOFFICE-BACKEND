@@ -80,7 +80,6 @@ jobs:
           -e OMISE_SECRET_KEY="$OMISE_SECRET_KEY" \
           -d \
           --name the-aj-explorer-api \
-          --network aj-network \
           $IMAGE_NAME_THE_AJ_API
 
     - name: Connect docker network
