@@ -28,10 +28,9 @@ export class FinancialController {
 
     async generateQr(req: Request, res: Response) {
         try {
-            const { bookingId, amount } = req.body as chargeDTO;
+            const { bookingId } = req.body as chargeDTO;
 
             const chargeDATA: chargeDTO = {
-                amount,
                 bookingId
             }
 

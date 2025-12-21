@@ -29,9 +29,6 @@ const financialController = new FinancialController(financialService);
  *         bookingId:
  *           type: string
  *           example: "BK-1414141414141"
- *         amount:
- *           type: integer
- *           example: 10000
  *       required:
  *         - bookingId
  *         - amount

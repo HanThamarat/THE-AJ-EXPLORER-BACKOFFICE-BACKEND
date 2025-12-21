@@ -8,7 +8,7 @@ import { NormalBookingSumary, GroupBookingSumary } from "../../helpers/templetes
 export class BookingDataSource implements BookingRepositoryPort {
     constructor(private db: typeof prisma) {}
 
-    async createNewBooking(booking: bookingEntity): Promise<bookingEntity | null> {
+    async createNewBooking(booking: bookingEntity): Promise<bookingEntity> {
 
 
         const generateBookId = await Generate.generateBookingId();
@@ -44,6 +44,7 @@ export class BookingDataSource implements BookingRepositoryPort {
                     expire_at: extendedTime
                 },
                 select: {
+                    id: true,
                     bookingId: true,
                     adultPrice: true,
                     adultQty: true,
@@ -52,11 +53,24 @@ export class BookingDataSource implements BookingRepositoryPort {
                     amount: true,
                     groupPrice: true,
                     groupQty: true,
+                    paymentStatus: true,
+                    bookingStatus: true,
+                    packageId: true,
+                    additionalDetail: true,
+                    pickupLocation: true,
+                    pickup_lat: true,
+                    pickup_lgn: true,
+                    trip_at: true,
+                    policyAccept: true,
                     booker: {
                         select: {
+                            id: true,
                             email: true,
                             firstName: true,
-                            lastName: true
+                            lastName: true,
+                            country: true,
+                            phoneNumber: true,
+                            userId: true,
                         }
                     }
                 }
@@ -67,31 +81,36 @@ export class BookingDataSource implements BookingRepositoryPort {
             return createBook;
         });
 
-
-        if (createBook.adultPrice || createBook.childPrice) {
-            const bookedMail = await transporterMailer.sendMail({
-                from: "The Aj Explorer Support.",
-                to: createBook.booker.email as string,
-                subject: `Booking #${createBook.bookingId}`,
-                text: `Your Booking (#${createBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
-                html: NormalBookingSumary(createBook)
-            });
-
-            console.log("Message sent:", bookedMail.messageId);
+        const ressponseFormat: bookingEntity = {
+            id: createBook.id,
+            bookingId: createBook.bookingId,
+            paymentStatus: createBook.paymentStatus,
+            bookingStatus: createBook.bookingStatus,
+            packageId: createBook.packageId,
+            contractBooking: {
+                id: createBook.booker.id,
+                email: createBook.booker.email,
+                firstName: createBook.booker.firstName,
+                lastName: createBook.booker.lastName,
+                country: createBook.booker.country,
+                phoneNumber: createBook.booker.phoneNumber,
+                userId: createBook.booker.userId ? createBook.booker.userId : "no data",
+            },
+            childPrice: createBook.childPrice ? createBook.childPrice : undefined,
+            childQty: createBook.childQty ? createBook.childQty : undefined,
+            adultPrice: createBook.adultPrice ? createBook.adultPrice : undefined,
+            adultQty: createBook.adultQty ? createBook.adultQty : undefined,
+            groupPrice: createBook.groupPrice ? createBook.groupPrice : undefined,
+            groupQty: createBook.groupQty ? createBook.groupQty : undefined,
+            amount: createBook.amount ? createBook.amount : 0,
+            additionalDetail: createBook.additionalDetail ? createBook.additionalDetail : undefined,
+            pickupLocation: createBook.pickupLocation ? createBook.pickupLocation : undefined,
+            pickup_lat: createBook.pickup_lat ? Number(createBook.pickup_lat) : 0,
+            pickup_lgn: createBook.pickup_lgn ? Number(createBook.pickup_lgn) : 0,
+            trip_at: createBook.trip_at,
+            policyAccept: createBook.policyAccept
         }
 
-        if (createBook.groupPrice) {
-            const bookedMail = await transporterMailer.sendMail({
-                from: "The Aj Explorer Support.",
-                to: createBook.booker.email as string,
-                subject: `Booking #${createBook.bookingId}`,
-                text: `Your Booking (#${createBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
-                html: GroupBookingSumary(createBook)
-            });
-
-            console.log("Message sent:", bookedMail.messageId);
-        }
-
-        return null;
+        return ressponseFormat;
     }
 }

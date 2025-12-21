@@ -372,6 +372,8 @@ model Booking {
   pickup_lgn        Decimal
   trip_at           DateTime
   policyAccept      Boolean      @default(false)
+  messageSend       Boolean?     @default(false)
+  messageId         String?      @db.VarChar(60)
   expire_at         DateTime
   created_at        DateTime     @default(now())
   updated_at        DateTime     @updatedAt

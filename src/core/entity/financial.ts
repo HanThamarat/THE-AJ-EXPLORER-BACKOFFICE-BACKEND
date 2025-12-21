@@ -225,7 +225,6 @@ export type omiseSourceEntity = z.infer<typeof omiseSourceEntitySchema>;
 
 export const chargeDTOSchema = z.object({
     bookingId: z.string(),
-    amount: z.number().positive(),
 });
 
 export type chargeDTO = z.infer<typeof chargeDTOSchema>;
