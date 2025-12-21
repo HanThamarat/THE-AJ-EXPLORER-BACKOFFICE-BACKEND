@@ -51,13 +51,13 @@ const bookingController = new BookingContorller(bookingService);
  *           example: 1
  *         childPrice:
  *           type: integer
- *           example: 70000
+ *           example: 700
  *         childQty:
  *           type: integer
  *           example: 2
  *         adultPrice:
  *           type: integer
- *           example: 150000
+ *           example: 1500
  *         adultQty:
  *           type: integer
  *           example: 3
@@ -69,7 +69,7 @@ const bookingController = new BookingContorller(bookingService);
  *           example: 0
  *         amount:
  *           type: integer
- *           example: 590000
+ *           example: 5900
  *         additionalDetail:
  *           type: string
  *           example: "A 3-day adventure in Phuket"

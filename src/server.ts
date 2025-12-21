@@ -85,7 +85,7 @@ app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), f
 app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
 app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: false }), bookingRoutes);
 app.use('/api/v1/client/package', clientPackageRoutes);
-app.use('/api/v1/client/booking_service', clientbookingRoutes);
+app.use('/api/v1/client/booking_service', passport.authenticate('jwt', { session: false }), clientbookingRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
