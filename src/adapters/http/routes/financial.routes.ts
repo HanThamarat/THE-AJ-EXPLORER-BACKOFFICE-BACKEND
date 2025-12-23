@@ -4,7 +4,7 @@ import { FinancialORM } from "../prisma/financial";
 import { FinancialService } from "../../../core/services/financialService";
 import { FinancialController } from "../controllers/financialController";
 import { validateRequest } from "../middleware/validateRequest";
-import { chargeDTOSchema, financialIdParamSchema, refundDTOSchema } from "../../../core/entity/financial";
+import { financialIdParamSchema, refundDTOSchema } from "../../../core/entity/financial";
 
 const router = express.Router();
 
@@ -23,16 +23,6 @@ const financialController = new FinancialController(financialService);
  * @swagger
  * components:
  *   schemas:
- *     CreatePaymentPromptpay:
- *       type: object
- *       properties:
- *         bookingId:
- *           type: string
- *           example: "BK-1414141414141"
- *       required:
- *         - bookingId
- *         - amount
- * 
  *     CreateRefund:
  *       type: object
  *       properties:
@@ -62,29 +52,6 @@ const financialController = new FinancialController(financialService);
 *         description: Get the financial.
 */
 router.get("/balance", financialController.balance.bind(financialController));
-
-/**
-* @swagger
-* /api/v1/financial/pay/promptpay:
-*   post:
-*     tags: [Financial]
-*     summary: Create a new charges for generate qr code promptpay.
-*     description: Create a new charges for generate qr code promptpay.
-*     requestBody:
-*       required: true
-*       content:
-*         application/json:
-*           schema:
-*             $ref: '#/components/schemas/CreatePaymentPromptpay'
-*     responses:
-*       201:
-*         description: Create a new charges for generate qr code promptpay successfully.
-*/
-router.post(
-  "/pay/promptpay",
-  validateRequest({ body: chargeDTOSchema }),
-  financialController.generateQr.bind(financialController)
-);
 
 /**
 * @swagger

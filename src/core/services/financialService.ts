@@ -1,4 +1,4 @@
-import { omiseChargeEntity, omiseFinancialEntity, chargeDTO, RefundDTO, OmiseRefundEntiry } from "../entity/financial";
+import { omiseChargeEntity, omiseFinancialEntity, RefundDTO, OmiseRefundEntiry } from "../entity/financial";
 import { FinancialRepositoryPort } from "../ports/financialRopositoryPort";
 
 export class FinancialService {
@@ -8,9 +8,6 @@ export class FinancialService {
         return this.financialRepositoryPort.balance();
     } 
 
-    generateQr(chargeDTO: chargeDTO): Promise<omiseChargeEntity> {
-        return this.financialRepositoryPort.generateQr(chargeDTO);
-    }
 
     findChargesById(chargesId: string): Promise<omiseChargeEntity> {
         return this.financialRepositoryPort.findChargesById(chargesId);
