@@ -11,4 +11,9 @@ export class CurrencyConvert {
 
         return formatter.format(decimalValue);
     }
+
+    static currencyConvertToThai = (num: number) => {
+        const currencyConverted = num;
+        return currencyConverted.toLocaleString("th-TH");
+    }
 }

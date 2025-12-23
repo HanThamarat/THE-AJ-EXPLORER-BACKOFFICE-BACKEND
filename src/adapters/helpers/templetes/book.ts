@@ -65,11 +65,11 @@ export const NormalBookingSumary = (bookData: BookType) => `
           <table width="100%" style="margin-top:10px; color:#6b7280; font-size:14px;">
             <tr>
               <td>Adult x ${bookData.adultQty}</td>
-              <td align="right">${CurrencyConvert.formatAsThb(bookData.adultPrice as number)}</td>
+              <td align="right">${CurrencyConvert.currencyConvertToThai(bookData.adultPrice as number)} THB</td>
             </tr>
             <tr>
               <td>Child x ${bookData.childQty}</td>
-              <td align="right">${CurrencyConvert.formatAsThb(bookData.childPrice as number)}</td>
+              <td align="right">${CurrencyConvert.currencyConvertToThai(bookData.childPrice as number)} THB</td>
             </tr>
           </table>
 
@@ -78,7 +78,7 @@ export const NormalBookingSumary = (bookData: BookType) => `
           <table width="100%" style="margin-top:10px; font-size:20px; color:#6b7280;">
             <tr>
               <td><strong>Total</strong></td>
-              <td align="right"><strong>${CurrencyConvert.formatAsThb(bookData.amount as number)}</strong></td>
+              <td align="right"><strong>${CurrencyConvert.currencyConvertToThai(bookData.amount as number)} THB</strong></td>
             </tr>
           </table>
         </td>
@@ -136,7 +136,7 @@ export const GroupBookingSumary = (bookData: BookType) => `
           <table width="100%" style="margin-top:10px; color:#6b7280; font-size:14px;">
             <tr>
               <td>Group x ${bookData.groupQty}</td>
-              <td align="right">${CurrencyConvert.formatAsThb(bookData.groupPrice as number)}</td>
+              <td align="right">${CurrencyConvert.currencyConvertToThai(bookData.groupPrice as number)} THB</td>
             </tr>
           </table>
 
@@ -145,7 +145,7 @@ export const GroupBookingSumary = (bookData: BookType) => `
           <table width="100%" style="margin-top:10px; font-size:20px; color:#6b7280;">
             <tr>
               <td><strong>Total</strong></td>
-              <td align="right"><strong>${CurrencyConvert.formatAsThb(bookData.amount as number)}</strong></td>
+              <td align="right"><strong>${CurrencyConvert.currencyConvertToThai(bookData.amount as number)} THB</strong></td>
             </tr>
           </table>
         </td>
