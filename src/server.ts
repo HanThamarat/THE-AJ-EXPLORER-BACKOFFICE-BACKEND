@@ -28,6 +28,7 @@ import clientbookingRoutes      from './adapters/http/routes/clientBooking.route
 import clientPaymentRoutes      from "./adapters/http/routes/payment.routes";
 
 import { Server } from 'socket.io';
+import { clientAuthMiddleware } from './conf/clientMiddleware';
 
 
 dotenv.config({
@@ -75,6 +76,7 @@ app.use(helmet(helmetOption));
 
 app.set("trust proxy", 1);
 
+// back office
 app.use('/docs', sawgerserver, swaggerui);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/usermanagement', passport.authenticate('jwt', { session: false }), userRoutes);
@@ -85,9 +87,11 @@ app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }),
 app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), financialRoutes);
 app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
 app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: false }), bookingRoutes);
+
+// client
 app.use('/api/v1/client/package', clientPackageRoutes);
-app.use('/api/v1/client/booking_service', passport.authenticate('jwt', { session: false }), clientbookingRoutes);
-app.use('/api/v1/client/payment_service', passport.authenticate('jwt', { session: false }), clientPaymentRoutes);
+app.use('/api/v1/client/booking_service', clientAuthMiddleware, clientbookingRoutes);
+app.use('/api/v1/client/payment_service', clientAuthMiddleware, clientPaymentRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {

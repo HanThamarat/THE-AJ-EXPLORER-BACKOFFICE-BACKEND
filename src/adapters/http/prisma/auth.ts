@@ -31,7 +31,7 @@ export class AuthPrismaORM implements AuthRepositoryPort {
                 phoneNumber: account.user.phoneNumber
             } 
 
-            const genAccessToken = await Ecrypt.generateToken(format);
+            const genAccessToken = await Ecrypt.generateTokenClient(format);
 
             return {
                 ...format,
@@ -95,7 +95,7 @@ export class AuthPrismaORM implements AuthRepositoryPort {
             phoneNumber: newUser.phoneNumber
         } 
 
-        const genAccessToken = await Ecrypt.generateToken(format);
+        const genAccessToken = await Ecrypt.generateTokenClient(format);
 
         return {
             ...format,
@@ -145,7 +145,7 @@ export class AuthPrismaORM implements AuthRepositoryPort {
             phoneNumber: user.phoneNumber
         } 
 
-        const genAccessToken = await Ecrypt.generateToken(format);
+        const genAccessToken = await Ecrypt.generateTokenClient(format);
 
         return {
             ...format,

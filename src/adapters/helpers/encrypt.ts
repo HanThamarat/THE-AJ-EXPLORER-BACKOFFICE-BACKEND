@@ -2,11 +2,12 @@ import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import { Request } from 'express';
-import { authUserEntity } from '../../core/entity/auth';
+import { authUserEntity, customerEntity } from '../../core/entity/auth';
 
 dotenv.config();
 
 const  JWT_SECRET : string = process.env.JWT_SECRET as string;
+const  CLIENT_JWT_SECRET : string = process.env.CLIENT_JWT_SECRET as string;
 
 interface payload {
     id: string;
@@ -25,6 +26,10 @@ export class Ecrypt {
         return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
     }
 
+    static async generateTokenClient(payload: payload) {
+        return jwt.sign(payload, CLIENT_JWT_SECRET, { expiresIn: "365d" });
+    }
+
     static async JWTDecrypt(req: Request): Promise<authUserEntity | null> {
         try {
             const authHeader = req.headers['authorization'];
@@ -40,6 +45,27 @@ export class Ecrypt {
             const userData = jwt.verify(token, JWT_SECRET);
             
             return userData as authUserEntity;
+        } catch (error) {
+            console.error('Invalid Token:', error);
+            return null;
+        }
+    }
+
+    static async JWTClientDecrypt(req: Request): Promise<customerEntity | null> {
+        try {
+            const authHeader = req.headers['authorization'];
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                return null;
+            }
+
+            const token = authHeader.split(' ')[1];
+            if (!token) {
+                return null;
+            }
+
+            const userData = jwt.verify(token, CLIENT_JWT_SECRET);
+            
+            return userData as customerEntity;
         } catch (error) {
             console.error('Invalid Token:', error);
             return null;

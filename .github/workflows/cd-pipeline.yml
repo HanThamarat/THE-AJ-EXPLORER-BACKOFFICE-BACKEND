@@ -39,6 +39,7 @@ jobs:
         SERVER_PORT: ${{secrets.SERVER_PORT}}
         PORT: ${{secrets.PORT}}
         JWT_SECRET: ${{secrets.JWT_SECRET}}
+        CLIENT_JWT_SECRET: ${{secrets.CLIENT_JWT_SECRET}}
         API_DOC_URL: ${{secrets.API_DOC_URL}}
         API_ROUTES_PATH: ${{secrets.API_ROUTES_PATH}}
         DATABASE_URL: ${{secrets.DATABASE_URL}}
@@ -62,6 +63,7 @@ jobs:
           -e PORT="$PORT" \
           -e CORS_URL="$CORS_URL" \
           -e JWT_SECRET="$JWT_SECRET" \
+          -e CLIENT_JWT_SECRET="$CLIENT_JWT_SECRET" \
           -e API_DOC_URL="$API_DOC_URL" \
           -e API_ROUTES_PATH="$API_ROUTES_PATH" \
           -e DATABASE_URL="$DATABASE_URL" \
