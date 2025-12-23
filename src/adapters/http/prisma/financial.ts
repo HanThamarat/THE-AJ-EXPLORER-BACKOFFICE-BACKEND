@@ -118,7 +118,16 @@ export class FinancialORM implements FinancialRepositoryPort {
                         }
                     }
                 }
-            })
+            });
+
+            await prisma.booking.update({
+                where: {
+                    bookingId: chargeDTO.bookingId
+                },
+                data: {
+                    paymentStatus: "paid"
+                }
+            });
 
             if (bookingData?.adultPrice || bookingData?.childPrice) {
                 const bookedMail = await transporterMailer.sendMail({
@@ -136,7 +145,7 @@ export class FinancialORM implements FinancialRepositoryPort {
                         },
                         data: {
                             messageSend: true,
-                            messageId: bookedMail.messageId
+                            messageId: bookedMail.messageId,
                         }
                     });
                 }
@@ -163,6 +172,17 @@ export class FinancialORM implements FinancialRepositoryPort {
                     });
                 }
             }
+        }
+
+        if (chargeData.failure_message !== null) {
+            await prisma.booking.update({
+                where: {
+                    bookingId: chargeDTO.bookingId
+                },
+                data: {
+                    paymentStatus: "failed"
+                }
+            });
         }
 
         return chargeData as omiseChargeEntity;
