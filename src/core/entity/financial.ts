@@ -223,12 +223,6 @@ export const omiseSourceEntitySchema = z.object({
 
 export type omiseSourceEntity = z.infer<typeof omiseSourceEntitySchema>;
 
-export const chargeDTOSchema = z.object({
-    bookingId: z.string(),
-});
-
-export type chargeDTO = z.infer<typeof chargeDTOSchema>;
-
 export const omiseRefundEntitySchema = z.object({
     object: z.string(),
     id: z.string(),

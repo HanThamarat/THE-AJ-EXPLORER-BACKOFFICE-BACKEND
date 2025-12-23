@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { FinancialService } from "../../../core/services/financialService";
 import { setErrResponse, setResponse } from "../../../hooks/response";
-import { chargeDTO, RefundDTO } from "../../../core/entity/financial";
+import { RefundDTO } from "../../../core/entity/financial";
 
 export class FinancialController {
     constructor(private financialService: FinancialService) {}
@@ -21,32 +21,6 @@ export class FinancialController {
                 res: res,
                 message: "Get balance failed.",
                 error: err instanceof Error ? err.message : 'Get balance failed.',
-                statusCode: 500
-            });
-        }
-    }
-
-    async generateQr(req: Request, res: Response) {
-        try {
-            const { bookingId } = req.body as chargeDTO;
-
-            const chargeDATA: chargeDTO = {
-                bookingId
-            }
-
-            const response = await this.financialService.generateQr(chargeDATA);
-
-            return setResponse({
-                res: res,
-                message: "Generate the qr code successfully.",
-                statusCode: 200,
-                body: response
-            });
-        } catch (err) {
-            return setErrResponse({
-                res: res,
-                message: "Generate the qr code.",
-                error: err instanceof Error ? err.message : 'Generate the qr code.',
                 statusCode: 500
             });
         }

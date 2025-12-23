@@ -9,19 +9,17 @@ export class BookingDataSource implements BookingRepositoryPort {
     constructor(private db: typeof prisma) {}
 
     async createNewBooking(booking: bookingEntity): Promise<bookingEntity> {
-
-
         const generateBookId = await Generate.generateBookingId();
         const date = new Date();
         const extendedTime = new Date(date.getTime() + 15 * 60000);
 
         const createBook = await prisma.$transaction(async (tx) => {
             
-            const createContractBook = await this.db.contractBooking.create({
+            const createContractBook = await tx.contractBooking.create({
                 data: booking.contractBooking
             });
 
-            const createBook = await this.db.booking.create({
+            const createBook = await tx.booking.create({
                 data: {
                     bookingId: generateBookId,
                     packageId: booking.packageId,

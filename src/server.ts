@@ -25,6 +25,7 @@ import blogRoutes               from './adapters/http/routes/blog.routes';
 import bookingRoutes            from './adapters/http/routes/booking.routes';
 import clientPackageRoutes      from "./adapters/http/routes/clientPackage.routes";
 import clientbookingRoutes      from './adapters/http/routes/clientBooking.routes';
+import clientPaymentRoutes      from "./adapters/http/routes/payment.routes";
 
 import { Server } from 'socket.io';
 
@@ -59,7 +60,7 @@ const helmetOption = {
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
-	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	limit: 400, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
 	standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
@@ -86,6 +87,7 @@ app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false 
 app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: false }), bookingRoutes);
 app.use('/api/v1/client/package', clientPackageRoutes);
 app.use('/api/v1/client/booking_service', passport.authenticate('jwt', { session: false }), clientbookingRoutes);
+app.use('/api/v1/client/payment_service', passport.authenticate('jwt', { session: false }), clientPaymentRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {
