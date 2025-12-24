@@ -355,6 +355,7 @@ model Booking {
   bookingId         String       @unique @db.VarChar(50)
   packageId         Int
   paymentRef        String?      @db.VarChar(60)
+  paymentMethod     String?      @db.VarChar(30)
   paymentStatus     payStatus    @default(panding)
   bookingStatus     bkStatus     @default(panding)
   ContractBookingId Int

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { setErrResponse, setResponse } from "../../../hooks/response";
-import { BookingByCardDTOType, chargeDTO } from "../../../core/entity/payment";
+import { BookingByCardDTOType, chargeDTO, createMobileBankChargeSchema, createMobileBankChargeType } from "../../../core/entity/payment";
 import { PaymentService } from "../../../core/services/paymentService";
 import { Ecrypt } from "../../helpers/encrypt";
 
@@ -84,6 +84,33 @@ export class PaymentController {
                 res: res,
                 message: "Generate the qr code.",
                 error: err instanceof Error ? err.message : 'Generate the qr code.',
+                statusCode: 500
+            });
+        }
+    }
+
+    async createBookWithMbBank(req: Request, res: Response) {
+        try {
+            const { bank, bookingId } = req.body as createMobileBankChargeType;
+
+            const chargeDATA: createMobileBankChargeType = {
+                bank,
+                bookingId
+            }
+
+            const response = await this.paymentService.createBookWithMbBank(chargeDATA);
+
+            return setResponse({
+                res: res,
+                message: "Create charge with mobile_banking successfully.",
+                statusCode: 200,
+                body: response
+            });
+        } catch (err) {
+            return setErrResponse({
+                res: res,
+                message: "Create charge with mobile_banking failed.",
+                error: err instanceof Error ? err.message : 'Create charge with mobile_banking failed.',
                 statusCode: 500
             });
         }

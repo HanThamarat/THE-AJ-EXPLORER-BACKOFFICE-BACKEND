@@ -1,5 +1,5 @@
 import { bookingEntity } from "../../../core/entity/clientBooking";
-import { BookingByCardDTOType, chargeDTO } from "../../../core/entity/payment";
+import { BookingByCardDTOType, chargeDTO, createMobileBankChargeType } from "../../../core/entity/payment";
 import { PaymentRepositoryPort } from "../../../core/ports/paymentRepositoryPort";
 import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
@@ -7,6 +7,7 @@ import omise from "../../database/omise";
 import { omiseChargeEntity } from "../../../core/entity/financial";
 import { transporterMailer } from "../../helpers/nodemailer";
 import { GroupBookingSumary, NormalBookingSumary } from "../../helpers/templetes/book";
+import { payMethod } from "@prisma/client";
 
 export class PaymentDataSource implements PaymentRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -118,7 +119,8 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                         bookingId: createBook.bookingId
                     },
                     data: {
-                        paymentStatus: "paid"
+                        paymentStatus: "paid",
+                        paymentMethod: `${createCharge.object}-${createCharge.branch}`
                     }
                 });   
             }
@@ -129,7 +131,8 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                         bookingId: createBook.bookingId
                     },
                     data: {
-                        paymentStatus: "failed"
+                        paymentStatus: "failed",
+                        paymentMethod: `${createCharge.object}-${createCharge.branch}`
                     }
                 });   
             }
@@ -262,7 +265,8 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                         bookingId: chargeDTO.bookingId
                     },
                     data: {
-                        paymentRef: charge.id
+                        paymentRef: charge.id,
+                        paymentMethod: 'promptpay'
                     }
                 });
             }
@@ -368,6 +372,164 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             await prisma.booking.update({
                 where: {
                     bookingId: chargeDTO.bookingId
+                },
+                data: {
+                    paymentStatus: "failed"
+                }
+            });
+        }
+
+        return chargeData as omiseChargeEntity;
+    }
+
+    async createBookWithMbBank(chardDTO: createMobileBankChargeType): Promise<omiseChargeEntity> {
+        const reCheckBooking = await this.db.booking.findFirst({
+            where: {
+                bookingId: chardDTO.bookingId,
+            },
+            select: {
+                bookingId: true,
+                amount: true,
+                paymentStatus: true,
+                paymentRef: true,
+                messageSend: true
+            }
+        });
+
+        if (!reCheckBooking) throw new Error("Don't have this booking id in the system, Please try again later");
+
+        if (reCheckBooking.paymentRef === null) {
+            const mergeAmout = reCheckBooking.amount * 100;
+
+            const createNewSource = await omise.sources.create({
+                type: chardDTO.bank,
+                currency: "thb",
+                amount: mergeAmout
+            });
+
+            const createNewCharge = await omise.charges.create({
+                amount: mergeAmout,
+                currency: "thb",
+                source: createNewSource.id,
+                return_uri: process.env.MOBLIE_BANKING_CALLBACK_URL,
+                metadata: {
+                    booking_id: reCheckBooking.bookingId
+                }
+            });
+
+            if (createNewCharge.id) {
+                await this.db.booking.update({
+                    where: {
+                        bookingId: reCheckBooking.bookingId
+                    },
+                    data: {
+                        paymentRef: createNewCharge.id,
+                        paymentMethod: chardDTO.bank
+                    }
+                });
+            }
+
+            return createNewCharge as omiseChargeEntity;
+        }
+
+        const chargeData = await omise.charges.retrieve(reCheckBooking.paymentRef);
+
+        if (chargeData.paid === true && reCheckBooking.messageSend === false) {
+            const bookingData = await prisma.booking.findFirst({
+                where: {
+                    bookingId: chardDTO.bookingId
+                },
+                select: {
+                    id: true,
+                    bookingId: true,
+                    adultPrice: true,
+                    adultQty: true,
+                    childPrice: true,
+                    childQty: true,
+                    amount: true,
+                    groupPrice: true,
+                    groupQty: true,
+                    paymentStatus: true,
+                    bookingStatus: true,
+                    packageId: true,
+                    additionalDetail: true,
+                    pickupLocation: true,
+                    pickup_lat: true,
+                    pickup_lgn: true,
+                    trip_at: true,
+                    policyAccept: true,
+                    booker: {
+                        select: {
+                            id: true,
+                            email: true,
+                            firstName: true,
+                            lastName: true,
+                            country: true,
+                            phoneNumber: true,
+                            userId: true,
+                        }
+                    }
+                }
+            });
+
+            await prisma.booking.update({
+                where: {
+                    bookingId: chardDTO.bookingId
+                },
+                data: {
+                    paymentStatus: "paid"
+                }
+            });
+
+            if (bookingData?.adultPrice || bookingData?.childPrice) {
+                const bookedMail = await transporterMailer.sendMail({
+                    from: "The Aj Explorer Support.",
+                    to: bookingData.booker.email as string,
+                    subject: `Booking #${bookingData.bookingId}`,
+                    text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+                    html: NormalBookingSumary(bookingData)
+                });
+
+                if (bookedMail.messageId) {
+                    await prisma.booking.update({
+                        where: {
+                            bookingId: bookingData.bookingId
+                        },
+                        data: {
+                            messageSend: true,
+                            messageId: bookedMail.messageId,
+                        }
+                    });
+                }
+            }
+
+            if (bookingData?.groupPrice) {
+                const bookedMail = await transporterMailer.sendMail({
+                    from: "The Aj Explorer Support.",
+                    to: bookingData.booker.email as string,
+                    subject: `Booking #${bookingData.bookingId}`,
+                    text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+                    html: GroupBookingSumary(bookingData)
+                });
+
+                if (bookedMail.messageId) {
+                    await prisma.booking.update({
+                        where: {
+                            bookingId: bookingData.bookingId
+                        },
+                        data: {
+                            messageSend: true,
+                            messageId: bookedMail.messageId
+                        }
+                    });
+                }
+            }
+        }
+
+        if (chargeData.failure_message !== null) {
+            await prisma.booking.update({
+                where: {
+                    bookingId: chardDTO.bookingId
                 },
                 data: {
                     paymentStatus: "failed"
