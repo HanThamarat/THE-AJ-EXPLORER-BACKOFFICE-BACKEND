@@ -37,9 +37,6 @@ const paymentController = new PaymentController(paymentService);
  *         contractBooking:
  *           type: object
  *           properties:
- *            userId:
- *             type: string
- *             example: "cmi0escrq0000s7vu1ymxfb80"
  *            firstName:
  *             type: string
  *             example: "Thamarat"
