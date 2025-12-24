@@ -16,7 +16,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
         const date = new Date();
         const extendedTime = new Date(date.getTime() + 15 * 60000);
 
-        const createBook = await prisma.$transaction(async (tx) => {
+        const createnewBook = await this.db.$transaction(async (tx) => {
             
             const createContractBook = await tx.contractBooking.create({
                 data: bookingDTO.contractBooking
@@ -100,39 +100,115 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                 },
             });
 
-            console.log(createCharge);
+
+            if (!createCharge) throw new Error("have something wrong in payment process, Please try again later.");
+
+            await tx.booking.update({
+                where: {
+                    bookingId: createBook.bookingId
+                },
+                data: {
+                    paymentRef: createCharge.id
+                }
+            });   
+
+            if (createCharge.paid === true) {
+                await tx.booking.update({
+                    where: {
+                        bookingId: createBook.bookingId
+                    },
+                    data: {
+                        paymentStatus: "paid"
+                    }
+                });   
+            }
+
+            if (createCharge.failure_code !== null) {
+                await tx.booking.update({
+                    where: {
+                        bookingId: createBook.bookingId
+                    },
+                    data: {
+                        paymentStatus: "failed"
+                    }
+                });   
+            }
 
             return createBook;
         });
 
+        if (createnewBook?.adultPrice || createnewBook?.childPrice) {
+            const bookedMail = await transporterMailer.sendMail({
+                from: "The Aj Explorer Support.",
+                to: createnewBook.booker.email as string,
+                subject: `Booking #${createnewBook.bookingId}`,
+                text: `Your Booking (#${createnewBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+                html: NormalBookingSumary(createnewBook)
+            });        
+
+            if (bookedMail.messageId) {
+                await this.db.booking.update({
+                    where: {
+                        bookingId: createnewBook.bookingId
+                    },
+                    data: {
+                        messageSend: true,
+                        messageId: bookedMail.messageId,
+                    }
+                });
+            }
+        }
+
+        if (createnewBook?.groupPrice) {
+            const bookedMail = await transporterMailer.sendMail({
+                from: "The Aj Explorer Support.",
+                to: createnewBook.booker.email as string,
+                subject: `Booking #${createnewBook.bookingId}`,
+                text: `Your Booking (#${createnewBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+                html: GroupBookingSumary(createnewBook)
+            });
+
+            if (bookedMail.messageId) {
+                await this.db.booking.update({
+                    where: {
+                        bookingId: createnewBook.bookingId
+                    },
+                    data: {
+                        messageSend: true,
+                        messageId: bookedMail.messageId
+                    }
+                });
+            }
+        }
+
         const ressponseFormat: bookingEntity = {
-            id: createBook.id,
-            bookingId: createBook.bookingId,
-            paymentStatus: createBook.paymentStatus,
-            bookingStatus: createBook.bookingStatus,
-            packageId: createBook.packageId,
+            id: createnewBook.id,
+            bookingId: createnewBook.bookingId,
+            paymentStatus: createnewBook.paymentStatus,
+            bookingStatus: createnewBook.bookingStatus,
+            packageId: createnewBook.packageId,
             contractBooking: {
-                id: createBook.booker.id,
-                email: createBook.booker.email,
-                firstName: createBook.booker.firstName,
-                lastName: createBook.booker.lastName,
-                country: createBook.booker.country,
-                phoneNumber: createBook.booker.phoneNumber,
-                userId: createBook.booker.userId ? createBook.booker.userId : "no data",
+                id: createnewBook.booker.id,
+                email: createnewBook.booker.email,
+                firstName: createnewBook.booker.firstName,
+                lastName: createnewBook.booker.lastName,
+                country: createnewBook.booker.country,
+                phoneNumber: createnewBook.booker.phoneNumber,
+                userId: createnewBook.booker.userId ? createnewBook.booker.userId : "no data",
             },
-            childPrice: createBook.childPrice ? createBook.childPrice : undefined,
-            childQty: createBook.childQty ? createBook.childQty : undefined,
-            adultPrice: createBook.adultPrice ? createBook.adultPrice : undefined,
-            adultQty: createBook.adultQty ? createBook.adultQty : undefined,
-            groupPrice: createBook.groupPrice ? createBook.groupPrice : undefined,
-            groupQty: createBook.groupQty ? createBook.groupQty : undefined,
-            amount: createBook.amount ? createBook.amount : 0,
-            additionalDetail: createBook.additionalDetail ? createBook.additionalDetail : undefined,
-            pickupLocation: createBook.pickupLocation ? createBook.pickupLocation : undefined,
-            pickup_lat: createBook.pickup_lat ? Number(createBook.pickup_lat) : 0,
-            pickup_lgn: createBook.pickup_lgn ? Number(createBook.pickup_lgn) : 0,
-            trip_at: createBook.trip_at,
-            policyAccept: createBook.policyAccept
+            childPrice: createnewBook.childPrice ? createnewBook.childPrice : undefined,
+            childQty: createnewBook.childQty ? createnewBook.childQty : undefined,
+            adultPrice: createnewBook.adultPrice ? createnewBook.adultPrice : undefined,
+            adultQty: createnewBook.adultQty ? createnewBook.adultQty : undefined,
+            groupPrice: createnewBook.groupPrice ? createnewBook.groupPrice : undefined,
+            groupQty: createnewBook.groupQty ? createnewBook.groupQty : undefined,
+            amount: createnewBook.amount ? createnewBook.amount : 0,
+            additionalDetail: createnewBook.additionalDetail ? createnewBook.additionalDetail : undefined,
+            pickupLocation: createnewBook.pickupLocation ? createnewBook.pickupLocation : undefined,
+            pickup_lat: createnewBook.pickup_lat ? Number(createnewBook.pickup_lat) : 0,
+            pickup_lgn: createnewBook.pickup_lgn ? Number(createnewBook.pickup_lgn) : 0,
+            trip_at: createnewBook.trip_at,
+            policyAccept: createnewBook.policyAccept
         }
 
         return ressponseFormat;

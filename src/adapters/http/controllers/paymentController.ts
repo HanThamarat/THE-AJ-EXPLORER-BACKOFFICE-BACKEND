@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { setErrResponse, setResponse } from "../../../hooks/response";
 import { BookingByCardDTOType, chargeDTO } from "../../../core/entity/payment";
 import { PaymentService } from "../../../core/services/paymentService";
+import { Ecrypt } from "../../helpers/encrypt";
 
 export class PaymentController {
     constructor(private paymentService: PaymentService) {}
@@ -13,6 +14,9 @@ export class PaymentController {
                 groupPrice, groupQty, amount, additionalDetail, locationId,
                 pickup_lat, pickup_lgn, trip_at, policyAccept, packageId, contractBooking, pickupLocation, card
             } = req.body as BookingByCardDTOType;
+
+            const userInfo = await Ecrypt.JWTClientDecrypt(req);
+            const userId = userInfo?.id;
 
             const bookingData: BookingByCardDTOType = {
                 childPrice, 
@@ -29,7 +33,14 @@ export class PaymentController {
                 trip_at, 
                 policyAccept,
                 packageId : Number(packageId), 
-                contractBooking, 
+                contractBooking: {
+                    userId: userId,
+                    firstName: contractBooking.firstName,
+                    lastName: contractBooking.lastName,
+                    email: contractBooking.email,
+                    country: contractBooking.country,
+                    phoneNumber: contractBooking.phoneNumber
+                }, 
                 pickupLocation, 
                 card
             };
