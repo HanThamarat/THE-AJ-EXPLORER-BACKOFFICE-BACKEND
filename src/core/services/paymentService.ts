@@ -1,6 +1,6 @@
 import { bookingEntity } from "../entity/clientBooking";
 import { omiseChargeEntity } from "../entity/financial";
-import { BookingByCardDTOType, chargeDTO } from "../entity/payment";
+import { BookingByCardDTOType, chargeDTO, createMobileBankChargeType } from "../entity/payment";
 import { PaymentRepositoryPort } from "../ports/paymentRepositoryPort";
 
 export class PaymentService {
@@ -12,5 +12,9 @@ export class PaymentService {
 
     async generateQr(chargeDTO: chargeDTO): Promise<omiseChargeEntity> {
         return this.paymentRepositoryPort.generateQr(chargeDTO);
+    }
+
+    async createBookWithMbBank(chardDTO: createMobileBankChargeType): Promise<omiseChargeEntity> {
+        return this.paymentRepositoryPort.createBookWithMbBank(chardDTO);
     }
 }

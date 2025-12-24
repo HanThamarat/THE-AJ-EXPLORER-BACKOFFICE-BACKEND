@@ -4,7 +4,7 @@ import { prisma as db } from "../../database/data-source";
 import { PaymentService } from "../../../core/services/paymentService";
 import { PaymentController } from "../controllers/paymentController";
 import { validateRequest } from "../middleware/validateRequest";
-import { BookingByCardDTO, chargeDTOSchema } from "../../../core/entity/payment";
+import { BookingByCardDTO, chargeDTOSchema, createMobileBankChargeSchema } from "../../../core/entity/payment";
 
 const router = express.Router();
 const paymentRepositoryPort = new PaymentDataSource(db);
@@ -22,6 +22,19 @@ const paymentController = new PaymentController(paymentService);
  * @swagger
  * components:
  *   schemas:
+ *     CreatePaymentMbBanking:
+ *       type: object
+ *       properties:
+ *         bank:
+ *           type: string
+ *           example: "mobile_banking_bbl"
+ *         bookingId:
+ *           type: string
+ *           example: "BK-1414141414141"
+ *       required:
+ *         - bank
+ *         - bookingId
+ * 
  *     CreatePaymentPromptpay:
  *       type: object
  *       properties:
@@ -175,6 +188,28 @@ router.post(
   "/promptpay",
   validateRequest({ body: chargeDTOSchema }),
   paymentController.generateQr.bind(paymentController)
+);
+
+/**
+* @swagger
+* /api/v1/client/payment_service/moblie_banking:
+*   post:
+*     tags: [Payment]
+*     summary: Create a new charges for moblie banking.
+*     description: Create a new charges for moblie banking.
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CreatePaymentMbBanking'
+*     responses:
+*       201:
+*         description: Create a new charges for moblie banking successfully.
+*/
+router.post("/moblie_banking",
+  validateRequest({ body: createMobileBankChargeSchema }),
+  paymentController.createBookWithMbBank.bind(paymentController)
 );
 
 export default router;
