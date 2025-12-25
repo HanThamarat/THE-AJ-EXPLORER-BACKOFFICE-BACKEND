@@ -59,6 +59,10 @@ export class ClientPackageController {
     async findPackageDetail(req: Request, res: Response) {
         try {
             const { id } = req.params;
+            
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
 
             const response = await this.clientPackagService.findPackageDetail(Number(id));
 
