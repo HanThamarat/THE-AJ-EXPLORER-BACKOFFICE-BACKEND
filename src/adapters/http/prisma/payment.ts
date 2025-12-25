@@ -399,6 +399,9 @@ export class PaymentDataSource implements PaymentRepositoryPort {
         if (!reCheckBooking) throw new Error("Don't have this booking id in the system, Please try again later");
 
         if (reCheckBooking.paymentRef === null) {
+
+            if (!chardDTO.bank) throw new Error("Please enter mobile banking and try again later.");
+
             const mergeAmout = reCheckBooking.amount * 100;
 
             const createNewSource = await omise.sources.create({
