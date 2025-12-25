@@ -92,8 +92,20 @@ export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {
             }),
             prisma.packages.count({
                 where: {
-                    deleted_at: null
-                }
+                    deleted_at: null,
+                    status: true,
+                    OR: [
+                        {
+                            packageName: {
+                                contains: params.packageName,
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            provinceId: params.provinceId
+                        }
+                    ]
+                },
             })
         ]);
 
