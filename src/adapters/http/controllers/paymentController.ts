@@ -66,9 +66,12 @@ export class PaymentController {
     async generateQr(req: Request, res: Response) {
         try {
             const { bookingId } = req.body as chargeDTO;
+            const userInfo = await Ecrypt.JWTClientDecrypt(req);
+            const userId = userInfo?.id;
 
             const chargeDATA: chargeDTO = {
-                bookingId
+                bookingId,
+                userId
             }
 
             const response = await this.paymentService.generateQr(chargeDATA);
@@ -92,10 +95,13 @@ export class PaymentController {
     async createBookWithMbBank(req: Request, res: Response) {
         try {
             const { bank, bookingId } = req.body as createMobileBankChargeType;
+            const userInfo = await Ecrypt.JWTClientDecrypt(req);
+            const userId = userInfo?.id;
 
             const chargeDATA: createMobileBankChargeType = {
                 bank,
-                bookingId
+                bookingId,
+                userId
             }
 
             const response = await this.paymentService.createBookWithMbBank(chargeDATA);
