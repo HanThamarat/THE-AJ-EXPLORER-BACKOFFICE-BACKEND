@@ -55,7 +55,7 @@ export const chargeDTOSchema = z.object({
 export type chargeDTO = z.infer<typeof chargeDTOSchema>;
 
 export const createMobileBankChargeSchema = z.object({
-    bank: z.string(),
+    bank: z.string().optional(),
     bookingId: z.string(),
 });
 

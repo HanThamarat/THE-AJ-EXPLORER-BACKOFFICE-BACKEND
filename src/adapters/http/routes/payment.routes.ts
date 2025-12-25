@@ -32,7 +32,6 @@ const paymentController = new PaymentController(paymentService);
  *           type: string
  *           example: "BK-1414141414141"
  *       required:
- *         - bank
  *         - bookingId
  * 
  *     CreatePaymentPromptpay:
