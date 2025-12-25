@@ -411,7 +411,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                 amount: mergeAmout,
                 currency: "thb",
                 source: createNewSource.id,
-                return_uri: process.env.MOBLIE_BANKING_CALLBACK_URL,
+                return_uri: process.env.MOBLIE_BANKING_CALLBACK_URL + '/' + reCheckBooking.bookingId,
                 metadata: {
                     booking_id: reCheckBooking.bookingId
                 }
