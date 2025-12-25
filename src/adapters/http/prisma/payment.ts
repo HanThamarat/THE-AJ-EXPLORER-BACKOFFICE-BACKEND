@@ -228,10 +228,15 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                 paymentRef: true,
                 amount: true,
                 messageSend: true,
+                booker: {
+                    select: {
+                        userId: true
+                    }
+                }
             }
         });
 
-        if (!reCheckBooking) throw new Error("Don't have a booking in system, please try again later.");
+        if (!reCheckBooking || reCheckBooking.booker.userId !== chargeDTO.userId) throw new Error("Don't have this booking id in the system, Please try again later");
 
         if (reCheckBooking.paymentStatus !== "panding") throw new Error(`This booking ${reCheckBooking.paymentStatus}`);
 
@@ -392,11 +397,16 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                 amount: true,
                 paymentStatus: true,
                 paymentRef: true,
-                messageSend: true
+                messageSend: true,
+                booker: {
+                    select: {
+                        userId: true
+                    }
+                }
             }
         });
 
-        if (!reCheckBooking) throw new Error("Don't have this booking id in the system, Please try again later");
+        if (!reCheckBooking || reCheckBooking.booker.userId !== chardDTO.userId) throw new Error("Don't have this booking id in the system, Please try again later");
 
         if (reCheckBooking.paymentRef === null) {
 
