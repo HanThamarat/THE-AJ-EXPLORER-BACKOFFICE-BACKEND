@@ -211,4 +211,17 @@ router.post("/moblie_banking",
   paymentController.createBookWithMbBank.bind(paymentController)
 );
 
+/**
+* @swagger
+* /api/v1/client/payment_service/webhooks/omise:
+*   post:
+*     tags: [Payment]
+*     summary: Conect with omise webhook.
+*     description: Conect with omise webhook.
+*     responses:
+*       200:
+*         description: Conect with omise webhook successfully.
+*/
+router.post("/webhooks/omise", paymentController.omiseWebhook.bind(paymentController));
+
 export default router;

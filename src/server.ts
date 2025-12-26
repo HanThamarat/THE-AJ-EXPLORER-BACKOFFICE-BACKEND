@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { setResponse, setErrResponse } from './hooks/response';
 import morgan from 'morgan';
@@ -67,8 +67,16 @@ const limiter = rateLimit({
 	ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
 })
 
-app.use(bodyParser.json({ limit: 200 * 1024 * 1024 })); // 200 MB
-app.use(bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true }));
+app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.path === '/api/v1/client/payment_service/webhooks/omise') return next();
+    bodyParser.json({ limit: 200 * 1024 * 1024 })(req, res, next);
+}); // body size 200MB
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.path === '/api/v1/client/payment_service/webhooks/omise') return next();
+    bodyParser.urlencoded({ limit: 200 * 1024 * 1024, extended: true })(req, res, next);
+});
+
 process.env.NODE_ENV !== 'test' && app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);
@@ -91,7 +99,21 @@ app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: fa
 // client
 app.use('/api/v1/client/package', clientPackageRoutes);
 app.use('/api/v1/client/booking_service', clientAuthMiddleware, clientbookingRoutes);
-app.use('/api/v1/client/payment_service', clientAuthMiddleware, clientPaymentRoutes);
+
+// payments
+app.use('/api/v1/client/payment_service', (req, res, next) => {
+  // skip auth and use raw body for webhook
+  if (req.path === '/webhooks/omise' && req.method === 'POST') {
+    express.raw({ type: 'application/json' })(req, res, () => {
+      next();
+    });
+  } else {
+    // apply json parser and auth for other routes
+    express.json()(req, res, () => {
+      clientAuthMiddleware(req, res, next);
+    });
+  }
+}, clientPaymentRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     try {

@@ -17,4 +17,8 @@ export class PaymentService {
     async createBookWithMbBank(chardDTO: createMobileBankChargeType): Promise<omiseChargeEntity> {
         return this.paymentRepositoryPort.createBookWithMbBank(chardDTO);
     }
+
+    omiseWebhook(event_name: string, data: any): Promise<omiseChargeEntity | null> {
+        return this.paymentRepositoryPort.omiseWebhook(event_name, data);
+    }
 }

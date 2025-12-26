@@ -80,6 +80,25 @@ export class Bucket {
         return mergedImage;
     }
 
+    static async findFirstWithoutToken(image: imageEntity, file_path: string): Promise<imageEntity> {
+        const axios = await AxiosInstanceForFindBucket();
+        let imgArr: Array<string> = [];
+        imgArr.push(image.file_name);
+
+        const imageBase64 = await axios?.post('/findfiles', {
+            file_name: imgArr,
+            file_path: file_path
+        });
+
+        return {
+            file_name: image.file_name,
+            file_original_name: image.file_original_name,
+            file_path: image.file_path,
+            mainFile: image.mainFile,
+            base64: imageBase64?.data?.body[0].file_base64,
+        };
+    }
+
     static async upload(req: Request, image: imageDTO, file_path: string): Promise<imageEntity | Error> {
         try {
             const axios = await AxiosInstanceMultipart(req);
