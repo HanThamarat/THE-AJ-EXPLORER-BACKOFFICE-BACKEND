@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import { Request } from 'express';
 import { authUserEntity, customerEntity } from '../../core/entity/auth';
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -70,5 +71,14 @@ export class Ecrypt {
             console.error('Invalid Token:', error);
             return null;
         }
+    }
+
+    static async verifyOmiseWebhookSignature(payload: Buffer, signature: string): Promise<boolean> {
+        const hash = crypto
+        .createHmac('sha256', process.env.OMISE_SECRET_KEY!)
+        .update(payload)
+        .digest('hex');
+  
+        return hash === signature;
     }
 }

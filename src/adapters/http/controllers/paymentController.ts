@@ -121,4 +121,32 @@ export class PaymentController {
             });
         }
     }
+
+    async omiseWebhook(req: Request, res: Response) {
+        try {
+            const signature = req.headers['omise-signature'] as string;
+            const isVerify = Ecrypt.verifyOmiseWebhookSignature(req.body, signature);
+
+            if (!isVerify) throw new Error("Invalid signature");
+
+            const webhookData = JSON.parse(req.body.toString());
+            const { key, data } = webhookData;
+
+            const response = await this.paymentService.omiseWebhook(key, data);
+
+            return setResponse({
+                res: res,
+                message: "connection to omise web hook successfully.",
+                statusCode: 200,
+                body: response
+            });
+        } catch (err) {
+            return setErrResponse({
+                res: res,
+                message: "connection to omise web hook failed.",
+                error: err instanceof Error ? err.message : 'connection to omise web hook failed.',
+                statusCode: 500
+            });
+        }
+    }
 }

@@ -122,4 +122,22 @@ router.post(
   bookingController.createBooking.bind(bookingController)
 );
 
+/**
+* @swagger
+* /api/v1/client/booking_service/my_trip:
+*   get:
+*     tags: [ClientBooking]
+*     summary: Get the packages
+*     parameters:
+*       - in: query
+*         name: page
+*         schema:
+*           type: string
+*         description: Page type
+*     responses:
+*       200:
+*         description:  Get the packages.
+*/
+router.get("/my_trip", bookingController.findmytrip.bind(bookingController));
+
 export default router;

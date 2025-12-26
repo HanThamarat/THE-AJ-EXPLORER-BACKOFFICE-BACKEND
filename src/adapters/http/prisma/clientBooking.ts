@@ -1,9 +1,12 @@
-import { bookingEntity } from "../../../core/entity/clientBooking";
+import { Request } from "express";
+import { bookingEntity, findBookingType, mytripEntityType } from "../../../core/entity/clientBooking";
 import { BookingRepositoryPort } from "../../../core/ports/clientBookingRepositoryPort";
 import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
-import { transporterMailer } from "../../helpers/nodemailer";
-import { NormalBookingSumary, GroupBookingSumary } from "../../helpers/templetes/book";
+import dayjs from "dayjs";
+import { imageEntity } from "../../../const/schema/image";
+import { Bucket } from "../../database/bucket";
+import { FILE_SCHEMA } from "../../../const/schema/file";
 
 export class BookingDataSource implements BookingRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -110,5 +113,94 @@ export class BookingDataSource implements BookingRepositoryPort {
         }
 
         return ressponseFormat;
+    }
+
+    async myTrip(page: "upcoming" | "cancaled" | "completed", userId: string, req: Request): Promise<mytripEntityType[] | null> {
+        const recheckUserId = await this.db.user.count({
+            where: {
+                id: userId
+            }
+        });
+
+        if (recheckUserId === 0) throw new Error("This userId don't have in the system, Please try again later.");
+    
+        const currentDate = dayjs().format();
+        let findBooking: findBookingType[];
+        let result: mytripEntityType[] = [];
+
+        switch (page) {
+            case "upcoming":
+                findBooking = await this.db.$queryRaw`
+                    select b."bookingId", b."bookingStatus", b.trip_at , p."id" as packageId, p."packageImages", p."packageName", pv."nameEn" 
+                    from ((("ContractBooking" cb  inner join "Booking" b on cb.id = b."ContractBookingId") 
+                        inner join packages p on b."packageId" = p.id)
+                        inner join province pv on p."provinceId" = pv.id)
+                    where cb."userId" = ${userId} and date(b.trip_at) >= date(${currentDate})
+                ` as findBookingType[];
+                break;
+            case "cancaled":
+                findBooking = await this.db.$queryRaw`
+                    select b."bookingId", b."bookingStatus", b.trip_at , p."id" as packageId, p."packageImages", p."packageName", pv."nameEn" 
+                    from ((("ContractBooking" cb  inner join "Booking" b on cb.id = b."ContractBookingId") 
+                        inner join packages p on b."packageId" = p.id)
+                        inner join province pv on p."provinceId" = pv.id)
+                    where cb."userId" = ${userId} and b."bookingStatus" = 'failed'
+                ` as findBookingType[];
+                break;
+            case "completed":
+                findBooking = await this.db.$queryRaw`
+                    select b."bookingId", b."bookingStatus", b.trip_at , p."id" as packageId, p."packageImages", p."packageName", pv."nameEn" 
+                    from ((("ContractBooking" cb  inner join "Booking" b on cb.id = b."ContractBookingId") 
+                        inner join packages p on b."packageId" = p.id)
+                        inner join province pv on p."provinceId" = pv.id)
+                    where cb."userId" = ${userId} and date(b.trip_at) < date(${currentDate})
+                ` as findBookingType[];
+                break;
+            default:
+                findBooking = await this.db.$queryRaw`
+                    select b."bookingId", b."bookingStatus", b.trip_at , p."id" as packageId, p."packageImages", p."packageName", pv."nameEn" 
+                    from ((("ContractBooking" cb  inner join "Booking" b on cb.id = b."ContractBookingId") 
+                        inner join packages p on b."packageId" = p.id)
+                        inner join province pv on p."provinceId" = pv.id)
+                    where cb."userId" = ${userId} and date(b.trip_at) >= date(${currentDate})
+                ` as findBookingType[];
+                break;
+        }
+
+        const findUniueProvince = [...new Map(findBooking.map(item => [item.nameEn, item])).values()];
+
+        for (const provice of findUniueProvince) {
+            const filterPackagebyProvince = findBooking.filter((data) => data.nameEn === provice.nameEn);
+            const findUniueTripDate = [...new Map(filterPackagebyProvince.map((item) => [item.trip_at, item])).values()];
+            
+            for (const sameDay of findUniueTripDate)  {
+                const filterPackageByDate = filterPackagebyProvince.filter((datas) => datas.trip_at === sameDay.trip_at);
+
+                result.push({
+                    province_name: provice.nameEn,
+                    trip_date: sameDay.trip_at as string,
+                    booking_detail: await Promise.all(
+                        filterPackageByDate.map(async (item) => {
+
+                            const packageImageArr: imageEntity[] = JSON.parse(item.packageImages);
+                            const findMainImage = packageImageArr.filter((image) => image.mainFile === true);
+                            const base64Image = await Bucket.findFirstWithoutToken(findMainImage[0], FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);
+
+                            return {
+                                bookingId: item.bookingId,
+                                bookingStatus: item.bookingStatus,
+                                package: {
+                                    packageId: item.packageid,
+                                    packageName: item.packageName,
+                                    packageMainImage: base64Image as imageEntity,
+                                }
+                            }
+                        })
+                    )
+                });
+            }
+        }
+
+        return result as mytripEntityType[];
     }
 }

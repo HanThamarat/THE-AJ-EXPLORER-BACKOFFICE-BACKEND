@@ -6,4 +6,5 @@ export interface PaymentRepositoryPort {
     createBookingByCard(bookingDTO: BookingByCardDTOType): Promise<bookingEntity>;
     generateQr(chargeDTO: chargeDTO): Promise<omiseChargeEntity>;
     createBookWithMbBank(chardDTO: createMobileBankChargeType): Promise<omiseChargeEntity>;
+    omiseWebhook(event_name: string, data: any): Promise<omiseChargeEntity | null>;
 }

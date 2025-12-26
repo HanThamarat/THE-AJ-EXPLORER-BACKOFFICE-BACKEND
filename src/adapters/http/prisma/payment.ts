@@ -8,6 +8,8 @@ import { omiseChargeEntity } from "../../../core/entity/financial";
 import { transporterMailer } from "../../helpers/nodemailer";
 import { GroupBookingSumary, NormalBookingSumary } from "../../helpers/templetes/book";
 import { payMethod } from "@prisma/client";
+import { Request } from "express";
+import { Ecrypt } from "../../helpers/encrypt";
 
 export class PaymentDataSource implements PaymentRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -238,8 +240,6 @@ export class PaymentDataSource implements PaymentRepositoryPort {
 
         if (!reCheckBooking || reCheckBooking.booker.userId !== chargeDTO.userId) throw new Error("Don't have this booking id in the system, Please try again later");
 
-        if (reCheckBooking.paymentStatus !== "panding") throw new Error(`This booking ${reCheckBooking.paymentStatus}`);
-
         const now = new Date();
         now.setMinutes(now.getMinutes() + 15);
         const expiresAtISO = now.toISOString();
@@ -412,6 +412,9 @@ export class PaymentDataSource implements PaymentRepositoryPort {
 
             if (!chardDTO.bank) throw new Error("Please enter mobile banking and try again later.");
 
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 15);
+            const expiresAtISO = now.toISOString();
             const mergeAmout = reCheckBooking.amount * 100;
 
             const createNewSource = await omise.sources.create({
@@ -421,6 +424,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             });
 
             const createNewCharge = await omise.charges.create({
+                expires_at: expiresAtISO,
                 amount: mergeAmout,
                 currency: "thb",
                 source: createNewSource.id,
@@ -551,5 +555,134 @@ export class PaymentDataSource implements PaymentRepositoryPort {
         }
 
         return chargeData as omiseChargeEntity;
+    }
+
+    async omiseWebhook(event_name: string, data: any): Promise<omiseChargeEntity | null> {
+        
+        if (event_name === "charge.complete") {
+            
+            const chargeData = data as omiseChargeEntity;
+ 
+            const recheckBooking = await this.db.booking.findFirst({
+                where: {
+                    bookingId: data.metadata.booking_id,
+                },
+                select: {
+                    bookingId: true,
+                    messageSend: true
+                }
+            });
+
+            if (!recheckBooking) throw new Error("don't have booking id in the systems.");
+
+            if (chargeData.paid === true) {
+                await prisma.booking.update({
+                    where: {
+                        bookingId: recheckBooking.bookingId
+                    },
+                    data: {
+                        paymentStatus: "paid"
+                    }
+                });
+            }
+
+            if (recheckBooking.messageSend === false) {
+                const bookingData = await prisma.booking.findFirst({
+                    where: {
+                        bookingId: recheckBooking.bookingId
+                    },
+                    select: {
+                        id: true,
+                        bookingId: true,
+                        adultPrice: true,
+                        adultQty: true,
+                        childPrice: true,
+                        childQty: true,
+                        amount: true,
+                        groupPrice: true,
+                        groupQty: true,
+                        paymentStatus: true,
+                        bookingStatus: true,
+                        packageId: true,
+                        additionalDetail: true,
+                        pickupLocation: true,
+                        pickup_lat: true,
+                        pickup_lgn: true,
+                        trip_at: true,
+                        policyAccept: true,
+                        booker: {
+                            select: {
+                                id: true,
+                                email: true,
+                                firstName: true,
+                                lastName: true,
+                                country: true,
+                                phoneNumber: true,
+                                userId: true,
+                            }
+                        }
+                    }
+                });
+
+                if (bookingData?.adultPrice || bookingData?.childPrice) {
+                    const bookedMail = await transporterMailer.sendMail({
+                        from: "The Aj Explorer Support.",
+                        to: bookingData.booker.email as string,
+                        subject: `Booking #${bookingData.bookingId}`,
+                        text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+                        html: NormalBookingSumary(bookingData)
+                    });
+
+                    if (bookedMail.messageId) {
+                        await prisma.booking.update({
+                            where: {
+                                bookingId: bookingData.bookingId
+                            },
+                            data: {
+                                messageSend: true,
+                                messageId: bookedMail.messageId,
+                            }
+                        });
+                    }
+                }
+
+                if (bookingData?.groupPrice) {
+                    const bookedMail = await transporterMailer.sendMail({
+                        from: "The Aj Explorer Support.",
+                        to: bookingData.booker.email as string,
+                        subject: `Booking #${bookingData.bookingId}`,
+                        text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+                        html: GroupBookingSumary(bookingData)
+                    });
+
+                    if (bookedMail.messageId) {
+                        await prisma.booking.update({
+                            where: {
+                                bookingId: bookingData.bookingId
+                            },
+                            data: {
+                                messageSend: true,
+                                messageId: bookedMail.messageId
+                            }
+                        });
+                    }
+                }
+            }
+
+            if (chargeData.failure_message !== null) {
+                await prisma.booking.update({
+                    where: {
+                        bookingId: recheckBooking.bookingId
+                    },
+                    data: {
+                        paymentStatus: "failed"
+                    }
+                });
+            }
+
+            return chargeData as omiseChargeEntity;
+        }
+
+        return null;
     }
 }
