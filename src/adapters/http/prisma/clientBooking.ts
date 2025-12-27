@@ -171,10 +171,21 @@ export class BookingDataSource implements BookingRepositoryPort {
 
         for (const provice of findUniueProvince) {
             const filterPackagebyProvince = findBooking.filter((data) => data.nameEn === provice.nameEn);
-            const findUniueTripDate = [...new Map(filterPackagebyProvince.map((item) => [item.trip_at, item])).values()];
+            const findUniueTripDate = [...new Map(filterPackagebyProvince.map((item) => {
+                const key = item.trip_at instanceof Date 
+                    ? item.trip_at.toISOString() 
+                    : item.trip_at;
+                return [key, item];
+            })).values()
+            ].sort((a, b) => {
+                return new Date(a.trip_at).getTime() - new Date(b.trip_at).getTime();
+            });
             
             for (const sameDay of findUniueTripDate)  {
-                const filterPackageByDate = filterPackagebyProvince.filter((datas) => datas.trip_at === sameDay.trip_at);
+                const targetDate = new Date(sameDay.trip_at).toISOString();
+                const filterPackageByDate = filterPackagebyProvince.filter(
+                    (datas) => new Date(datas.trip_at).toISOString() === targetDate
+                );
 
                 result.push({
                     province_name: provice.nameEn,
