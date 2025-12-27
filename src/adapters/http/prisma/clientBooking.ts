@@ -153,7 +153,7 @@ export class BookingDataSource implements BookingRepositoryPort {
                     from ((("ContractBooking" cb  inner join "Booking" b on cb.id = b."ContractBookingId") 
                         inner join packages p on b."packageId" = p.id)
                         inner join province pv on p."provinceId" = pv.id)
-                    where cb."userId" = ${userId} and date(b.trip_at) < date(${currentDate})
+                    where cb."userId" = ${userId} and date(b.trip_at) < date(${currentDate}) and "bookingStatus" = 'completed'
                 ` as findBookingType[];
                 break;
             default:
