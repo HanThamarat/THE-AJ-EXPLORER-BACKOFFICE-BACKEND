@@ -825,9 +825,11 @@ export class PackagePrismaORM implements PackageRepositoryPort {
         if (packageIdCache !== null) {
             CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id);
         } else {
-             const convertResult = JSON.stringify(resultFormat);
+            const convertResult = JSON.stringify(resultFormat);
             CacheHelper.setCache(PACKAGE_SCHEMA.PACKAGE_ID_KEY + id, convertResult);
         }
+
+        CacheHelper.deleteCache(PACKAGE_SCHEMA.PACKAGES_DATA_KEY);
 
         return resultFormat;
     }
