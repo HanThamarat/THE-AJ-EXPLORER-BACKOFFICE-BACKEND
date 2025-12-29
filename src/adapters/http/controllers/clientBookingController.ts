@@ -77,4 +77,53 @@ export class BookingContorller {
             });
         }
     }
+
+    async findBookingDetail(req: Request, res: Response) {
+        try {
+            
+            const { bookingId } = req.params;
+            const userInfo = await Ecrypt.JWTClientDecrypt(req);
+            const userId = userInfo?.id;
+
+            const response = await this.bookingService.bookingDetail(bookingId, userId as string);
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Finding booking detail successfully.",
+                body: response,
+            });            
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Finding booking detail failed.",
+                error: error instanceof Error ? error.message : 'Finding booking detail failed.'
+            });
+        }
+    }
+
+    async getBookConfirmation(req: Request, res: Response) {
+        try {
+            const { bookingId } = req.params;
+            const userInfo = await Ecrypt.JWTClientDecrypt(req);
+            const userId = userInfo?.id;
+
+            const response = await this.bookingService.getBookConfirmation(userId as string, bookingId);
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Sending booking confirmation to email successfully.",
+                body: response,
+            });      
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Sending booking confirmation to email failed.",
+                error: error instanceof Error ? error.message : 'Sending booking confirmation to email failed.'
+            });
+        }
+    }
 }

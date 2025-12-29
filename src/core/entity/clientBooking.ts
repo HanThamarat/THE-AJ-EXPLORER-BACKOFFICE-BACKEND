@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { imageEntitySchema } from "../../const/schema/image";
+import { payStatus } from "@prisma/client";
 
 export const contractBookingSchema = z.object({
     id: z.number().int().optional(),
@@ -98,3 +99,39 @@ export interface findBookingType {
     packageName: string;
     nameEn: string;
 }
+
+export const bookedCapacityInfoSchema = z.object({
+    adult: z.number().nullable(),
+    adultPrice: z.number().nullable(),
+    child: z.number().nullable(),
+    childPrice: z.number().nullable(),
+    group: z.number().nullable(),
+    groupPrice: z.number().nullable(),
+    totalPrice: z.number()
+});
+
+export type bookedCapacityInfoType = z.infer<typeof bookedCapacityInfoSchema>;
+
+export const bookerInfoSchema = z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    phoneNumber: z.string(),
+    email: z.string(),
+});
+
+export type bookerInfoType = z.infer<typeof bookerInfoSchema>;
+
+export const bookingInfoSchema = z.object({
+    bookingzId: z.string(),
+    payStatus: z.string(),
+    bookingStatus: z.string(),
+    packageName: z.string(),
+    packageImage: z.string(),
+    trip_at: z.union([z.date(), z.string()]),
+    bookerInfo: bookerInfoSchema,
+    pickUpLocation: z.string(),
+    specialRequest: z.string().nullable(),
+    booked_info: bookedCapacityInfoSchema,
+});
+
+export type bookingInfoType = z.infer<typeof bookingInfoSchema>;

@@ -140,4 +140,44 @@ router.post(
 */
 router.get("/my_trip", bookingController.findmytrip.bind(bookingController));
 
+/**
+* @swagger
+* /api/v1/client/booking_service/booking_detail/{bookingId}:
+*   get:
+*     tags: [ClientBooking]
+*     summary: Get booking info by booking id
+*     parameters:
+*       - in: path
+*         name: bookingId
+*         required: true
+*         description: The ID of the get booking detail.
+*         schema:
+*           type: string
+*     requestBody:
+*     responses:
+*       200:
+*         description: Fetch booking detail from system.
+*/
+router.get("/booking_detail/:bookingId", bookingController.findBookingDetail.bind(bookingController));
+
+/**
+* @swagger
+* /api/v1/client/booking_service/get_booking_confirmation/{bookingId}:
+*   get:
+*     tags: [ClientBooking]
+*     summary: Sending booking info to email
+*     parameters:
+*       - in: path
+*         name: bookingId
+*         required: true
+*         description: The ID of the get booking detail.
+*         schema:
+*           type: string
+*     requestBody:
+*     responses:
+*       200:
+*         description: Sending booking info to email detail from system.
+*/
+router.get("/get_booking_confirmation/:bookingId", bookingController.getBookConfirmation.bind(bookingController));
+
 export default router;

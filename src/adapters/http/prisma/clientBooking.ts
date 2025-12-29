@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { bookingEntity, findBookingType, mytripEntityType } from "../../../core/entity/clientBooking";
+import { bookingEntity, bookingInfoType, findBookingType, mytripEntityType } from "../../../core/entity/clientBooking";
 import { BookingRepositoryPort } from "../../../core/ports/clientBookingRepositoryPort";
 import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
@@ -7,6 +7,9 @@ import dayjs from "dayjs";
 import { imageEntity } from "../../../const/schema/image";
 import { Bucket } from "../../database/bucket";
 import { FILE_SCHEMA } from "../../../const/schema/file";
+import { BOOKING_DATA_SOURNCE } from "../../database/querys/booking";
+import { transporterMailer } from "../../helpers/nodemailer";
+import { GroupBookingSumary, NormalBookingSumary } from "../../helpers/templetes/book";
 
 export class BookingDataSource implements BookingRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -213,5 +216,172 @@ export class BookingDataSource implements BookingRepositoryPort {
         }
 
         return result as mytripEntityType[];
+    }
+
+    async bookingDetail(bookingId: string, userId: string): Promise<bookingInfoType> {
+
+
+        const recheckBooking = BOOKING_DATA_SOURNCE.reCheckBookingByUserId(userId, bookingId);
+
+        if (!recheckBooking) throw new Error("Not found this bookingId system please try again later");
+
+        const bookingResult = await this.db.booking.findFirst({
+            where: {
+                bookingId: bookingId
+            },
+            select: {
+                bookingId: true,
+                trip_at: true,
+                bookingStatus: true,
+                paymentStatus: true,
+                pickupLocation: true,
+                additionalDetail: true,
+                adultQty: true,
+                adultPrice: true,
+                childQty: true,
+                childPrice: true,
+                groupQty: true,
+                groupPrice: true,
+                amount: true,
+                ToPackage: {
+                    select: {
+                        packageName: true,
+                        packageImages: true,
+                    }
+                },
+                booker: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        phoneNumber: true,
+                        email: true
+                    }
+                }
+            }
+        });
+
+        if (!bookingResult) throw new Error("Can't find booking detail, Please try again later.");
+
+        const imageArr: imageEntity[] = JSON.parse(bookingResult.ToPackage.packageImages as string) as imageEntity[];
+        const findMainImage = imageArr.filter((item) => item.mainFile = true);
+
+        const getBase64Image = await Bucket.findFirstWithoutToken(findMainImage[0], FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);
+
+        const resultFormat: bookingInfoType = {
+            bookingzId: bookingResult.bookingId,
+            packageName: bookingResult.ToPackage.packageName as string,
+            packageImage: getBase64Image.base64 as string,
+            trip_at: bookingResult.trip_at,
+            bookingStatus: bookingResult.bookingStatus,
+            payStatus: bookingResult.paymentStatus,
+            pickUpLocation: bookingResult.pickupLocation as string,
+            specialRequest: bookingResult.additionalDetail,
+            bookerInfo: {
+                firstName: bookingResult.booker.firstName,
+                lastName: bookingResult.booker.lastName,
+                phoneNumber: bookingResult.booker.phoneNumber,
+                email: bookingResult.booker.email,
+            },
+            booked_info: {
+                adult: bookingResult.adultQty,
+                adultPrice: (bookingResult.adultPrice ? bookingResult.adultPrice : 0) * (bookingResult.adultQty ? bookingResult.adultQty : 0),
+                child: bookingResult.childQty,
+                childPrice: (bookingResult.childPrice ? bookingResult.childPrice : 0) * (bookingResult.childQty ? bookingResult.childQty : 0),
+                group: bookingResult.groupPrice,
+                groupPrice: (bookingResult.groupPrice ? bookingResult.groupPrice : 0) * (bookingResult.groupQty ? bookingResult.groupQty : 0),
+                totalPrice: bookingResult.amount
+            }
+        };
+
+        return resultFormat;
+    }
+
+    async getBookConfirmation(userId: string, bookingId: string): Promise<string> {
+        const recheckBooking = BOOKING_DATA_SOURNCE.reCheckBookingByUserId(userId, bookingId);
+
+        if (!recheckBooking) throw new Error("Not found this bookingId system please try again later");
+        
+        const bookingData = await prisma.booking.findFirst({
+        where: {
+            bookingId: bookingId
+        },
+        select: {
+            id: true,
+            bookingId: true,
+            adultPrice: true,
+            adultQty: true,
+            childPrice: true,
+            childQty: true,
+            amount: true,
+            groupPrice: true,
+            groupQty: true,
+            paymentStatus: true,
+            bookingStatus: true,
+            packageId: true,
+            additionalDetail: true,
+            pickupLocation: true,
+            pickup_lat: true,
+            pickup_lgn: true,
+            trip_at: true,
+            policyAccept: true,
+            booker: {
+                select: {
+                    id: true,
+                    email: true,
+                    firstName: true,
+                    lastName: true,
+                    country: true,
+                    phoneNumber: true,
+                    userId: true,
+                }
+            }
+        }
+    });
+
+    if (bookingData?.adultPrice || bookingData?.childPrice) {
+        const bookedMail = await transporterMailer.sendMail({
+            from: "The Aj Explorer Support.",
+            to: bookingData.booker.email as string,
+            subject: `Booking #${bookingData.bookingId}`,
+            text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+            html: NormalBookingSumary(bookingData)
+        });
+
+        if (bookedMail.messageId) {
+            await prisma.booking.update({
+                where: {
+                    bookingId: bookingData.bookingId
+                },
+                data: {
+                    messageSend: true,
+                    messageId: bookedMail.messageId,
+                }
+            });
+        }
+    }
+
+    if (bookingData?.groupPrice) {
+        const bookedMail = await transporterMailer.sendMail({
+            from: "The Aj Explorer Support.",
+            to: bookingData.booker.email as string,
+            subject: `Booking #${bookingData.bookingId}`,
+            text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
+            html: GroupBookingSumary(bookingData)
+        });
+
+        if (bookedMail.messageId) {
+            await prisma.booking.update({
+                where: {
+                    bookingId: bookingData.bookingId
+                },
+                data: {
+                    messageSend: true,
+                    messageId: bookedMail.messageId
+                }
+            });
+        }
+    }
+
+        return "send comfirmation to email successfully";
     }
 }
