@@ -78,6 +78,7 @@ services:
       - WATCHPACK_POLLING=true
     networks:
       - server
+      - shared-net
     depends_on:
       postgreSql:
         condition: service_healthy
@@ -87,5 +88,7 @@ services:
 networks:
   server:
     driver: bridge
+  shared-net:
+    external: true
 
       
