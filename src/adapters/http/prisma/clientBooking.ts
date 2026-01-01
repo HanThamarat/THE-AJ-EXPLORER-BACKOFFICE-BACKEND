@@ -284,11 +284,11 @@ export class BookingDataSource implements BookingRepositoryPort {
             },
             booked_info: {
                 adult: bookingResult.adultQty,
-                adultPrice: (bookingResult.adultPrice ? bookingResult.adultPrice : 0) * (bookingResult.adultQty ? bookingResult.adultQty : 0),
+                adultPrice: bookingResult.adultPrice,
                 child: bookingResult.childQty,
-                childPrice: (bookingResult.childPrice ? bookingResult.childPrice : 0) * (bookingResult.childQty ? bookingResult.childQty : 0),
-                group: bookingResult.groupPrice,
-                groupPrice: (bookingResult.groupPrice ? bookingResult.groupPrice : 0) * (bookingResult.groupQty ? bookingResult.groupQty : 0),
+                childPrice: bookingResult.childPrice,
+                group: bookingResult.groupQty,
+                groupPrice: bookingResult.groupPrice,
                 totalPrice: bookingResult.amount
             }
         };
