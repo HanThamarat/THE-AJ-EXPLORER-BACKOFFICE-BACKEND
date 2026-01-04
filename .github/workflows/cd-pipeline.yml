@@ -61,6 +61,7 @@ jobs:
         OMISE_SECRET_KEY: ${{secrets.OMISE_SECRET_KEY}}
         MOBLIE_BANKING_CALLBACK_URL: ${{secrets.MOBLIE_BANKING_CALLBACK_URL}}
         CORS_URL: ${{secrets.CORS_URL}}
+        FIREBASE_CREDENTAIL: ${{secrets.FIREBASE_CREDENTAIL}}
       run: |
         sudo docker run \
           -p "$SERVER_PORT:$SERVER_PORT" \
@@ -85,6 +86,7 @@ jobs:
           -e OMISE_PUBLIC_KEY="$OMISE_PUBLIC_KEY" \
           -e OMISE_SECRET_KEY="$OMISE_SECRET_KEY" \
           -e MOBLIE_BANKING_CALLBACK_URL="$MOBLIE_BANKING_CALLBACK_URL" \
+          -e FIREBASE_CREDENTAIL="$FIREBASE_CREDENTAIL" \
           -d \
           --name the-aj-explorer-api \
           $IMAGE_NAME_THE_AJ_API
