@@ -4,7 +4,14 @@ import admin from "firebase-admin";
 
 dotenv.config();
 
-const firebaseCredential = JSON.parse(process.env.FIREBASE_CREDENTAIL as string);
+const encodedCreds = process.env.FIREBASE_CREDENTAIL;
+
+if (!encodedCreds) {
+    throw new Error("FIREBASE_CREDENTAIL is missing from env variables");
+}
+
+const decodedString = Buffer.from(encodedCreds, 'base64').toString('utf-8');
+const firebaseCredential = JSON.parse(decodedString);
 
 export const prisma = new PrismaClient({
     transactionOptions: {
