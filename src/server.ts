@@ -12,6 +12,7 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import { setupSocket } from './conf/socket';
 import helmet from 'helmet';
+import { requestLogger } from './conf/requestLogger';
 
 // import routes  here
 import authRoutes               from './adapters/http/routes/auth.routes';
@@ -81,6 +82,7 @@ process.env.NODE_ENV !== 'test' && app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(limiter);
 app.use(helmet(helmetOption));
+app.use(requestLogger);
 
 app.set("trust proxy", 1);
 
