@@ -5,7 +5,7 @@ export default async function UserInitial() {
     try {
         const recheckUser = await prisma.administrator.count({});
 
-        if (recheckUser !== 0) return console.log('🚀User Initialize successfully');
+        if (recheckUser !== 0) return console.log('🚀 User Initialize successfully');
 
         const passportHashing = await Ecrypt.passwordEncrypt('123456');
          
@@ -20,7 +20,7 @@ export default async function UserInitial() {
             }
         });
 
-         return console.log('🚀User Initialize successfully: ', result);
+         return console.log('🚀 User Initialize successfully: ', result);
     } catch (error) {
         return console.log('User Initialize failed: ', error);
     }

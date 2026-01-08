@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { bookingEntity, bookingInfoType, findBookingType, mytripEntityType } from "../../../core/entity/clientBooking";
+import { bookingEntity, bookingInfoType, cancelBookingResponseType, cancelBookingType, findBookingType, mytripEntityType } from "../../../core/entity/clientBooking";
 import { BookingRepositoryPort } from "../../../core/ports/clientBookingRepositoryPort";
 import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
@@ -221,7 +221,7 @@ export class BookingDataSource implements BookingRepositoryPort {
     async bookingDetail(bookingId: string, userId: string): Promise<bookingInfoType> {
 
 
-        const recheckBooking = BOOKING_DATA_SOURNCE.reCheckBookingByUserId(userId, bookingId);
+        const recheckBooking = await BOOKING_DATA_SOURNCE.reCheckBookingByUserId(userId, bookingId);
 
         if (!recheckBooking) throw new Error("Not found this bookingId system please try again later");
 
@@ -297,7 +297,7 @@ export class BookingDataSource implements BookingRepositoryPort {
     }
 
     async getBookConfirmation(userId: string, bookingId: string): Promise<string> {
-        const recheckBooking = BOOKING_DATA_SOURNCE.reCheckBookingByUserId(userId, bookingId);
+        const recheckBooking = await BOOKING_DATA_SOURNCE.reCheckBookingByUserId(userId, bookingId);
 
         if (!recheckBooking) throw new Error("Not found this bookingId system please try again later");
         
@@ -383,5 +383,27 @@ export class BookingDataSource implements BookingRepositoryPort {
     }
 
         return "send comfirmation to email successfully";
+    }
+
+    async cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType | null> {
+
+        const recheckBooking = await BOOKING_DATA_SOURNCE.reCheckBookingByUserId(cancelDTO.userId as string, cancelDTO.bookingId);
+
+        if (!recheckBooking) throw new Error("This booking not found in the system, Please recheck your booking id.");
+
+        const cresteNewCancel = await this.db.$transaction(async (tx) => {
+
+            await tx.cancalationBooking.create({
+                data: {
+                    cancelStatus: "panding",
+                    bookingId: cancelDTO.bookingId
+                }
+            });
+
+
+            await tx.c
+        });
+
+        return null;   
     }
 }

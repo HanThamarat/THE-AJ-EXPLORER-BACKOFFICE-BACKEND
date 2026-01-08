@@ -4,7 +4,7 @@ import { BookingService } from '../../../core/services/clientBookingService';
 import { BookingContorller } from '../controllers/clientBookingController';
 import { prisma as db } from '../../database/data-source';
 import { validateRequest } from '../middleware/validateRequest';
-import { clientBookingCreateSchema } from '../../../core/entity/clientBooking';
+import { cancelBookingDTO, clientBookingCreateSchema } from '../../../core/entity/clientBooking';
 
 const router = express.Router();
 const bookingRepository = new BookingDataSource(db);
@@ -97,6 +97,31 @@ const bookingController = new BookingContorller(bookingService);
  *         - pickup_lgn
  *         - trip_at
  *         - policyAccept
+ * 
+ *     CreateCanCalBooking:
+ *       type: object
+ *       properties:
+ *         bookingId:
+ *           type: string
+ *           example: "Booking Id"
+ *         bankAccount:
+ *           type: object
+ *           properties:
+ *            bankId:
+ *             type: integer
+ *             example: 1
+ *            accountFirstName:
+ *             type: string
+ *             example: "Thamarat"
+ *            accountLastName:
+ *             type: string
+ *             example: "Laosen"
+ *            accountNumber:
+ *             type: string
+ *             example: "10-131314-1414-14"
+ *       required:
+ *         - bookingId
+ *         - bankAccount
  */
 
 /**
@@ -179,5 +204,28 @@ router.get("/booking_detail/:bookingId", bookingController.findBookingDetail.bin
 *         description: Sending booking info to email detail from system.
 */
 router.get("/get_booking_confirmation/:bookingId", bookingController.getBookConfirmation.bind(bookingController));
+
+
+/**
+* @swagger
+* /api/v1/client/booking_service/create_cancel_booking:
+*   post:
+*     tags: [ClientBooking]
+*     summary: Create a new cancel booking
+*     description: Create a new cancel booking in the system.
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/CreateCanCalBooking'
+*     responses:
+*       201:
+*         description: cancel booking created
+*/
+router.post("/create_cancel_booking", 
+  validateRequest({ body: cancelBookingDTO }),
+  bookingController.cancelBooking.bind(bookingController)
+);
 
 export default router;

@@ -29,7 +29,7 @@ export const packageOptionTypeInitial = async () => {
     try {
         const reCheckPackageOpTpye = await prisma.packageOptionType.count({});
 
-        if (reCheckPackageOpTpye !== 0) return  console.log('Package Option Type Initialize successfully');
+        if (reCheckPackageOpTpye !== 0) return  console.log('🚀 Package Option Type Initialize successfully');
 
         const result = await prisma.packageOptionType.createMany({
             data: [
@@ -44,7 +44,7 @@ export const packageOptionTypeInitial = async () => {
             ]
         });
 
-        return console.log('🚀Package Option Initialize successfully: ', result);
+        return console.log('🚀 Package Option Initialize successfully: ', result);
     } catch (error) {
         return console.log('Package Option Initialize failed: ', error);
     }
