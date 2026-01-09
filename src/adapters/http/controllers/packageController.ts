@@ -6,7 +6,7 @@ import { Ecrypt } from "../../helpers/encrypt";
 import { Convertion } from "../../helpers/convertion";
 import { AxiosInstanceMultipart } from "../../../hooks/axiosInstance";
 import FormData from 'form-data';
-import { FILE_SCHEMA } from "../../../const/schema/file";
+import { FILE_SCHEMA } from "../../../types/file";
 
 export class PackageController {
     constructor(private packageService: PackageService) {}

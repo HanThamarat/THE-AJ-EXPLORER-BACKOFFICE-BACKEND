@@ -4,12 +4,14 @@ import { BookingRepositoryPort } from "../../../core/ports/clientBookingReposito
 import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
 import dayjs from "dayjs";
-import { imageEntity } from "../../../const/schema/image";
+import { imageEntity } from "../../../types/image";
 import { Bucket } from "../../database/bucket";
-import { FILE_SCHEMA } from "../../../const/schema/file";
+import { FILE_SCHEMA } from "../../../types/file";
 import { BOOKING_DATA_SOURNCE } from "../../database/querys/booking";
 import { transporterMailer } from "../../helpers/nodemailer";
 import { GroupBookingSumary, NormalBookingSumary } from "../../helpers/templetes/book";
+import { Prisma } from "@prisma/client";
+import omise from "../../database/omise";
 
 export class BookingDataSource implements BookingRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -19,7 +21,7 @@ export class BookingDataSource implements BookingRepositoryPort {
         const date = new Date();
         const extendedTime = new Date(date.getTime() + 15 * 60000);
 
-        const createBook = await prisma.$transaction(async (tx) => {
+        const createBook = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             
             const createContractBook = await tx.contractBooking.create({
                 data: booking.contractBooking
@@ -385,25 +387,324 @@ export class BookingDataSource implements BookingRepositoryPort {
         return "send comfirmation to email successfully";
     }
 
-    async cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType | null> {
+    async cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType> {
 
         const recheckBooking = await BOOKING_DATA_SOURNCE.reCheckBookingByUserId(cancelDTO.userId as string, cancelDTO.bookingId);
 
         if (!recheckBooking) throw new Error("This booking not found in the system, Please recheck your booking id.");
 
-        const cresteNewCancel = await this.db.$transaction(async (tx) => {
-
-            await tx.cancalationBooking.create({
-                data: {
-                    cancelStatus: "panding",
-                    bookingId: cancelDTO.bookingId
-                }
-            });
-
-
-            await tx.c
+        const recheckCancalStatus = await prisma.cancalationBooking.findFirst({
+            where: {
+                bookingId: cancelDTO.bookingId,
+            },
+            select: {
+                cancelStatus: true
+            }
         });
 
-        return null;   
+        if (recheckCancalStatus) throw new Error(`This booking id already canceled, please wait this booking in ${recheckCancalStatus.cancelStatus} progess.`);
+
+        const bookingInfo = await prisma.booking.findFirst({
+            where: {
+                bookingId: cancelDTO.bookingId
+            },
+            select: {
+                trip_at: true,
+                paymentMethod: true,
+                amount: true,
+                created_at: true,
+                paymentRef: true,
+                bookingId: true,
+            }
+        });
+
+
+        const bookCreatedAt = dayjs(bookingInfo?.created_at);
+        const tripAt = dayjs(bookingInfo?.trip_at);
+        const currentDate = dayjs();
+
+        // This condition for check trip day with booking day if booking day less 48hrs gonna refund full amount.
+        if (bookCreatedAt.diff(tripAt, 'h') >= -48) {
+            const getChargeData = await omise.charges.retrieve(bookingInfo?.paymentRef as string);
+
+            if (getChargeData.card !== null) {
+                const createNewCancel = await prisma.$transaction(async (tx) => {
+                    const createCancel = await tx.cancalationBooking.create({
+                        data: {
+                            cancelStatus: "panding",
+                            bookingId: bookingInfo?.bookingId as string
+                        },
+                        select: {
+                            bookingId: true,
+                            cancelStatus: true,
+                            created_at: true,
+                        }
+                    });
+
+                    const createRefund = await tx.refundBooking.create({
+                        data: {
+                            bookingId: bookingInfo?.bookingId as string,
+                            amount: bookingInfo?.amount as number,
+                            refundPercentage: 100,
+                            reason: cancelDTO.reason,
+                            refundStatus: "panding",
+                            processed_at: dayjs().format()
+                        },
+                        select: {
+                            amount: true,
+                            refundStatus: true,
+                        }
+                    });
+
+                    const resultFormat: cancelBookingResponseType = {
+                        bookingId: createCancel.bookingId,
+                        amount: createRefund.amount.toNumber(),
+                        cancelStatus: createCancel.cancelStatus,
+                        refundStatus: createRefund.refundStatus,
+                        canceled_at: createCancel.created_at,
+                    }
+
+                    return resultFormat;
+                });
+
+                if (!createNewCancel) throw new Error("Creating cancel failed, Please try again later.");
+
+                return createNewCancel;
+            }
+
+
+            const createNewCancalWithoutCsrd = await prisma.$transaction(async (tx) => {
+                const createNewCancel = await tx.cancalationBooking.create({
+                    data: {
+                        bookingId: bookingInfo?.bookingId as string,
+                        cancelStatus: "panding"
+                    }
+                });
+
+                const cresteUserBankAccount = await tx.userBankAccount.create({
+                    data: {
+                        userId: cancelDTO.userId as string,
+                        bankId: cancelDTO.bankAccount.bankId,
+                        accountFirstName: cancelDTO.bankAccount.accountFirstName,
+                        accountLastNaem: cancelDTO.bankAccount.accountLastName,
+                        accountNumber: cancelDTO.bankAccount.accountNumber,
+                    }
+                });
+
+                const createRefund = await tx.refundBooking.create({
+                    data: {
+                        bookingId: bookingInfo?.bookingId as string,
+                        amount: bookingInfo?.amount as number,
+                        refundPercentage: 100,
+                        reason: cancelDTO.reason,
+                        refundStatus: "panding",
+                        manualRefund: cresteUserBankAccount.id,
+                        processed_at: dayjs().format(),
+                    }
+                });
+
+                const resultFormat: cancelBookingResponseType = {
+                    bookingId: createNewCancel.bookingId,
+                    amount: createRefund.amount.toNumber(),
+                    cancelStatus: createNewCancel.cancelStatus,
+                    refundStatus: createRefund.refundStatus,
+                    canceled_at: createNewCancel.created_at,
+                }
+
+                return resultFormat;
+            });
+
+            return createNewCancalWithoutCsrd;
+        }
+
+        // This condition for check trip day not leat more 3 days refund full amount.
+        if (currentDate.diff(tripAt, 'd') <= -3) {
+            const getChargeData = await omise.charges.retrieve(bookingInfo?.paymentRef as string);
+
+            if (getChargeData.card !== null) {
+                const createNewCancel = await prisma.$transaction(async (tx) => {
+                    const createCancel = await tx.cancalationBooking.create({
+                        data: {
+                            cancelStatus: "panding",
+                            bookingId: bookingInfo?.bookingId as string
+                        },
+                        select: {
+                            bookingId: true,
+                            cancelStatus: true,
+                            created_at: true,
+                        }
+                    });
+
+                    const createRefund = await tx.refundBooking.create({
+                        data: {
+                            bookingId: bookingInfo?.bookingId as string,
+                            amount: bookingInfo?.amount as number,
+                            refundPercentage: 100,
+                            reason: cancelDTO.reason,
+                            refundStatus: "panding",
+                            processed_at: dayjs().format()
+                        },
+                        select: {
+                            amount: true,
+                            refundStatus: true,
+                        }
+                    });
+
+                    const resultFormat: cancelBookingResponseType = {
+                        bookingId: createCancel.bookingId,
+                        amount: createRefund.amount.toNumber(),
+                        cancelStatus: createCancel.cancelStatus,
+                        refundStatus: createRefund.refundStatus,
+                        canceled_at: createCancel.created_at,
+                    }
+
+                    return resultFormat;
+                });
+
+                if (!createNewCancel) throw new Error("Creating cancel failed, Please try again later.");
+
+                return createNewCancel;
+            }
+
+
+            const createNewCancalWithoutCsrd = await prisma.$transaction(async (tx) => {
+                const createNewCancel = await tx.cancalationBooking.create({
+                    data: {
+                        bookingId: bookingInfo?.bookingId as string,
+                        cancelStatus: "panding"
+                    }
+                });
+
+                const cresteUserBankAccount = await tx.userBankAccount.create({
+                    data: {
+                        userId: cancelDTO.userId as string,
+                        bankId: cancelDTO.bankAccount.bankId,
+                        accountFirstName: cancelDTO.bankAccount.accountFirstName,
+                        accountLastNaem: cancelDTO.bankAccount.accountLastName,
+                        accountNumber: cancelDTO.bankAccount.accountNumber,
+                    }
+                });
+
+                const createRefund = await tx.refundBooking.create({
+                    data: {
+                        bookingId: bookingInfo?.bookingId as string,
+                        amount: bookingInfo?.amount as number,
+                        refundPercentage: 100,
+                        reason: cancelDTO.reason,
+                        refundStatus: "panding",
+                        manualRefund: cresteUserBankAccount.id,
+                        processed_at: dayjs().format(),
+                    }
+                });
+
+                const resultFormat: cancelBookingResponseType = {
+                    bookingId: createNewCancel.bookingId,
+                    amount: createRefund.amount.toNumber(),
+                    cancelStatus: createNewCancel.cancelStatus,
+                    refundStatus: createRefund.refundStatus,
+                    canceled_at: createNewCancel.created_at,
+                }
+
+                return resultFormat;
+            });
+
+            return createNewCancalWithoutCsrd;
+        }
+      
+        // This condition for check trip day not leat more 1-2 days 50 percent refund
+        if (currentDate.diff(tripAt, 'd') >= -2 && currentDate.diff(tripAt, 'd') < 0) {
+            const getChargeData = await omise.charges.retrieve(bookingInfo?.paymentRef as string);
+
+            if (getChargeData.card !== null) {
+                const createNewCancel = await prisma.$transaction(async (tx) => {
+                    const createCancel = await tx.cancalationBooking.create({
+                        data: {
+                            cancelStatus: "panding",
+                            bookingId: bookingInfo?.bookingId as string
+                        },
+                        select: {
+                            bookingId: true,
+                            cancelStatus: true,
+                            created_at: true,
+                        }
+                    });
+
+                    const createRefund = await tx.refundBooking.create({
+                        data: {
+                            bookingId: bookingInfo?.bookingId as string,
+                            amount: (bookingInfo?.amount as number * (1 - 50 / 100)),
+                            refundPercentage: 50,
+                            reason: cancelDTO.reason,
+                            refundStatus: "panding",
+                            processed_at: dayjs().format()
+                        },
+                        select: {
+                            amount: true,
+                            refundStatus: true,
+                        }
+                    });
+
+                    const resultFormat: cancelBookingResponseType = {
+                        bookingId: createCancel.bookingId,
+                        amount: createRefund.amount.toNumber(),
+                        cancelStatus: createCancel.cancelStatus,
+                        refundStatus: createRefund.refundStatus,
+                        canceled_at: createCancel.created_at,
+                    }
+
+                    return resultFormat;
+                });
+
+                if (!createNewCancel) throw new Error("Creating cancel failed, Please try again later.");
+
+                return createNewCancel;
+            }
+
+
+            const createNewCancalWithoutCsrd = await prisma.$transaction(async (tx) => {
+                const createNewCancel = await tx.cancalationBooking.create({
+                    data: {
+                        bookingId: bookingInfo?.bookingId as string,
+                        cancelStatus: "panding"
+                    }
+                });
+
+                const cresteUserBankAccount = await tx.userBankAccount.create({
+                    data: {
+                        userId: cancelDTO.userId as string,
+                        bankId: cancelDTO.bankAccount.bankId,
+                        accountFirstName: cancelDTO.bankAccount.accountFirstName,
+                        accountLastNaem: cancelDTO.bankAccount.accountLastName,
+                        accountNumber: cancelDTO.bankAccount.accountNumber,
+                    }
+                });
+
+                const createRefund = await tx.refundBooking.create({
+                    data: {
+                        bookingId: bookingInfo?.bookingId as string,
+                        amount: (bookingInfo?.amount as number * (1 - 50 / 100)),
+                        refundPercentage: 50,
+                        reason: cancelDTO.reason,
+                        refundStatus: "panding",
+                        manualRefund: cresteUserBankAccount.id,
+                        processed_at: dayjs().format(),
+                    }
+                });
+
+                const resultFormat: cancelBookingResponseType = {
+                    bookingId: createNewCancel.bookingId,
+                    amount: createRefund.amount.toNumber(),
+                    cancelStatus: createNewCancel.cancelStatus,
+                    refundStatus: createRefund.refundStatus,
+                    canceled_at: createNewCancel.created_at,
+                }
+
+                return resultFormat;
+            });
+
+            return createNewCancalWithoutCsrd;
+        }
+
+        throw new Error("Can't cancel booking, over booking day.");
     }
 }

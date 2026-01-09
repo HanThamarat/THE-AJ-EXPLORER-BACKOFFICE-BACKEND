@@ -129,11 +129,12 @@ export class BookingContorller {
 
     async cancelBooking(req: Request, res: Response) {
         try {
-            const { bookingId, bankAccount } = req.body as cancelBookingType;
+            const { bookingId, bankAccount, reason } = req.body as cancelBookingType;
             const userInfo = await Ecrypt.JWTClientDecrypt(req);
             const userId = userInfo?.id;
 
             const dataFormat: cancelBookingType = {
+                reason: reason,
                 bookingId: bookingId,
                 userId: userId,
                 bankAccount: bankAccount

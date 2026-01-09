@@ -6,5 +6,5 @@ export interface BookingRepositoryPort {
     myTrip(page: "upcoming" | "cancaled" | "completed", userId: string, req: Request): Promise<mytripEntityType[] | null>;
     bookingDetail(bookingId: string, userId: string): Promise<bookingInfoType>;
     getBookConfirmation(userId: string, bookingId: string): Promise<string>; 
-    cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType | null>;
+    cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType>;
 }

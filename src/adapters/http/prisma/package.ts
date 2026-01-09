@@ -3,9 +3,9 @@ import { PackageRepositoryPort } from "../../../core/ports/packageRepositoryPort
 import { prisma } from "../../database/data-source";
 import { AxiosInstance } from "../../../hooks/axiosInstance";
 import { Request } from "express";
-import { FILE_SCHEMA } from "../../../const/schema/file";
+import { FILE_SCHEMA } from "../../../types/file";
 import { CacheHelper } from "../../helpers/redisCache";
-import { PACKAGE_SCHEMA } from "../../../const/schema/package";
+import { PACKAGE_SCHEMA } from "../../../types/package";
 
 export class PackagePrismaORM implements PackageRepositoryPort {
     

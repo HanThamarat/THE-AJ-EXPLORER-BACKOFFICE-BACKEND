@@ -104,6 +104,9 @@ const bookingController = new BookingContorller(bookingService);
  *         bookingId:
  *           type: string
  *           example: "Booking Id"
+ *         reason:
+ *           type: string
+ *           example: "reason for cancel"
  *         bankAccount:
  *           type: object
  *           properties:

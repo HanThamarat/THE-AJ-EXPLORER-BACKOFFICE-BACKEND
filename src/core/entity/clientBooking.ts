@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { imageEntitySchema } from "../../const/schema/image";
+import { imageEntitySchema } from "../../types/image";
 import { payStatus } from "@prisma/client";
 import { type } from "os";
 
@@ -149,6 +149,7 @@ export type bankAccDTOType = z.infer<typeof bankAccDTOSchema>;
 export const cancelBookingDTO = z.object({
     bookingId: z.string(),
     userId: z.string().optional(),
+    reason: z.string(),
     bankAccount: bankAccDTOSchema
 });
 

@@ -21,7 +21,7 @@ export class BookingService {
         return this.bookingRepositoryPort.getBookConfirmation(userId, bookingId);
     }
 
-    cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType | null> {
+    cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType> {
         return this.bookingRepositoryPort.cancelBooking(cancelDTO);
     }    
 }

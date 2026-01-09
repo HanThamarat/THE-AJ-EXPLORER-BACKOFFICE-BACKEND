@@ -1,4 +1,4 @@
-import { GEOLOCATION } from "../../../const/schema/geolocat";
+import { GEOLOCATION } from "../../../types/geolocat";
 import { districtByProidEntity, provinceRelational } from "../../../core/entity/geolocation";
 import { GeolocatRepositoryPort } from "../../../core/ports/geolocatRepository";
 import { prisma } from "../../database/data-source";

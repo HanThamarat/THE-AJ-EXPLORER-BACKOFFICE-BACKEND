@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { z } from "zod";
-import { imageDTOSchema, imageEntitySchema, imageDTO, imageEntity } from "../../const/schema/image";
+import { imageDTOSchema, imageEntitySchema, imageDTO, imageEntity } from "../../types/image";
 
 const blogPayloadSchema = z.object({
     title: z.string().trim().min(1, "Blog title is required."),

@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { AxiosInstance, AxiosInstanceForFindBucket, AxiosInstanceMultipart } from "../../hooks/axiosInstance";
-import { imageDTO, imageEntity } from "../../const/schema/image";
+import { imageDTO, imageEntity } from "../../types/image";
 import { Convertion } from "../helpers/convertion";
 import FormData from 'form-data';
 

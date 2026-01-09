@@ -1,5 +1,5 @@
-import { FILE_SCHEMA } from "../../../const/schema/file";
-import { imageEntity } from "../../../const/schema/image";
+import { FILE_SCHEMA } from "../../../types/file";
+import { imageEntity } from "../../../types/image";
 import { blogEntity } from "../../../core/entity/blog";
 import { prisma } from "../data-source";
 import { AxiosInstance } from "../../../hooks/axiosInstance";
