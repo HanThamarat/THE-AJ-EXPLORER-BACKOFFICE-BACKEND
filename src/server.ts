@@ -152,7 +152,7 @@ if (process.env.NODE_ENV !== "test") {
     server.listen(port, () => {
         try {
             AutoinitializeData();
-            console.log('Server is runing on port :', port);
+            console.log('🚀 Server is runing on port :', port);
         } catch (error) {
             return console.log('Server is not runing : ', error);
         }

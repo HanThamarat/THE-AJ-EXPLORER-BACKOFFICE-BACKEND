@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { bookingEntity, bookingInfoType, mytripEntityType } from "../entity/clientBooking";
+import { bookingEntity, bookingInfoType, mytripEntityType, cancelBookingResponseType, cancelBookingType } from "../entity/clientBooking";
 import { BookingRepositoryPort } from "../ports/clientBookingRepositoryPort";
 
 export class BookingService {
@@ -20,4 +20,8 @@ export class BookingService {
     getBookConfirmation(userId: string, bookingId: string): Promise<string> {
         return this.bookingRepositoryPort.getBookConfirmation(userId, bookingId);
     }
+
+    cancelBooking(cancelDTO: cancelBookingType): Promise<cancelBookingResponseType> {
+        return this.bookingRepositoryPort.cancelBooking(cancelDTO);
+    }    
 }

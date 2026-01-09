@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { imageEntitySchema } from "../../const/schema/image";
+import { imageEntitySchema } from "../../types/image";
 import { payStatus } from "@prisma/client";
+import { type } from "os";
 
 export const contractBookingSchema = z.object({
     id: z.number().int().optional(),
@@ -135,3 +136,31 @@ export const bookingInfoSchema = z.object({
 });
 
 export type bookingInfoType = z.infer<typeof bookingInfoSchema>;
+
+export const bankAccDTOSchema = z.object({
+    bankId: z.number(),
+    accountFirstName: z.string(),
+    accountLastName: z.string(),
+    accountNumber: z.string()
+});
+
+export type bankAccDTOType = z.infer<typeof bankAccDTOSchema>;
+
+export const cancelBookingDTO = z.object({
+    bookingId: z.string(),
+    userId: z.string().optional(),
+    reason: z.string(),
+    bankAccount: bankAccDTOSchema
+});
+
+export type cancelBookingType = z.infer<typeof cancelBookingDTO>;
+
+export const cancelBookingResponseSchema = z.object({
+    bookingId:  z.string(),
+    amount: z.number(),
+    cancelStatus: z.string(),
+    refundStatus: z.string().optional(),
+    canceled_at: z.union([z.date(), z.string()]),
+});
+
+export type cancelBookingResponseType = z.infer<typeof cancelBookingResponseSchema>;

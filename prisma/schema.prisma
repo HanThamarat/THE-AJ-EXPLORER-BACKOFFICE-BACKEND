@@ -443,9 +443,10 @@ model CancalationBooking {
 model RefundBooking {
   id                Int         @id @default(autoincrement())
   bookingId         String
-  paymentMethod     payMethod
   amount            Decimal
-  resson            String?     @db.VarChar(600)
+  refundPercentage  Int
+  reason            String?     @db.VarChar(600)
+  refundStatus      rfStatus    @default(panding)
   manualRefund      Int?
   processed_at      DateTime
   created_at        DateTime    @default(now())
@@ -455,24 +456,39 @@ model RefundBooking {
   toUserBankAcc     UserBankAccount? @relation("userBankAcc", fields: [manualRefund], references: [id])
 
   @@index([id])
-  @@index([paymentMethod])
   @@index([amount])
 }
 
 model UserBankAccount {
   id                Int         @id @default(autoincrement())
   userId            String
-  bankName          String
-  accountName       String
-  accountNumber     String
+  bankId            Int
+  accountFirstName  String      @db.VarChar(100)
+  accountLastNaem   String      @db.VarChar(100)
+  accountNumber     String      @db.VarChar(40)
   created_at        DateTime    @default(now())
   updated_at        DateTime    @updatedAt
 
   toRefund          RefundBooking[]  @relation("userBankAcc") 
   
   toUser            User        @relation("MyBankAcc", fields: [userId], references: [id])
+  toBanking         Banking     @relation("BankAcc", fields: [bankId], references: [id])
 
   @@index([id])
+}
+
+model Banking {
+  id                Int        @id @default(autoincrement())
+  bankNameEn        String     @db.VarChar(100)
+  bankNameTh        String     @db.VarChar(100)
+  bankShortName     String     @db.VarChar(20)
+  bankCode          String     @db.VarChar(10)
+  bankPicture       String?    @db.Text
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
+  deleted_at        DateTime?
+
+  toUserBankAccount UserBankAccount[] @relation("BankAcc")
 }
 
 model locationPoint {
@@ -486,12 +502,6 @@ model locationPoint {
   booking           Booking[]    @relation("pickuplocation")
 }
 
-enum payMethod {
-  qr_propmtpay
-  mobile_banking
-  card
-}
-
 enum clStatus {
   panding
   confirmed
@@ -499,6 +509,12 @@ enum clStatus {
 }
 
 enum payStatus {
+  panding
+  paid
+  failed
+}
+
+enum rfStatus {
   panding
   paid
   failed

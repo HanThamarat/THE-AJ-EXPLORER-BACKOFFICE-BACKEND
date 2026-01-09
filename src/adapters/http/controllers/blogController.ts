@@ -2,7 +2,7 @@ import { BlogService } from "../../../core/services/blogService";
 import { Request, Response } from "express";
 import { setResponse, setErrResponse } from "../../../hooks/response";
 import { Ecrypt } from "../../helpers/encrypt";
-import { imageDTO } from "../../../const/schema/image";
+import { imageDTO } from "../../../types/image";
 import { BlogCreateBody, BlogUpdateBody, blogDTO } from "../../../core/entity/blog";
 
 export class BlogController {

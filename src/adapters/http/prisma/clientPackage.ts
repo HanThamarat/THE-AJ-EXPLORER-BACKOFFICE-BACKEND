@@ -1,5 +1,5 @@
-import { FILE_SCHEMA } from "../../../const/schema/file";
-import { imageEntity } from "../../../const/schema/image";
+import { FILE_SCHEMA } from "../../../types/file";
+import { imageEntity } from "../../../types/image";
 import { findProvinceByPackageEntity, packageClientResponse, packageListEntity, packageSearchParams } from "../../../core/entity/clientPackage";
 import { packageEntity, packageImageSave, packageInclude, packageNotInclude } from "../../../core/entity/package";
 import { ClientPacakgeRepositoryPort } from "../../../core/ports/clientPackagePort";
@@ -8,7 +8,7 @@ import { prisma } from "../../database/data-source";
 import dayjs from "dayjs"; 
 import { CacheHelper } from "../../helpers/redisCache";
 import { AxiosInstance, AxiosInstanceForFindBucket } from "../../../hooks/axiosInstance";
-import { PACKAGE_SCHEMA } from "../../../const/schema/package";
+import { PACKAGE_SCHEMA } from "../../../types/package";
 import { Request } from "express";
 
 export class ClientPackageDataSource implements ClientPacakgeRepositoryPort {

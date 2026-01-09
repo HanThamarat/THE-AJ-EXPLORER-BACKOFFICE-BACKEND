@@ -2,21 +2,21 @@ import { prisma } from "../data-source";
 
 export class BOOKING_DATA_SOURNCE {
     static async reCheckBookingByUserId(userId: string, bookingId: string) {
-        const recheckBooking = await prisma.contractBooking.findFirst({
+        const recheckBooking = await prisma.booking.findFirst({
             where: {
-                userId: userId,
+                bookingId: bookingId,
             },
             select: {
-                toBooking: {
-                    where: {
-                        bookingId: bookingId,
-                    },
+                bookingId: true,
+                booker: {
                     select: {
-                        bookingId: true
+                        userId: true
                     }
                 }
             }
         });
+
+        if (recheckBooking?.booker.userId !== userId) return null;
 
         return recheckBooking;
     }

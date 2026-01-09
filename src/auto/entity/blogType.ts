@@ -4,7 +4,7 @@ export const blogTypeInitial = async () => {
     try {
         const reCheckblogTpye = await prisma.blogType.count({});
 
-        if (reCheckblogTpye !== 0) return  console.log('Blog Type Initialize successfully');
+        if (reCheckblogTpye !== 0) return  console.log('🚀 Blog Type Initialize successfully');
 
         const result = await prisma.blogType.createMany({
             data: [
@@ -17,7 +17,7 @@ export const blogTypeInitial = async () => {
             ]
         });
 
-        return console.log('🚀Blog Type Initialize successfully: ', result);
+        return console.log('🚀 Blog Type Initialize successfully: ', result);
     } catch (error) {
         return console.log('Blog Type Initialize failed: ', error);
     }

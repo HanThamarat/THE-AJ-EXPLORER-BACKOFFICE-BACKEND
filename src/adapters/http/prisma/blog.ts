@@ -1,8 +1,8 @@
-import { FILE_SCHEMA } from "../../../const/schema/file";
+import { FILE_SCHEMA } from "../../../types/file";
 import { blogDTO, blogEntity, blogTypeEntity } from "../../../core/entity/blog";
 import { BlogRepositoryPort } from "../../../core/ports/blogRepositortPort";
 import { prisma } from "../../database/data-source";
-import { imageEntity } from "../../../const/schema/image";
+import { imageEntity } from "../../../types/image";
 import { BLOG_DATA_SOURCE } from "../../database/querys/blog";
 import { Request } from "express";
 import { Bucket } from "../../database/bucket";

@@ -1,7 +1,7 @@
 import { BookingService } from "../../../core/services/clientBookingService";
 import { Request, Response } from "express";
 import { setErrResponse, setResponse } from "../../../hooks/response";
-import { ClientBookingCreateBody, bookingEntity } from "../../../core/entity/clientBooking";
+import { ClientBookingCreateBody, bookingEntity, cancelBookingType } from "../../../core/entity/clientBooking";
 import { Ecrypt } from "../../helpers/encrypt";
 
 export class BookingContorller {
@@ -123,6 +123,37 @@ export class BookingContorller {
                 statusCode: 500,
                 message: "Sending booking confirmation to email failed.",
                 error: error instanceof Error ? error.message : 'Sending booking confirmation to email failed.'
+            });
+        }
+    }
+
+    async cancelBooking(req: Request, res: Response) {
+        try {
+            const { bookingId, bankAccount, reason } = req.body as cancelBookingType;
+            const userInfo = await Ecrypt.JWTClientDecrypt(req);
+            const userId = userInfo?.id;
+
+            const dataFormat: cancelBookingType = {
+                reason: reason,
+                bookingId: bookingId,
+                userId: userId,
+                bankAccount: bankAccount
+            };
+
+            const response = await this.bookingService.cancelBooking(dataFormat);
+
+            return setResponse({
+                res: res,
+                statusCode: 201,
+                message: "Canceling booking created.",
+                body: response,
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Canceling booking failed.",
+                error: error instanceof Error ? error.message : 'Canceling booking failed.'
             });
         }
     }

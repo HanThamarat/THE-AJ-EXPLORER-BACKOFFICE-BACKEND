@@ -7,9 +7,6 @@ import omise from "../../database/omise";
 import { omiseChargeEntity } from "../../../core/entity/financial";
 import { transporterMailer } from "../../helpers/nodemailer";
 import { GroupBookingSumary, NormalBookingSumary } from "../../helpers/templetes/book";
-import { payMethod } from "@prisma/client";
-import { Request } from "express";
-import { Ecrypt } from "../../helpers/encrypt";
 
 export class PaymentDataSource implements PaymentRepositoryPort {
     constructor(private db: typeof prisma) {}
