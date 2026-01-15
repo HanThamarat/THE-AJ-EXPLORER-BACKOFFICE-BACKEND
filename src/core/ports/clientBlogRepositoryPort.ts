@@ -1,5 +1,7 @@
-import { blogListEntityType } from "../entity/clientBlog";
+import { blogListEntityType, blogListResponseType, blogSearchParamsType } from "../entity/clientBlog";
+
 
 export interface ClientBlogRepositoryPort {
-    findBlogs(): Promise<blogListEntityType[]>;
+    findBlogs(params: blogSearchParamsType): Promise<blogListResponseType>;
+    findBlogDetail(blogId: string): Promise<blogListEntityType>;
 }

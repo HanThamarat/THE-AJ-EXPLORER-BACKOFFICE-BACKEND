@@ -342,12 +342,12 @@ model blogType {
 model blogViewer {
   id              Int             @id @default(autoincrement())
   blogId          Int
-  userId          String
+  userId          String?
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt
 
   blogView        blog            @relation("blogView", fields: [blogId], references: [id])
-  userView        User            @relation("userView", fields: [userId], references: [id])
+  userView        User?           @relation("userView", fields: [userId], references: [id])
 }
 
 model Booking {
