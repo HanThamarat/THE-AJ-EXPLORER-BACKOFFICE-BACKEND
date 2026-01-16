@@ -140,6 +140,7 @@ export class ClientBlogDataSource implements ClientBlogRepositoryPort {
             id: blogResult?.id as number,
             blogName: blogResult?.title as string,
             blogType: blogResult?.toBlogType.name as string,
+            description: blogResult?.descrition,
             viewer: viewerCount,
             thumnbnail: imageResponse as imageEntity,
             created_at: blogResult?.created_at as Date,
