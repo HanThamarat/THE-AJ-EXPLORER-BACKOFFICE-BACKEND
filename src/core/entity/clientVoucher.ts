@@ -3,6 +3,7 @@ import z from "zod";
 
 export const couponEntitySchema = z.object({
     id: z.number(),
+    couponName: z.string().optional(),
     type: z.string(),
     maxPercentDiscount: z.number().optional(),
     minimumPercentDiscount: z.number().optional(),

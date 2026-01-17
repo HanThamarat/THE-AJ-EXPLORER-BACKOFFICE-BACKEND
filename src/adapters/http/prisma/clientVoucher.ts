@@ -40,6 +40,7 @@ export class ClientVoucherDataSource implements ClientVoucherRepositoryPort {
                 select: {
                     id: true,
                     type: true,
+                    promoName: true,
                     description: true,
                     promoLink: {
                         select: {
@@ -68,6 +69,7 @@ export class ClientVoucherDataSource implements ClientVoucherRepositoryPort {
             return {
                 id: item.id,
                 type: item.type,
+                couponName: item.promoName,
                 maxPercentDiscount: findMaxValue,
                 minimumPercentDiscount: findMinValue,
                 description: item.description
