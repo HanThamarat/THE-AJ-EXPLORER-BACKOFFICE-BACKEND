@@ -72,6 +72,7 @@ model User {
   userViewer  blogViewer[]  @relation("userView")
   toUserBank  UserBankAccount[] @relation("MyBankAcc")
   ToContractBook ContractBooking[]  @relation("ContractBooking")
+  toCouponInventory couponInventory[] @relation("UserCouponInventory")
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -286,6 +287,7 @@ model packagePromo {
   userUpdate       administrator?   @relation("PromoUserUpdate", fields: [updated_by], references: [id])
 
   promoLink        promoLink[]      @relation("packagePromo")
+  toCouponInventory couponInventory[] @relation("PromoCouponInventory")
 
   @@index([id])
   @@index([startDate])
@@ -304,6 +306,20 @@ model promoLink {
   
   packagePromoLink  packages         @relation("packagePromoLink", fields: [packageLink], references: [id])
   packagePromo      packagePromo     @relation("packagePromo", fields: [promoId], references: [id])
+}
+
+model couponInventory {
+  id                Int           @id @default(autoincrement())
+  couponId          Int
+  userId            String
+  bookingId         String?
+  used_at           DateTime?     
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  toUser            User          @relation("UserCouponInventory", fields: [userId], references: [id])
+  toPromo           packagePromo  @relation("PromoCouponInventory", fields: [couponId], references: [id])
+  toBooking         Booking?      @relation("BookingCouponInventory", fields: [bookingId], references: [bookingId])
 }
 
 model blog {
@@ -382,6 +398,7 @@ model Booking {
   toReview          Review[]     @relation("bookingReview")
   toCancel          CancalationBooking[] @relation("cancalationBooking")
   toRefund          RefundBooking[] @relation("bookingRefund")
+  ToCouponInventory couponInventory[]   @relation("BookingCouponInventory")
 
   ToPackage         packages         @relation("bookingRelation", fields: [packageId], references: [id])
   location          locationPoint?   @relation("pickuplocation", fields: [locationId], references: [id])
