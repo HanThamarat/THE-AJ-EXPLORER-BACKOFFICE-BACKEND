@@ -43,8 +43,8 @@ const app = express();
 const corsOrigins = process.env.CORS_URL?.split(",") || [];
 const corsOptions = {
     origin: corsOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Authorization', 'Origin', 'X-Requested-With', 'X-API-KEY'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Authorization', 'Origin', 'X-Requested-With', 'X-API-KEY', 'Cache-Control', 'Pragma', 'Expires'],
     credentials: true,
 };
 
