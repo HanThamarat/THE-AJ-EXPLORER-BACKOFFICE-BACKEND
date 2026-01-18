@@ -35,7 +35,8 @@ export class ClientVoucherDataSource implements ClientVoucherRepositoryPort {
                     },
                     endDate: {
                         gte: dayjs().format(),
-                    }
+                    },
+                    type: "coupon"
                 },
                 select: {
                     id: true,
@@ -56,7 +57,8 @@ export class ClientVoucherDataSource implements ClientVoucherRepositoryPort {
                     },
                     endDate: {
                         lte: dayjs().format(),
-                    }
+                    },
+                    type: "coupon"
                 }
             })
         ]);
