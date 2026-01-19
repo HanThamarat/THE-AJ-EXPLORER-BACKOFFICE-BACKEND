@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import fs from "fs";
 
 export class Convertion {
     static async Decodebase64(base64String: string) {
@@ -8,5 +8,9 @@ export class Convertion {
         const fileBuffer = Buffer.from(matches[2], "base64");
 
         return fileBuffer;
+    }
+
+    static async FileToBase64WithPath(path: string) {
+        return fs.readFileSync(path, { encoding: "base64" });
     }
 }
