@@ -143,7 +143,7 @@ export class ClientVoucherDataSource implements ClientVoucherRepositoryPort {
         });
 
         return {
-            id: createNewInventory.id,
+            id: couponInventoryDTO.couponId,
             type: createNewInventory.toPromo.type,
             description: createNewInventory.toPromo.description
         }

@@ -29,6 +29,7 @@ import clientbookingRoutes      from './adapters/http/routes/clientBooking.route
 import clientPaymentRoutes      from "./adapters/http/routes/payment.routes";
 import clientBlogRoutes         from "./adapters/http/routes/clientBlog.routes";
 import clientVoucherRoutes      from "./adapters/http/routes/clientVoucher.routes";
+import clientBankRoutes         from "./adapters/http/routes/clientBank.routes";
 
 import { Server } from 'socket.io';
 import { clientAuthMiddleware } from './conf/clientMiddleware';
@@ -111,6 +112,7 @@ app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: fa
 // client
 app.use('/api/v1/client/package', clientPackageRoutes);
 app.use('/api/v1/client/blog', clientBlogRoutes);
+app.use('/api/v1/client/bank_service', clientAuthMiddleware, clientBankRoutes);
 app.use('/api/v1/client/booking_service', clientAuthMiddleware, clientbookingRoutes);
 app.use('/api/v1/client/voucher_service', (req, res, next) => {
     if (req.path === '/coupon_list' && req.method === 'GET') {
