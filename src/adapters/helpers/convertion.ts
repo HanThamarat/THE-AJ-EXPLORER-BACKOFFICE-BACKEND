@@ -1,4 +1,6 @@
 import fs from "fs";
+import mime from "mime-types";
+
 
 export class Convertion {
     static async Decodebase64(base64String: string) {
@@ -11,6 +13,10 @@ export class Convertion {
     }
 
     static async FileToBase64WithPath(path: string) {
-        return fs.readFileSync(path, { encoding: "base64" });
+        const buffer = fs.readFileSync(path);
+        const base64 = buffer.toString("base64");
+        const mineType = mime.lookup(path) || "application/octet-stream";
+
+        return `data:${mineType};base64,${base64}`;
     }
 }
