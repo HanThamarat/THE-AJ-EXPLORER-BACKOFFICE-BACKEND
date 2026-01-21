@@ -15,7 +15,7 @@ export class ClientBankDataSource implements ClientBankRepositoryPort {
         const mapResultFormat: bankEntityType[] = await Promise.all(result.map(async (item) => {
             
             const pathSplit = (item.bankPicture as string).split('./');
-            const path = devMode ? item.bankPicture : `./dist/${pathSplit[2] as string}`
+            const path = devMode ? item.bankPicture : `./dist/${pathSplit[1] as string}`
 
             const base64 = await Convertion.FileToBase64WithPath(path as string);
 
