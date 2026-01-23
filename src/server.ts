@@ -30,6 +30,7 @@ import clientPaymentRoutes      from "./adapters/http/routes/payment.routes";
 import clientBlogRoutes         from "./adapters/http/routes/clientBlog.routes";
 import clientVoucherRoutes      from "./adapters/http/routes/clientVoucher.routes";
 import clientBankRoutes         from "./adapters/http/routes/clientBank.routes";
+import kipRoutes                from "./adapters/http/routes/kpi.routes";
 
 import { Server } from 'socket.io';
 import { clientAuthMiddleware } from './conf/clientMiddleware';
@@ -108,6 +109,7 @@ app.use('/api/v1/geolocation', passport.authenticate('jwt', { session: false }),
 app.use('/api/v1/financial', passport.authenticate('jwt', { session: false }), financialRoutes);
 app.use('/api/v1/blogmanagement', passport.authenticate('jwt', { session: false }), blogRoutes);
 app.use('/api/v1/booking_management', passport.authenticate('jwt', { session: false }), bookingRoutes);
+app.use('/api/v1/kpi_service', passport.authenticate('jwt', { session: false }), kipRoutes);
 
 // client
 app.use('/api/v1/client/package', clientPackageRoutes);
