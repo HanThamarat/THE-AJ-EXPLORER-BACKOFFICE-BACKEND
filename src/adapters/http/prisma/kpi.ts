@@ -9,8 +9,8 @@ export class KPIDataSource implements KPIRepositoryPort {
     async findPopularProvince(): Promise<popularProviceType[]> {
         const qtyResult: any = await prisma.$queryRaw`
             select pv.id as province_id, pv."nameEn" as province_name, count(pv.id) as qty
-            from (("Booking" b inner join packages p on b."packageId" = p.id)
-                inner join province pv on p."provinceId" = pv.id)
+            from (("Booking" b left join packages p on b."packageId" = p.id)
+                left join province pv on p."provinceId" = pv.id)
             where b."bookingStatus" = 'confirmed'
             group by pv.id order by qty desc limit 5
         `;
