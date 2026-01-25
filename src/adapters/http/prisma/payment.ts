@@ -142,7 +142,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
         if (createnewBook?.adultPrice || createnewBook?.childPrice) {
             const bookedMail = await transporterMailer.sendMail({
                 from: "The Aj Explorer Support.",
-                to: createnewBook.booker.email as string,
+                to: [createnewBook.booker.email as string, process.env.MAILER_EMAIL as string],
                 subject: `Booking #${createnewBook.bookingId}`,
                 text: `Your Booking (#${createnewBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                 html: NormalBookingSumary(createnewBook)
@@ -164,7 +164,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
         if (createnewBook?.groupPrice) {
             const bookedMail = await transporterMailer.sendMail({
                 from: "The Aj Explorer Support.",
-                to: createnewBook.booker.email as string,
+                to: [createnewBook.booker.email as string, process.env.MAILER_EMAIL as string],
                 subject: `Booking #${createnewBook.bookingId}`,
                 text: `Your Booking (#${createnewBook.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                 html: GroupBookingSumary(createnewBook)
@@ -328,7 +328,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             if (bookingData?.adultPrice || bookingData?.childPrice) {
                 const bookedMail = await transporterMailer.sendMail({
                     from: "The Aj Explorer Support.",
-                    to: bookingData.booker.email as string,
+                    to: [bookingData.booker.email as string, process.env.MAILER_EMAIL as string],
                     subject: `Booking #${bookingData.bookingId}`,
                     text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                     html: NormalBookingSumary(bookingData)
@@ -350,7 +350,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             if (bookingData?.groupPrice) {
                 const bookedMail = await transporterMailer.sendMail({
                     from: "The Aj Explorer Support.",
-                    to: bookingData.booker.email as string,
+                    to:[bookingData.booker.email as string, process.env.MAILER_EMAIL as string],
                     subject: `Booking #${bookingData.bookingId}`,
                     text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                     html: GroupBookingSumary(bookingData)
@@ -498,7 +498,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             if (bookingData?.adultPrice || bookingData?.childPrice) {
                 const bookedMail = await transporterMailer.sendMail({
                     from: "The Aj Explorer Support.",
-                    to: bookingData.booker.email as string,
+                    to: [bookingData.booker.email as string, process.env.MAILER_EMAIL as string],
                     subject: `Booking #${bookingData.bookingId}`,
                     text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                     html: NormalBookingSumary(bookingData)
@@ -520,7 +520,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             if (bookingData?.groupPrice) {
                 const bookedMail = await transporterMailer.sendMail({
                     from: "The Aj Explorer Support.",
-                    to: bookingData.booker.email as string,
+                    to: [bookingData.booker.email as string, process.env.MAILER_EMAIL as string],
                     subject: `Booking #${bookingData.bookingId}`,
                     text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                     html: GroupBookingSumary(bookingData)
@@ -624,7 +624,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                 if (bookingData?.adultPrice || bookingData?.childPrice) {
                     const bookedMail = await transporterMailer.sendMail({
                         from: "The Aj Explorer Support.",
-                        to: bookingData.booker.email as string,
+                        to: [bookingData.booker.email as string, process.env.MAILER_EMAIL as string],
                         subject: `Booking #${bookingData.bookingId}`,
                         text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                         html: NormalBookingSumary(bookingData)
@@ -646,7 +646,7 @@ export class PaymentDataSource implements PaymentRepositoryPort {
                 if (bookingData?.groupPrice) {
                     const bookedMail = await transporterMailer.sendMail({
                         from: "The Aj Explorer Support.",
-                        to: bookingData.booker.email as string,
+                        to: [bookingData.booker.email as string, process.env.MAILER_EMAIL as string],
                         subject: `Booking #${bookingData.bookingId}`,
                         text: `Your Booking (#${bookingData.bookingId}) was successfully and your payment has been processed. Here is your booking summary`, // plain‑text body
                         html: GroupBookingSumary(bookingData)
