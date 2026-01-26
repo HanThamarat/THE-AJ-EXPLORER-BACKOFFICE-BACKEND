@@ -4,9 +4,10 @@ import { PaymentRepositoryPort } from "../../../core/ports/paymentRepositoryPort
 import { prisma } from "../../database/data-source";
 import { Generate } from "../../helpers/generate";
 import omise from "../../database/omise";
-import { omiseChargeEntity } from "../../../core/entity/financial";
+import { omiseChargeEntity, omiseRefund } from "../../../core/entity/financial";
 import { transporterMailer } from "../../helpers/nodemailer";
 import { GroupBookingSumary, NormalBookingSumary } from "../../helpers/templetes/book";
+import dayjs from "dayjs";
 
 export class PaymentDataSource implements PaymentRepositoryPort {
     constructor(private db: typeof prisma) {}
@@ -678,6 +679,35 @@ export class PaymentDataSource implements PaymentRepositoryPort {
             }
 
             return chargeData as omiseChargeEntity;
+        }
+
+        if (event_name === "refund.create") {
+            const refundData = data as omiseRefund;
+            const bookingId = refundData?.metadata?.booking_id as string;
+
+            const findRefund = await prisma.refundBooking.findFirst({
+                where: {
+                    bookingId: bookingId,
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!findRefund) throw new Error("This booking don't have in refund");
+            
+            await prisma.refundBooking.update({
+                where: {
+                    id: findRefund.id
+                },
+                data: {
+                    refunded_at: dayjs().format(),
+                    refundRef: refundData.id,
+                    refundStatus: "refunded"
+                }
+            });
+
+            return null;
         }
 
         return null;

@@ -37,16 +37,3 @@ export const cancelDTOSchema = z.object({
 });
 
 export type cancelDTOType = z.infer<typeof cancelDTOSchema>;
-
-export const refundEntitySchema = z.object({
-    bookingId: z.string(),
-    bookerName: z.string(),
-    packageName: z.string(),
-    paymentStatus: z.string(),
-    refundStatus: z.string(),
-    amount: z.number(),
-    refundPercentahe: z.number(),
-    refundAmount: z.number()
-});
-
-export type refundEntityType =  z.infer<typeof referencesSchema>;

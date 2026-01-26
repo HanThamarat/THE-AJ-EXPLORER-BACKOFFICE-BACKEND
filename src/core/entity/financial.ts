@@ -256,3 +256,28 @@ export const financialIdParamSchema = z.object({
 });
 
 export type FinancialIdParams = z.infer<typeof financialIdParamSchema>;
+
+export const omiseRefundSchema = z.object({
+  object: z.literal("refund"),
+  id: z.string(),
+  livemode: z.boolean(),
+  location: z.string(),
+  acquirer_reference_number: z.string().optional().nullable(),
+  amount: z.number().int(),
+  approval_code: z.string().optional().nullable(),
+  capture: z.string().optional().nullable(),
+  charge: z.union([z.string(), z.record(z.any())]),
+  created_at: z.string().datetime(),
+  currency: z.string().length(3),
+  funding_amount: z.number().int().optional().nullable(),
+  funding_currency: z.string().length(3).optional().nullable(),
+  merchant_name: z.string().optional().nullable(),
+  merchant_uid: z.string().optional().nullable(),
+  metadata: z.record(z.any()).optional().nullable(),
+  status: z.string(),
+  terminal: z.string().optional().nullable(),
+  transaction: z.union([z.string(), z.record(z.any())]).optional().nullable(),
+  voided: z.boolean(),
+});
+
+export type omiseRefund = z.infer<typeof omiseRefundSchema>;

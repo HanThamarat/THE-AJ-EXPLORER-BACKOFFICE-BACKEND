@@ -464,8 +464,10 @@ model RefundBooking {
   refundPercentage  Int
   reason            String?     @db.VarChar(600)
   refundStatus      rfStatus    @default(panding)
+  refundRef         String?
   manualRefund      Int?
   processed_at      DateTime
+  refunded_at       DateTime?
   created_at        DateTime    @default(now())
   updated_at        DateTime    @updatedAt
 
@@ -533,7 +535,7 @@ enum payStatus {
 
 enum rfStatus {
   panding
-  paid
+  refunded
   failed
 }
 
