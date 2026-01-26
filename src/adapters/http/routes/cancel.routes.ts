@@ -2,6 +2,8 @@ import express from "express";
 import { CancelDataSource } from "../prisma/cancel";
 import { CancelService } from "../../../core/services/cancelService";
 import { CancelController } from "../controllers/cancelController";
+import { validateRequest } from "../middleware/validateRequest";
+import { cancelDTOSchema } from "../../../core/entity/cancel";
 
 const router = express.Router();
 const cancelRepositoryPort = new CancelDataSource();
@@ -85,6 +87,9 @@ router.get('/cancel/:bookingId', cancelController.findCancelDetail.bind(cancelCo
 *       200:
 *         description: Update cancel booking status in the system successfully
 */
-router.put('/cancel/:bookingId', cancelController.updateCancelStatus.bind(cancelController));
+router.put('/cancel/:bookingId', 
+    validateRequest({ body: cancelDTOSchema }),
+    cancelController.updateCancelStatus.bind(cancelController)
+);
 
 export default router;
