@@ -137,56 +137,72 @@ export class CancelDataSource implements CancelRepositoryPort {
 
         if (!recheckCancel) throw new Error("This booking id not found in the system.");
 
-        const updateCancel = await prisma.cancalationBooking.update({
-            where: {
-                id: recheckCancel.id
-            },
-            data: {
-                cancelStatus: cancelDTO.cancelStatus
-            },
-            select: {
-                bookingId: true,
-                cancelStatus: true,
-                toBooking: {
-                    select: {
-                        bookingId: true,
-                        amount: true,
-                        paymentStatus: true,
-                        trip_at: true,
-                        toRefund: {
-                            select: {
-                                refundPercentage: true,
-                                amount: true,
-                            }
-                        },
-                        booker: {
-                            select: {
-                                firstName: true,
-                                lastName: true
-                            }
-                        },
-                        ToPackage: {
-                            select: {
-                                packageName: true
+        const updateResult = await prisma.$transaction(async (tx) => {
+
+            await prisma.booking.update({
+                where: {
+                    bookingId: bookingId
+                },
+                data: {
+                    bookingStatus: "failed"
+                }
+            });
+
+            const updateCancel = await prisma.cancalationBooking.update({
+                where: {
+                    id: recheckCancel.id
+                },
+                data: {
+                    cancelStatus: cancelDTO.cancelStatus
+                },
+                select: {
+                    bookingId: true,
+                    cancelStatus: true,
+                    toBooking: {
+                        select: {
+                            bookingId: true,
+                            amount: true,
+                            paymentStatus: true,
+                            trip_at: true,
+                            toRefund: {
+                                select: {
+                                    refundPercentage: true,
+                                    amount: true,
+                                }
+                            },
+                            booker: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true
+                                }
+                            },
+                            ToPackage: {
+                                select: {
+                                    packageName: true
+                                }
                             }
                         }
                     }
                 }
-            }
+            });
+
+            return updateCancel;
         });
 
-        if (!updateCancel) throw new Error("Have something wrong in updating cancel progess, please try again later.");
+       
+
+        if (!updateResult) throw new Error("Have something wrong in updating cancel progess, please try again later.");
 
         const responseFormat: cancelEntityType = {
-            bookingId: updateCancel.bookingId,
-            bookerName: `${updateCancel.toBooking.booker.firstName} ${updateCancel.toBooking.booker.lastName}`,
-            packageName: updateCancel.toBooking.ToPackage.packageName as string,
-            paymentStatus: updateCancel.toBooking.paymentStatus,
-            cancelStatus: updateCancel.cancelStatus,
-            amount: updateCancel.toBooking.amount,
-            refundAmount: Number(updateCancel.toBooking.toRefund[0].amount),
-            refundPercentage: updateCancel.toBooking.toRefund[0].refundPercentage,
-            trip_at: updateCancel.toBooking.trip_at
+            bookingId: updateResult.bookingId,
+            bookerName: `${updateResult.toBooking.booker.firstName} ${updateResult.toBooking.booker.lastName}`,
+            packageName: updateResult.toBooking.ToPackage.packageName as string,
+            paymentStatus: updateResult.toBooking.paymentStatus,
+            cancelStatus: updateResult.cancelStatus,
+            amount: updateResult.toBooking.amount,
+            refundAmount: Number(updateResult.toBooking.toRefund[0].amount),
+            refundPercentage: updateResult.toBooking.toRefund[0].refundPercentage,
+            trip_at: updateResult.toBooking.trip_at
         };
 
         return responseFormat;

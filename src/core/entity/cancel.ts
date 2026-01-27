@@ -1,5 +1,4 @@
 import z from "zod";
-import { referencesSchema } from "./financial";
 
 export const cancelEntitySchema = z.object({
     bookingId: z.string(),
