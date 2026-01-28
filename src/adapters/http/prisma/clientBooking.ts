@@ -245,6 +245,11 @@ export class BookingDataSource implements BookingRepositoryPort {
                 groupQty: true,
                 groupPrice: true,
                 amount: true,
+                toCancel: {
+                    select: {
+                        cancelStatus: true
+                    }
+                },
                 ToPackage: {
                     select: {
                         packageName: true,
@@ -275,6 +280,7 @@ export class BookingDataSource implements BookingRepositoryPort {
             packageImage: getBase64Image.base64 as string,
             trip_at: bookingResult.trip_at,
             bookingStatus: bookingResult.bookingStatus,
+            cancelStatus: bookingResult?.toCancel[0]?.cancelStatus,
             payStatus: bookingResult.paymentStatus,
             pickUpLocation: bookingResult.pickupLocation as string,
             specialRequest: bookingResult.additionalDetail,
