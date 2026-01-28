@@ -126,6 +126,7 @@ export const bookingInfoSchema = z.object({
     bookingzId: z.string(),
     payStatus: z.string(),
     bookingStatus: z.string(),
+    cancelStatus: z.string().optional().nullable(),
     packageName: z.string(),
     packageImage: z.string(),
     trip_at: z.union([z.date(), z.string()]),
