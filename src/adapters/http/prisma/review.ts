@@ -94,6 +94,9 @@ export class ReviewDataSource implements ReviewRepositoryPort {
         `;
 
         for (const booking of findMyBooking) {
+
+            if (myReview.length >= 5) break;
+
             const review = await prisma.review.findFirst({
                 where: {
                     bookingId: booking.bookingId as string
