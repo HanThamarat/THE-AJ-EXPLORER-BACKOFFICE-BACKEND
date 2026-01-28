@@ -76,7 +76,7 @@ export const providerReferencesSchema = z.object({
 
 export type ProviderReferences = z.infer<typeof providerReferencesSchema>;
 
-export const metadataSchema = z.record(z.unknown());
+export const metadataSchema = z.record(z.union([z.any(), z.number()]), z.unknown());
 
 export type Metadata = z.infer<typeof metadataSchema>;
 
@@ -266,17 +266,17 @@ export const omiseRefundSchema = z.object({
   amount: z.number().int(),
   approval_code: z.string().optional().nullable(),
   capture: z.string().optional().nullable(),
-  charge: z.union([z.string(), z.record(z.any())]),
+  charge: z.union([z.string(), z.record(z.any(), z.unknown())]),
   created_at: z.string().datetime(),
   currency: z.string().length(3),
   funding_amount: z.number().int().optional().nullable(),
   funding_currency: z.string().length(3).optional().nullable(),
   merchant_name: z.string().optional().nullable(),
   merchant_uid: z.string().optional().nullable(),
-  metadata: z.record(z.any()).optional().nullable(),
+  metadata: z.record(z.any(), z.unknown()).optional().nullable(),
   status: z.string(),
   terminal: z.string().optional().nullable(),
-  transaction: z.union([z.string(), z.record(z.any())]).optional().nullable(),
+  transaction: z.union([z.string(), z.record(z.any(), z.unknown())]).optional().nullable(),
   voided: z.boolean(),
 });
 

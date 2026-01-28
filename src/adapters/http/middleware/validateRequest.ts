@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { AnyZodObject, ZodError } from "zod";
+import z, { ZodError } from "zod";
 import { setErrResponse } from "../../../hooks/response";
+
+type AnyZodObject = z.ZodObject<z.ZodRawShape>;
 
 type SchemaTargets = {
     body?: AnyZodObject;
@@ -19,11 +21,13 @@ export const validateRequest = (schemas: SchemaTargets) => async (
         }
 
         if (schemas.params) {
-            req.params = await schemas.params.parseAsync(req.params);
+            const parsedParams = await schemas.params.parseAsync(req.params);
+            Object.assign(req.params, parsedParams);
         }
 
         if (schemas.query) {
-            req.query = await schemas.query.parseAsync(req.query);
+            const parsedQuery = await schemas.query.parseAsync(req.query);
+            Object.assign(req.query, parsedQuery);
         }
 
         return next();

@@ -2,6 +2,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from 'swagger-jsdoc';
 import { Request } from 'express';
 import dotenv from "dotenv";
+import { generateZodComponent } from './swagger-registry';
 
 dotenv.config();
 
@@ -36,7 +37,15 @@ const swaggerOptions = {
       apis: [process.env.API_ROUTES_PATH as string],
 };
 
-const swaggerDocs = swaggerDocument(swaggerOptions);
+const swaggerDocs: any = swaggerDocument(swaggerOptions as any);
+
+const zodComponents = generateZodComponent();
+
+swaggerDocs.components = swaggerDocs.components ?? {};
+swaggerDocs.components.schemas = {
+  ...(swaggerDocs.components.schemas ?? {}),
+  ...(zodComponents.schemas ?? {}),
+};
 
 export const swaggerui = swaggerUi.setup(swaggerDocs, {
     swaggerOptions: {
