@@ -16,6 +16,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.4.0",
     "@auth/core": "^0.40.0",
     "@auth/express": "^0.11.0",
     "@auth/prisma-adapter": "^2.10.0",
@@ -45,7 +46,7 @@
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "zod": "^3.25.76"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

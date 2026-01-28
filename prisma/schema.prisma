@@ -433,9 +433,9 @@ model Review {
   cleanliness       Int
   staff             Int
   location          Int
-  title             String      @db.VarChar(100)
-  samary            String      @db.VarChar(1000)
-  iamge             String      @db.Text
+  title             String?     @db.VarChar(100)
+  samary            String?     @db.VarChar(1000)
+  iamge             String?     @db.Text
   created_at        DateTime    @default(now())
   updated_at        DateTime    @updatedAt 
 

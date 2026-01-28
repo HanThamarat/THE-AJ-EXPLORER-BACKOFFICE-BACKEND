@@ -33,6 +33,7 @@ import clientBankRoutes         from "./adapters/http/routes/clientBank.routes";
 import kipRoutes                from "./adapters/http/routes/kpi.routes";
 import cancelRoutes             from "./adapters/http/routes/cancel.routes";
 import refundRoutes             from "./adapters/http/routes/refund.routes";
+import clientReviewRoutes       from "./adapters/http/routes/review.routes";
 
 import { Server } from 'socket.io';
 import { clientAuthMiddleware } from './conf/clientMiddleware';
@@ -120,6 +121,7 @@ app.use('/api/v1/client/package', clientPackageRoutes);
 app.use('/api/v1/client/blog', clientBlogRoutes);
 app.use('/api/v1/client/bank_service', clientAuthMiddleware, clientBankRoutes);
 app.use('/api/v1/client/booking_service', clientAuthMiddleware, clientbookingRoutes);
+app.use('/api/v1/client/review_service', clientAuthMiddleware, clientReviewRoutes);
 app.use('/api/v1/client/voucher_service', (req, res, next) => {
     if (req.path === '/coupon_list' && req.method === 'GET') {
         express.json()(req, res, () => {
