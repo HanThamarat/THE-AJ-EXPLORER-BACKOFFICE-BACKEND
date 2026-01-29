@@ -1,7 +1,7 @@
 import express from "express";
 import { ReviewDataSource } from "../prisma/review";
 import { ReviewService } from "../../../core/services/reviewService";
-import { ReviewController } from "../controllers/revireController";
+import { ReviewController } from "../controllers/reviewController";
 import { validateRequest } from "../middleware/validateRequest";
 import { reviewDTOSchema } from "../../../core/entity/review";
 
@@ -58,5 +58,37 @@ router.post("/review",
 *                   $ref: '#/components/schemas/myReviewResponse'
 */
 router.get("/review", reviewController.findMyReviews.bind(reviewController));
+
+/**
+* @swagger
+* /api/v1/client/review_service/packate_review:
+*   get:
+*     tags: [Review]
+*     summary: Get the package review
+*     parameters:
+*       - in: query
+*         name: page
+*         schema:
+*           type: integer
+*         description: Page number
+*       - in: query
+*         name: limit
+*         schema:
+*           type: integer
+*         description: Items per page
+*       - in: query
+*         name: packageId
+*         schema:
+*           type: string
+*         description: Search by packageId
+*     responses:
+*       200:
+*         description: et the package review successfully.
+*         content:
+*           application/json:
+*               schema:
+*                   $ref: '#/components/schemas/packageReviewResponse'
+*/
+router.get("/packate_review", reviewController.findPackageReview.bind(reviewController));
 
 export default router;

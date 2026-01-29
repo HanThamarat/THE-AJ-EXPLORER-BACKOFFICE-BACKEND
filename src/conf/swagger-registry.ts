@@ -1,5 +1,5 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
-import { reviewDTOSchema, reviewEntitySchema, reviewResponseSchema } from "../core/entity/review";
+import { packageReviwResponseSchema, reviewDTOSchema, reviewEntitySchema, reviewResponseSchema } from "../core/entity/review";
 
 export const zodSwaggerGeneratorRegistry = new OpenAPIRegistry();
 
@@ -7,6 +7,7 @@ export const zodSwaggerGeneratorRegistry = new OpenAPIRegistry();
 zodSwaggerGeneratorRegistry.register("reviewDTO", reviewDTOSchema);
 zodSwaggerGeneratorRegistry.register("reviewEntity", reviewEntitySchema);
 zodSwaggerGeneratorRegistry.register("myReviewResponse", reviewResponseSchema);
+zodSwaggerGeneratorRegistry.register("packageReviewResponse", packageReviwResponseSchema);
 
 export const generateZodComponent = () => {
     const generator = new OpenApiGeneratorV3(zodSwaggerGeneratorRegistry.definitions);

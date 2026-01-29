@@ -121,7 +121,17 @@ app.use('/api/v1/client/package', clientPackageRoutes);
 app.use('/api/v1/client/blog', clientBlogRoutes);
 app.use('/api/v1/client/bank_service', clientAuthMiddleware, clientBankRoutes);
 app.use('/api/v1/client/booking_service', clientAuthMiddleware, clientbookingRoutes);
-app.use('/api/v1/client/review_service', clientAuthMiddleware, clientReviewRoutes);
+app.use('/api/v1/client/review_service', (req, res, next) => {
+    if (req.path === '/packate_review' && req.method === "GET") {
+        express.json()(req, res, () => {
+            next();
+        });
+    } else {
+        express.json()(req, res, () => {
+            clientAuthMiddleware(req, res, next);
+        });
+    }
+}, clientReviewRoutes);
 app.use('/api/v1/client/voucher_service', (req, res, next) => {
     if (req.path === '/coupon_list' && req.method === 'GET') {
         express.json()(req, res, () => {

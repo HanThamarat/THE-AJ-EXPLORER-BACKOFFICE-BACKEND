@@ -36,3 +36,52 @@ export const reviewResponseSchema = z.object({
 
 export type reviewResponseType = z.infer<typeof reviewResponseSchema>;
 
+export const bookerInfoSchema = z.object({
+    bookerName: z.string(),
+    image: z.string(),
+});
+
+export type bookerInfoType = z.infer<typeof bookerInfoSchema>;
+
+export const packageReviewSchema = z.object({
+    title: z.string(),
+    sumary: z.string(),
+    ratingStar: z.number(),
+    created_at: z.union([z.string(), z.date()]),
+    booker: bookerInfoSchema
+});
+
+export type packageReviewType = z.infer<typeof packageReviewSchema>;
+
+export const packageReviewSearchParams = z.object({
+    packageid: z.number(),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).default(10),
+});
+
+export type packageReviewSearchType = z.infer<typeof packageReviewSearchParams>;
+
+export const reviewSQLStatementSchema = z.object({
+  title: z.string(),
+  samary: z.string(),
+  staff: z.number(),
+  cleanliness: z.number(),
+  location: z.number(), 
+  created_at: z.union([z.string(), z.date()]),
+  bookerimage: z.string().nullable(),
+  bookername: z.string(),
+});
+
+export type reviewSQLStatementType = z.infer<typeof reviewSQLStatementSchema>;
+
+export const packageReviwResponseSchema = z.object({
+    page: z.number().int(),
+    limit: z.number().int(),
+    total: z.number().int(),
+    totalPage: z.number().int(),
+    nextPage: z.number().int(),
+    prevPage: z.number().int(),
+    items: z.array(packageReviewSchema),
+});
+
+export type packageReviwResponseType = z.infer<typeof packageReviwResponseSchema>;
