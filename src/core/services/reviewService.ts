@@ -1,4 +1,4 @@
-import { reviewDTOType, reviewEntityType, reviewResponseType } from "../entity/review";
+import { packageReviewSearchType, packageReviwResponseType, reviewDTOType, reviewEntityType, reviewResponseType } from "../entity/review";
 import { ReviewRepositoryPort } from "../ports/reviewRepositoryPort";
 
 export class ReviewService {
@@ -10,5 +10,9 @@ export class ReviewService {
 
     findMyReviews(userId: string): Promise<reviewResponseType[]> {
         return this.reviewRepositoryPort.findMyReviews(userId);
+    }
+
+    findPackageReview(searchParams: packageReviewSearchType): Promise<packageReviwResponseType | null> {
+        return this.reviewRepositoryPort.findPackageReview(searchParams);
     }
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ReviewService } from "../../../core/services/reviewService";
 import { setErrResponse, setResponse } from "../../../hooks/response";
-import { reviewDTOType } from "../../../core/entity/review";
+import { packageReviewSearchType, reviewDTOType } from "../../../core/entity/review";
 import { Ecrypt } from "../../helpers/encrypt";
 
 export class ReviewController {
@@ -49,7 +49,7 @@ export class ReviewController {
 
             return setResponse({
                 res: res,
-                statusCode: 201,
+                statusCode: 200,
                 message: "Find my reviews successfully.",
                 body: response
             });
@@ -58,7 +58,35 @@ export class ReviewController {
                 res: res,
                 statusCode: 500,
                 message: "Find my reviews failed.",
-                error: error instanceof Error ? error.message : 'Create new review failed.'
+                error: error instanceof Error ? error.message : 'ind my reviews failed.'
+            });
+        }
+    }
+
+    async findPackageReview(req: Request, res: Response) {
+        try {
+            const { page, limit, packageId } = req.query;
+
+            const searchParams: packageReviewSearchType = {
+                page: Number(page) || 1,
+                limit: Number(limit) || 10,
+                packageid: Number(packageId)
+            };
+
+            const response =  await this.reviewService.findPackageReview(searchParams);
+
+            return setResponse({
+                res: res,
+                statusCode: 200,
+                message: "Find package review successfully.",
+                body: response
+            });
+        } catch (error) {
+            return setErrResponse({
+                res: res,
+                statusCode: 500,
+                message: "Find package review failed.",
+                error: error instanceof Error ? error.message : 'Create package review failed.'
             });
         }
     }

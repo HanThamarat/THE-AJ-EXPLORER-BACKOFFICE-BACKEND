@@ -1,4 +1,4 @@
-import { reviewDTOType, reviewEntityType, reviewResponseType } from "../../../core/entity/review";
+import { packageReviewSearchType, packageReviewType, packageReviwResponseType, reviewDTOType, reviewEntityType, reviewResponseType, reviewSQLStatementType } from "../../../core/entity/review";
 import { ReviewRepositoryPort } from "../../../core/ports/reviewRepositoryPort";
 import { imageEntity } from "../../../types/image";
 import { prisma } from "../../database/data-source";
@@ -97,49 +97,109 @@ export class ReviewDataSource implements ReviewRepositoryPort {
 
             if (myReview.length >= 5) break;
 
-            const review = await prisma.review.findFirst({
-                where: {
-                    bookingId: booking.bookingId as string
-                },
-                select: {
-                    id: true,
-                }
-            });
-            
-            if (!review) {
-                const mybook = await prisma.booking.findFirst({
+            if (booking.bookingId !== null) {
+                const review = await prisma.review.findFirst({
                     where: {
-                        bookingId: booking.bookingId as string,
-                        trip_at: {
-                            lte: currentDate,
-                        }
+                        bookingId: booking.bookingId as string
                     },
                     select: {
-                        bookingId: true,
-                        trip_at: true,
-                        ToPackage: {
-                            select: {
-                                packageName: true,
-                                packageImages: true,
-                            }
-                        }
+                        id: true,
                     }
                 });
-
-                if (mybook) {
-                    const image: imageEntity[] = JSON.parse(mybook.ToPackage.packageImages as string);
-                    const getImage: imageEntity = await Bucket.findFirstWithoutToken(image[0], FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);       
-
-                    myReview.push({
-                        bookingId: mybook.bookingId,
-                        packageName: mybook.ToPackage.packageName as string,
-                        trip_at: mybook.trip_at,
-                        image: getImage,
+                
+                if (!review) {
+                    const mybook = await prisma.booking.findFirst({
+                        where: {
+                            bookingId: booking.bookingId as string,
+                            trip_at: {
+                                lte: currentDate,
+                            }
+                        },
+                        select: {
+                            bookingId: true,
+                            trip_at: true,
+                            ToPackage: {
+                                select: {
+                                    packageName: true,
+                                    packageImages: true,
+                                }
+                            }
+                        }
                     });
+
+                    if (mybook) {
+                        const image: imageEntity[] = JSON.parse(mybook.ToPackage.packageImages as string);
+                        const getImage: imageEntity = await Bucket.findFirstWithoutToken(image[0], FILE_SCHEMA.PACKAGE_UPLOAD_IMAGE_PATH);       
+
+                        myReview.push({
+                            bookingId: mybook.bookingId,
+                            packageName: mybook.ToPackage.packageName as string,
+                            trip_at: mybook.trip_at,
+                            image: getImage,
+                        });
+                    }
                 }
             }
         }
 
         return myReview;
+    }
+
+    async findPackageReview(searchParams: packageReviewSearchType): Promise<packageReviwResponseType | null> {
+
+        if (!searchParams.packageid) throw new Error("Please enter a package id.");
+
+        const skip: number = (searchParams.page - 1) * searchParams.limit;
+        const take: number = searchParams.limit;
+
+        const recheckPackage = await prisma.packages.count({
+            where: {
+                status: true,
+                id: searchParams.packageid as number
+            }
+        });
+
+        if (recheckPackage === 0) throw new Error("Please recheck the package id, This package id don't have in the system.");
+
+        const [reviewResult, total] = await Promise.all([
+            prisma.$queryRaw`
+                select r.title, r.samary, r.staff, r.cleanliness, r."location", r.created_at, u.image as bookerImage, u."name" as bookerName
+                from ((("Booking" b inner join "Review" r on b."bookingId" = r."bookingId")
+                    inner join "ContractBooking" cb on b."ContractBookingId" = cb.id)
+                    inner join "User" u on cb."userId" = u.id)
+                where b."packageId" = ${searchParams.packageid}
+                order by r.created_at desc
+                offset ${skip} rows 
+                fetch next ${take} rows only
+            ` as any,
+            prisma.$queryRaw`select count(r.id) as total_reviews from "Booking" b inner join "Review" r on b."bookingId" = r."bookingId"` as any
+        ]);
+
+        const mapItemsResponse: packageReviewType[] = await Promise.all(reviewResult.map((item: reviewSQLStatementType) => {
+
+            const calstartAvg = ((item.cleanliness + item.location + item.staff) / 3).toFixed(1);
+
+            return {
+                title: item.title,
+                sumary: item.samary,
+                ratingStar: Number(calstartAvg),
+                created_at: item.created_at,
+                booker: {
+                    bookerName: item.bookername,
+                    image: item.bookerimage
+                }
+            }
+        }));
+        const totalReview = Number(total[0].total_reviews);
+
+        return {
+            page: searchParams.page,
+            limit: searchParams.limit,
+            total: totalReview,
+            totalPage: Math.ceil(totalReview / searchParams.limit),
+            nextPage: searchParams.page * searchParams.limit < totalReview ? searchParams.page + 1 : null,
+            prevPage: searchParams.page > 1 ? searchParams.page - 1 : null,
+            items: mapItemsResponse
+        } as packageReviwResponseType;
     }
 }
