@@ -10,6 +10,8 @@ export const geographyInitial = async () => {
         if (reheckInitail !== 0) return console.log('🚀 Geography Initialized.');
 
         await prisma.$transaction(async (tx) => {
+            await tx.$executeRawUnsafe(`SET LOCAL statement_timeout = '60min'`);
+
             for (const p of provinces) {
                 await tx.province.create({
                 data: {
