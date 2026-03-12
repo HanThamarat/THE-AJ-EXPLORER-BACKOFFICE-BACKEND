@@ -62,7 +62,7 @@ export class PkgTypeController {
 
     async findPkgTypeById(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.pkgTypeService.findPkgTypeByid(id);
 
@@ -85,7 +85,7 @@ export class PkgTypeController {
     async updatePkgType(req: Request, res: Response) {
         try {
             const { name, status } = req.body as PackageTypeBody;
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = userInfo?.id;
 
@@ -116,7 +116,7 @@ export class PkgTypeController {
 
     async deletePkgType(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.pkgTypeService.deletePkgType(id);
 

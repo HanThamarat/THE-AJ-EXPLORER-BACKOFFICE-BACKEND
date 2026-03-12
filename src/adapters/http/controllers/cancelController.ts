@@ -28,7 +28,7 @@ export class CancelController {
 
     async findCancelDetail(req: Request, res: Response) {
         try {
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
 
             const response = await this.cancelService.findCancelDetail(bookingId);
 
@@ -51,7 +51,7 @@ export class CancelController {
     async updateCancelStatus(req: Request, res: Response) {
         try {
             const { cancelStatus } = req.body as cancelDTOType;
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
 
             const DataDTO: cancelDTOType = { cancelStatus };
 

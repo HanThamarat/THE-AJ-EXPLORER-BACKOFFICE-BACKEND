@@ -1,7 +1,7 @@
 # -----------------------
 # 1️⃣ BUILD STAGE
 # -----------------------
-FROM node:lts-slim AS builder
+FROM node:24-slim AS builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ RUN npm prune --omit=dev
 # -----------------------
 # 2️⃣ RUN STAGE
 # -----------------------
-FROM node:lts-slim AS production
+FROM node:24-slim AS production
 
 # Set environment variables
 ARG PORT

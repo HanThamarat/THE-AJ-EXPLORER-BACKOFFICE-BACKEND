@@ -29,7 +29,7 @@ export class RefundController {
 
     async findRefundDetail(req: Request, res: Response) {
         try {
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
 
             const response = await this.refundService.findRefundDetail(bookingId);
 
@@ -51,7 +51,7 @@ export class RefundController {
 
     async updateRefund(req: Request, res: Response) {
         try {
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
             const { refundStatus } = req.body as refundDTOType;
 
             const dataDTO: refundDTOType = { refundStatus };

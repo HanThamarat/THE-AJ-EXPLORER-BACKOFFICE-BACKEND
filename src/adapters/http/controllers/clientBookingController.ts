@@ -81,7 +81,7 @@ export class BookingContorller {
     async findBookingDetail(req: Request, res: Response) {
         try {
             
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
             const userInfo = await Ecrypt.JWTClientDecrypt(req);
             const userId = userInfo?.id;
 
@@ -105,7 +105,7 @@ export class BookingContorller {
 
     async getBookConfirmation(req: Request, res: Response) {
         try {
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
             const userInfo = await Ecrypt.JWTClientDecrypt(req);
             const userId = userInfo?.id;
 

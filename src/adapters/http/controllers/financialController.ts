@@ -28,7 +28,7 @@ export class FinancialController {
 
     async findChargesById(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.financialService.findChargesById(id);
 

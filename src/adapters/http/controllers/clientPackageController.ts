@@ -58,7 +58,7 @@ export class ClientPackageController {
 
     async findPackageDetail(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.clientPackagService.findPackageDetail(Number(id));
 
