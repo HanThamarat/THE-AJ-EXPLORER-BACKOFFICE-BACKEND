@@ -27,7 +27,7 @@ export class GeolocatController {
 
     async findDistrictByProId(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.geolocatService.findDistrictByProId(id);
 

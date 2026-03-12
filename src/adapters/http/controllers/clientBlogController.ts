@@ -35,7 +35,7 @@ export class ClientBlogController {
 
     async findBlogDetail(req: Request, res: Response) {
         try {
-            const { blogId } = req.params;
+            const { blogId } = req.params as { blogId: string };
 
             const response = await this.clientBlogService.findBlogDetail(blogId);
 

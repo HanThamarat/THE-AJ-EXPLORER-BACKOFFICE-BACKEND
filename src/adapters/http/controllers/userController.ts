@@ -61,7 +61,7 @@ export class UserController {
 
     async findUserById(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const user = await this.userService.findUserById(id);
 
@@ -107,7 +107,7 @@ export class UserController {
     async updateUser(req: Request, res: Response) {
         try {
             const { firstName, lastName, email, username, password, roleId, currentPassword } = req.body as UserUpdateBody;
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             
             const userDraf : userDTO =  {
                 firstName: firstName,
@@ -141,7 +141,7 @@ export class UserController {
 
     async deleteUser(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const userDelete = await this.userService.delete(id);
 

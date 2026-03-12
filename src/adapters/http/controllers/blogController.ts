@@ -71,7 +71,7 @@ export class BlogController {
 
     async findBlogById(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.blogService.findBlogById(req, id);
             
@@ -93,7 +93,7 @@ export class BlogController {
 
     async updateBlog(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const { title, thumnbnail, descrition, status, blogType } = req.body as BlogUpdateBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId =  Number(userInfo?.id);
@@ -135,7 +135,7 @@ export class BlogController {
 
     async deleteBlog(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.blogService.deleteBlog(id);
 

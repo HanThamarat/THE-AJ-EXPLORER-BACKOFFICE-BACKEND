@@ -70,7 +70,7 @@ export class PromoController {
 
     async findPromoById(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.promoService.findById(id);
 
@@ -92,7 +92,7 @@ export class PromoController {
 
     async updatePromo(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const { promoName, startDate, endDate, status, PromoLink, type, couponCode, description } = req.body as PromotionUpdateBody;
             const userInfo = await Ecrypt.JWTDecrypt(req);
             const userId = await userInfo?.id;
@@ -135,7 +135,7 @@ export class PromoController {
 
     async deletePromo(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.promoService.delete(id);
 

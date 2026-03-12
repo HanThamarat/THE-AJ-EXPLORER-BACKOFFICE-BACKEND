@@ -148,7 +148,7 @@ export class PackageController {
 
     async findPackageByid(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.packageService.findPackageById(id, req);
 
@@ -173,7 +173,7 @@ export class PackageController {
             let fileBufferArr: any[] = [];
             let imageInBucket: packageImageSave[] = [];
             const axios = await AxiosInstanceMultipart(req);
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const { packageName, packageTypeId, description, additional_description, provinceId, districtId, subDistrictId, depart_point_lat, depart_point_lon,  end_point_lat, end_point_lon, status, packageImage, packageOption, benefit_include, benefit_not_include, attraction } = req.body as PackageRequestBody;
            
             const packageOptionArr: packageOptionDTO[] = packageOption.map((data: packageOptionDTO) => ({
@@ -290,7 +290,7 @@ export class PackageController {
 
     async deletePacakge(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
 
             const response = await this.packageService.deletePackage(id);
 

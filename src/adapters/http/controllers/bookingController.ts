@@ -28,7 +28,7 @@ export class BkController {
 
     async findBookingAvg(req: Request, res: Response) {
         try {
-            const { type } = req.params;
+            const { type } = req.params as { type: string };
 
             const response = await this.bkService.findBookingAvg(type as "Weekly" | "Monthly" | "Yearly");
 
@@ -50,7 +50,7 @@ export class BkController {
 
     async findBookingDetail(req: Request, res: Response) {
         try {
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
 
             const response = await this.bkService.findBookingDetail(bookingId);
 
@@ -72,7 +72,7 @@ export class BkController {
 
     async updateBookingStatus(req: Request, res: Response) {
         try {
-            const { bookingId, bookingStatus } = req.params;
+            const { bookingId, bookingStatus } = req.params as { bookingId: string, bookingStatus: string };
 
             const response = await this.bkService.updateBookingStatus(bookingId, bookingStatus as  "panding" | "confirmed" | "failed");
 
@@ -94,7 +94,7 @@ export class BkController {
 
     async updateBookingDetail(req: Request, res: Response) {
         try {
-            const { bookingId } = req.params;
+            const { bookingId } = req.params as { bookingId: string };
             const { firstName, lastName, phoneNumber, pickupLocation, specialRequirement, email, trip_at, country } = req.body as bookingDetailDTOType;
 
             const dataDTO: bookingDetailDTOType = {
